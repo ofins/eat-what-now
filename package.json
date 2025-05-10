@@ -2,7 +2,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "build": "tsc",
-    "dev": "nodemon src/server.ts",
+    "dev": "nodemon --watch src --exec ts-node src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tsc --noEmit && eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
@@ -17,7 +17,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "pg-promise": "^11.13.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
