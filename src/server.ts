@@ -1,21 +1,20 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
-import pgPromise from 'pg-promise';
 import feedRouter from './feed/feed.router';
 
 dotenv.config();
 
-const pgp = pgPromise();
-const db = pgp(process.env.DATABASE_URL!);
+// const pgp = pgPromise();
+// const db = pgp(process.env.DATABASE_URL || '');
 
-db.one('SELECT NOW() AS current_time')
-  .then((data) => {
-    console.log('Connection successful:', data.current_time);
-  })
-  .catch((error) => {
-    console.error('Connection failed:', error);
-  });
+// db.one('SELECT NOW() AS current_time')
+//   .then((data) => {
+//     console.log('Connection successful:', data.current_time);
+//   })
+//   .catch((error) => {
+//     console.error('Connection failed:', error);
+//   });
 
 const app = express();
 
