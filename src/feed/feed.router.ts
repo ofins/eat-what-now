@@ -1,11 +1,12 @@
 import express from 'express';
 import { RestaurantService } from '../db/restaurant';
+import { authenticateAPIKey } from '../middleware/auth';
 
 const router = express.Router();
 
 const restaurant = new RestaurantService();
 
-router.get('/', (req, res) => {
+router.get('/', authenticateAPIKey, (req, res) => {
   const { lon, lat } = req.query;
 
   // query based on location
