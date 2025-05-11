@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import cron from 'node-cron';
 import pgPromise, { IDatabase } from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
 import {
@@ -28,6 +29,12 @@ export class RestaurantService {
 
     this.db = pgp(this.config.connectionString);
     this.initializeDatabase();
+    this.createRestaurantDailyFeed();
+
+    cron.schedule('0 0 * * *', async () => {
+      console.log('Running daily restaurant shuffle...');
+      this.shuffleRestaurantDailyFeed();
+    });
   }
 
   private async initializeDatabase(): Promise<void> {
@@ -139,7 +146,12 @@ export class RestaurantService {
       }
 
       // Build query based on provided filters
-      let query = 'SELECT * FROM restaurants WHERE 1=1';
+      let query = `
+      SELECT r.*
+      FROM restaurant_daily_feed f
+      JOIN restaurants r on r.id = f.restaurant_id
+      WHERE f.date = current_date
+    `;
       const params: unknown[] = [];
       let paramIndex = 1;
 
@@ -147,16 +159,16 @@ export class RestaurantService {
       if (longitude !== undefined && latitude !== undefined) {
         // Use Haversine formula to calculate distance
         query += `
-          AND (
-            6371 * acos(
-              cos(radians($${paramIndex++})) * 
-              cos(radians(latitude)) * 
-              cos(radians(longitude) - radians($${paramIndex++})) + 
-              sin(radians($${paramIndex++})) * 
-              sin(radians(latitude))
-            )
-          ) <= $${paramIndex++}
-        `;
+        AND (
+          6371 * acos(
+            cos(radians($${paramIndex++})) * 
+            cos(radians(latitude)) * 
+            cos(radians(longitude) - radians($${paramIndex++})) + 
+            sin(radians($${paramIndex++})) * 
+            sin(radians(latitude))
+          )
+        ) <= $${paramIndex++}
+      `;
         params.push(latitude, longitude, latitude, radius);
       }
 
@@ -175,10 +187,10 @@ export class RestaurantService {
         params.push(minRating);
       }
 
-      // Add sorting and pagination
-      // query += ' ORDER BY rating DESC';
-      query += ' ORDER BY md5(id::text || current_date::text)';
+      // Explicit ordering by primary key: date and position
+      query += ' ORDER BY f.position';
 
+      // Add pagination
       if (limit > 0) {
         query += ` LIMIT $${paramIndex++}`;
         params.push(limit);
@@ -189,6 +201,7 @@ export class RestaurantService {
         params.push(offset);
       }
 
+      // Execute the query and return the results
       return await this.db.any<IRestaurant>(query, params);
     } catch (error) {
       console.error('Error fetching restaurants:', error);
@@ -357,6 +370,34 @@ export class RestaurantService {
     } catch (error) {
       console.error('Error closing database connection:', error);
       throw error;
+    }
+  }
+
+  async createRestaurantDailyFeed() {
+    await this.db.none(`
+      CREATE TABLE IF NOT EXISTS restaurant_daily_feed (
+      date DATE NOT NULL,
+      position INT NOT NULL,
+      restaurant_id INTEGER NOT NULL,
+      PRIMARY KEY (date, position),
+      FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
+    );
+      `);
+  }
+
+  async shuffleRestaurantDailyFeed(): Promise<void> {
+    try {
+      await this.db.none(
+        `DELETE FROM restaurant_daily_feed WHERE date = current_date`
+      );
+      await this.db.none(`
+        INSERT INTO restaurant_daily_feed (date, position, restaurant_id)
+        SELECT current_date, row_number() OVER (ORDER BY RANDOM()), id
+        FROM restaurants
+        ORDER BY RANDOM();
+      `);
+    } catch (error) {
+      console.error(`Error inserting daily feed:`, error);
     }
   }
 
