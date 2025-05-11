@@ -1,8 +1,8 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
-import './cron';
 import feedRouter from './feed/feed.router';
+import { swaggerUiHandler, swaggerUiSetup } from './swagger';
 
 dotenv.config();
 
@@ -10,6 +10,7 @@ const app = express();
 
 const port = process.env.PORT || 3000;
 
+app.use('/docs', swaggerUiHandler, swaggerUiSetup);
 app.use(cors());
 app.use(express.json());
 
