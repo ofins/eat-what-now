@@ -83,7 +83,7 @@ router.get('/', authenticateAPIKey, (req, res) => {
       limit: parseFloat(limit as string),
       offset: parseFloat(offset as string),
     })
-    .then((data) => res.send({ data }))
+    .then((data) => res.send(data))
     .catch((error) => {
       console.log(`Error fetching restaurants:${error}`);
       res.status(500).send({ error: 'Internal Server Error' });

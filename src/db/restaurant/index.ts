@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import cron from 'node-cron';
 import pgPromise, { IDatabase } from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
+import { PaginatedResponse, paginateResponse } from '../../utils/pagination';
 import {
   CreateRestaurantData,
   IRestaurant,
@@ -121,7 +122,7 @@ export class RestaurantService {
    */
   async getRestaurants(
     options: RestaurantFilterOptions = {}
-  ): Promise<IRestaurant[]> {
+  ): Promise<PaginatedResponse<IRestaurant>> {
     try {
       // Validate inputs
       const {
@@ -187,10 +188,8 @@ export class RestaurantService {
         params.push(minRating);
       }
 
-      // Explicit ordering by primary key: date and position
       query += ' ORDER BY f.position';
 
-      // Add pagination
       if (limit > 0) {
         query += ` LIMIT $${paramIndex++}`;
         params.push(limit);
@@ -201,8 +200,20 @@ export class RestaurantService {
         params.push(offset);
       }
 
-      // Execute the query and return the results
-      return await this.db.any<IRestaurant>(query, params);
+      const data = await this.db.any<IRestaurant>(query, params);
+      const total = await this.db.one(
+        'SELECT COUNT(*) FROM restaurants',
+        [],
+        (row) => +row.count
+      );
+
+      return paginateResponse<IRestaurant>(
+        data,
+        total,
+        // todo: doesn't seem like the best solution but it works
+        Number.isInteger(limit) ? limit : 10,
+        Number.isInteger(offset) ? offset : 0
+      );
     } catch (error) {
       console.error('Error fetching restaurants:', error);
       throw error;
