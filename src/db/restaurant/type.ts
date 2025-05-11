@@ -8,7 +8,7 @@ export interface IRestaurant {
 
   address: string;
   cuisine_type: string;
-  price_range: string;
+  price_range: number;
   rating: number;
   created_at: Date;
   updated_at: Date;
@@ -34,7 +34,7 @@ export interface CreateRestaurantData {
   name: string;
   address: string;
   cuisine_type: string;
-  price_range: string;
+  price_range: number;
   rating: number;
   longitude: number;
   latitude: number;
@@ -49,7 +49,7 @@ export interface UpdateRestaurantData {
   name?: string;
   address?: string;
   cuisine_type?: string;
-  price_range?: string;
+  price_range?: number;
   rating?: number;
   longitude?: number;
   latitude?: number;

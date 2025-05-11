@@ -7,13 +7,27 @@ const router = express.Router();
 const restaurant = new RestaurantService();
 
 router.get('/', authenticateAPIKey, (req, res) => {
-  const { lon, lat } = req.query;
+  const {
+    longitude,
+    latitude,
+    radius,
+    cuisineType,
+    priceRange,
+    minRating,
+    limit,
+    offset,
+  } = req.query;
 
-  // query based on location
   restaurant
     .getRestaurants({
-      longitude: lon as unknown as number,
-      latitude: lat as unknown as number,
+      longitude: parseFloat(longitude as string),
+      latitude: parseFloat(latitude as string),
+      radius: parseFloat(radius as string), // Default 5km radius
+      cuisineType: typeof cuisineType === 'string' ? cuisineType : undefined,
+      priceRange: priceRange === 'string' ? priceRange : undefined,
+      minRating: parseFloat(minRating as string),
+      limit: parseFloat(limit as string),
+      offset: parseFloat(offset as string),
     })
     .then((data) => res.send({ data }))
     .catch((error) => {

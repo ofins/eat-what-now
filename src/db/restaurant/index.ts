@@ -71,7 +71,7 @@ export class RestaurantService {
           name VARCHAR(255) NOT NULL,
           address TEXT NOT NULL,
           cuisine_type VARCHAR(100) NOT NULL,
-          price_range VARCHAR(50) NOT NULL,
+          price_range DECIMAL(3, 2) NOT NULL CHECK (price_range >= 0 AND price_range <= 5),
           rating DECIMAL(3, 2) NOT NULL CHECK (rating >= 0 AND rating <= 5),
           longitude DECIMAL(11, 8) NOT NULL,
           latitude DECIMAL(10, 8) NOT NULL,
@@ -176,7 +176,8 @@ export class RestaurantService {
       }
 
       // Add sorting and pagination
-      query += ' ORDER BY rating DESC';
+      // query += ' ORDER BY rating DESC';
+      query += ' ORDER BY md5(id::text || current_date::text)';
 
       if (limit > 0) {
         query += ` LIMIT $${paramIndex++}`;
@@ -377,8 +378,8 @@ export class RestaurantService {
       throw new Error('Cuisine type is required');
     }
 
-    if (!data.price_range || data.price_range.trim().length === 0) {
-      throw new Error('Price range is required');
+    if (!data.price_range || data.price_range < 0 || data.price_range > 5) {
+      throw new Error('Price range must be between 0 and 5');
     }
 
     if (data.rating < 0 || data.rating > 5) {
