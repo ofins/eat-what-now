@@ -9,6 +9,60 @@ export class FeedController {
     @inject('RestaurantService') private restaurantService: RestaurantService
   ) {}
 
+  /**
+   * @openapi
+   * /feed:
+   *   get:
+   *     tags:
+   *       - Restaurants
+   *     summary: Get a list of restaurants
+   *     security:
+   *       - ApiKeyAuth: []
+   *     parameters:
+   *       - in: query
+   *         name: longitude
+   *         schema:
+   *           type: integer
+   *         description: longitude
+   *       - in: query
+   *         name: latitude
+   *         schema:
+   *           type: integer
+   *         description: latitude
+   *       - in: query
+   *         name: radius
+   *         schema:
+   *           type: integer
+   *         description: default 5km
+   *       - in: query
+   *         name: cuisineType
+   *         schema:
+   *           type: integer
+   *         description: e.g. Italian
+   *       - in: query
+   *         name: priceRange
+   *         schema:
+   *           type: integer
+   *         description: price range from 1 to 5 (least to greatest)
+   *       - in: query
+   *         name: minRating
+   *         schema:
+   *           type: integer
+   *         description: range from 1 to 5 (least to greatest)
+   *       - in: query
+   *         name: limit
+   *         schema:
+   *           type: integer
+   *         description:
+   *       - in: query
+   *         name: offset
+   *         schema:
+   *           type: integer
+   *         description:
+   *     responses:
+   *       200:
+   *         description: A list of restaurants
+   */
   getRestaurants = (req: Request, res: Response) => {
     const {
       longitude,
@@ -32,7 +86,10 @@ export class FeedController {
         limit: parseFloat(limit as string),
         offset: parseFloat(offset as string),
       })
-      .then((data) => res.send(data))
+      .then((data) => {
+        console.log('fetched restaurants');
+        res.send(data);
+      })
       .catch((error) => {
         console.log(`Error fetching restaurants:${error}`);
         res.status(500).send({ error: 'Internal Server Error' });

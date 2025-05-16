@@ -35,6 +35,7 @@ export class RestaurantService {
     this.db = pgp(this.config.connectionString);
     this.initializeDatabase();
     this.createRestaurantDailyFeed();
+    this.shuffleRestaurantDailyFeed();
 
     cron.schedule('0 0 * * *', async () => {
       console.log('Running daily restaurant shuffle...');
@@ -203,6 +204,8 @@ export class RestaurantService {
         query += ` OFFSET $${paramIndex++}`;
         params.push(offset);
       }
+
+      console.log(query);
 
       const data = await this.db.any<IRestaurant>(query, params);
       const total = await this.db.one(
@@ -402,9 +405,7 @@ export class RestaurantService {
 
   async shuffleRestaurantDailyFeed(): Promise<void> {
     try {
-      await this.db.none(
-        `DELETE FROM restaurant_daily_feed WHERE date = current_date`
-      );
+      await this.db.none(`DELETE FROM restaurant_daily_feed;`);
       await this.db.none(`
         INSERT INTO restaurant_daily_feed (date, position, restaurant_id)
         SELECT current_date, row_number() OVER (ORDER BY RANDOM()), id
