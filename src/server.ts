@@ -1,7 +1,9 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
-import feedRouter from './feed/feed.router';
+import 'reflect-metadata';
+import { container } from 'tsyringe';
+import { FeedController } from './feed/feed.controller';
 import { swaggerUiHandler, swaggerUiSetup } from './swagger';
 
 dotenv.config();
@@ -14,7 +16,9 @@ app.use('/docs', swaggerUiHandler, swaggerUiSetup);
 app.use(cors());
 app.use(express.json());
 
-app.use('/feed', feedRouter);
+const feedController = container.resolve(FeedController);
+
+app.use('/feed', feedController.getRestaurants);
 
 app.get('/api/test', (req: Request, res: Response) => {
   res.json({ message: 'CORS is working!' });

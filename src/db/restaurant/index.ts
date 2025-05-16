@@ -2,6 +2,8 @@ import dotenv from 'dotenv';
 import cron from 'node-cron';
 import pgPromise, { IDatabase } from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
+import { injectable } from 'tsyringe';
+import '../../container';
 import { PaginatedResponse, paginateResponse } from '../../utils/pagination';
 import {
   CreateRestaurantData,
@@ -14,6 +16,8 @@ import {
 dotenv.config();
 
 const tableName = 'restaurants';
+
+@injectable()
 export class RestaurantService {
   private db: IDatabase<unknown, IClient>;
   private readonly config: Required<RestaurantServiceConfig>;
