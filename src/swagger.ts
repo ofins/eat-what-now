@@ -14,7 +14,7 @@ const options = {
         ApiKeyAuth: {
           type: 'apiKey',
           in: 'header',
-          name: 'x-api-key',
+          name: 'x-signature',
         },
       },
     },
