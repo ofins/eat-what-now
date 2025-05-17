@@ -2,11 +2,13 @@
 
 - use absolute path instead of relative path
 - add `todo.md` and `notes.md`
+- test docker compose locally
 
 Issue encountered:
 
 1. changing `tsconfig.json` settings alone is not allowing me to use absolute path. This is because it lets typescript recognize absolute time during development time, but node.js will not understand these aliases.
    1. solution: install `tsc-alias` to help convert absolute path to relative path after typescript compilation.
+2. Docker compose up is throwing errors of DI: `unable to inject restaurantService` into `FeedController`.
 
 ### 16th
 

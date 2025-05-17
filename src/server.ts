@@ -1,7 +1,8 @@
+import 'reflect-metadata';
+
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
-import 'reflect-metadata';
 import { container } from 'tsyringe';
 import { FeedController } from './feed/feed.controller';
 import { authenticateAPIKey } from './middleware/auth';

@@ -12,7 +12,7 @@ services:
     volumes:
       - .:/usr/src
       # - /usr/src/node_modules # avoid overwriting node_modules
-    command: npm run dev
+    command: npm run start
 
   db:
     image: postgres:16

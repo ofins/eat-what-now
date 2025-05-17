@@ -1,11 +1,16 @@
 # To-Do List
 
+## Bug Issues
+
+- [ ] Docker compose up throwing DI error (5.17.2025)
+
 ## Backend Development
 
 - [ ] Setup Logger for API and DB
 - [ ] Add unit testing
 - [ ] Setup CI/CD pipeline in Github Actions
 - [ ] Implement error handling middleware
+- [ ] Implement Type-ORM
 
 # Database Tasks
 
