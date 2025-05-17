@@ -3,7 +3,7 @@ import cron from 'node-cron';
 import pgPromise, { IDatabase } from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
 import { injectable } from 'tsyringe';
-import '../../container';
+import '../../di/di.container';
 import { PaginatedResponse, paginateResponse } from '../../utils/pagination';
 import {
   CreateRestaurantData,

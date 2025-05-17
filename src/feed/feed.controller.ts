@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 import { inject, injectable } from 'tsyringe';
-import '../container';
 import { RestaurantService } from '../db/restaurant';
+import '../di/di.container';
+import { InjectionTokensEnum } from '../di/enums/injection-tokens.enum';
 
 @injectable()
 export class FeedController {
   constructor(
-    @inject('RestaurantService') private restaurantService: RestaurantService
+    @inject(InjectionTokensEnum.RESTAURANT_SERVICE)
+    private restaurantService: RestaurantService
   ) {}
 
   /**
