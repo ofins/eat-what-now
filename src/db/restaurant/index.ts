@@ -2,9 +2,9 @@ import dotenv from 'dotenv';
 import cron from 'node-cron';
 import pgPromise, { IDatabase } from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
+import 'src/di/di.container';
+import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 import { injectable } from 'tsyringe';
-import '../../di/di.container';
-import { PaginatedResponse, paginateResponse } from '../../utils/pagination';
 import {
   CreateRestaurantData,
   IRestaurant,
