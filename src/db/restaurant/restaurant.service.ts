@@ -11,7 +11,8 @@ import {
   RestaurantFilterOptions,
   RestaurantServiceConfig,
   UpdateRestaurantData,
-} from './type';
+} from './restaurant.type';
+import restaurantData from './seed';
 
 dotenv.config();
 
@@ -33,10 +34,12 @@ export class RestaurantService {
     const pgp = pgPromise();
 
     this.db = pgp(this.config.connectionString);
-    this.initializeDatabase().then(() => {
-      this.createRestaurantDailyFeed();
-      this.shuffleRestaurantDailyFeed();
-    });
+    this.initializeDatabase()
+      .then(() => this.createRestaurantDailyFeed())
+      .then(() => this.shuffleRestaurantDailyFeed())
+      .catch((error) => {
+        console.error('Error initializing database:', error);
+      });
 
     cron.schedule('0 0 * * *', async () => {
       console.log('Running daily restaurant shuffle...');
@@ -79,6 +82,7 @@ export class RestaurantService {
 
   private async createRestaurantsTable(): Promise<void> {
     try {
+      // Create table with schema
       await this.db.none(`
         CREATE TABLE IF NOT EXISTS ${tableName} (
           id SERIAL PRIMARY KEY,
@@ -93,31 +97,60 @@ export class RestaurantService {
           contact_info TEXT,
           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-        );
-        
-        CREATE INDEX IF NOT EXISTS idx_restaurants_location ON restaurants (longitude, latitude);
-        CREATE INDEX IF NOT EXISTS idx_restaurants_cuisine ON restaurants (cuisine_type);
-        CREATE INDEX IF NOT EXISTS idx_restaurants_rating ON restaurants (rating);
+        )
+      `);
 
-        INSERT INTO ${tableName} (
-            name, address, cuisine_type, price_range, rating, longitude, latitude, open_hours, contact_info, created_at, updated_at
-          ) VALUES
-          ('The Gourmet Spot', '123 Main St, Cityville', 'Italian', 4.50, 4.80, -73.935242, 40.730610, 'Mon-Sun: 10am-10pm', '123-456-7890', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('Sushi Haven', '456 Elm St, Townsville', 'Japanese', 3.75, 4.50, -118.243683, 34.052235, 'Mon-Sun: 11am-11pm', '987-654-3210', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('Taco Fiesta', '789 Oak St, Villagetown', 'Mexican', 2.50, 4.20, -95.369804, 29.760427, 'Mon-Sat: 9am-9pm', '555-123-4567', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('Burger Bliss', '321 Pine St, Hamletville', 'American', 3.00, 4.00, -122.419418, 37.774929, 'Mon-Sun: 8am-8pm', '444-567-8901', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('Curry Delight', '654 Maple St, Boroughcity', 'Indian', 4.00, 4.70, -80.191788, 25.761681, 'Mon-Sun: 12pm-10pm', '333-678-9012', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('Dragon Wok', '987 Cedar St, Metropolis', 'Chinese', 3.25, 4.30, -77.036873, 38.907192, 'Mon-Sun: 10am-9pm', '222-789-0123', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('Pizza Paradise', '159 Birch St, Urbanville', 'Italian', 3.50, 4.60, -71.058880, 42.360081, 'Mon-Sun: 11am-11pm', '111-890-1234', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('Vegan Vibes', '753 Spruce St, Greentown', 'Vegan', 4.25, 4.90, -104.990250, 39.739236, 'Mon-Sun: 9am-9pm', '666-901-2345', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('Seafood Shack', '852 Willow St, Coastcity', 'Seafood', 4.75, 4.85, -122.676483, 45.523064, 'Mon-Sun: 12pm-10pm', '777-012-3456', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('BBQ Barn', '951 Aspen St, Ranchville', 'BBQ', 3.75, 4.40, -97.743057, 30.267153, 'Mon-Sun: 10am-10pm', '888-123-4567', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-              `);
-      console.log('Restaurants table created successfully');
+      // Create indexes separately
+      await this.db.none(`
+        CREATE INDEX IF NOT EXISTS idx_${tableName}_location ON ${tableName} (longitude, latitude);
+        CREATE INDEX IF NOT EXISTS idx_${tableName}_cuisine ON ${tableName} (cuisine_type);
+        CREATE INDEX IF NOT EXISTS idx_${tableName}_rating ON ${tableName} (rating);
+      `);
+
+      // Check if data already exists before inserting
+      const existingData = await this.db.oneOrNone(
+        `SELECT COUNT(*) FROM ${tableName}`
+      );
+      if (existingData && parseInt(existingData.count) > 0) {
+        console.log(
+          'Restaurants table already contains data, skipping seed data insertion'
+        );
+        return;
+      }
+      // Seed data in a separate method for better organization
+      await this.seedRestaurantsData(tableName);
+
+      console.log('Restaurants table created and seeded successfully');
     } catch (error) {
       console.error('Failed to create restaurants table:', error);
       throw error;
     }
+  }
+
+  private async seedRestaurantsData(tableName: string): Promise<void> {
+    const data = restaurantData;
+
+    // Use a transaction for bulk insert
+    this.db.tx(async (t) => {
+      const queries = data.map((restaurant) => {
+        return t.none(
+          `
+          INSERT INTO ${tableName} (
+            name, address, cuisine_type, price_range, rating, 
+            longitude, latitude, open_hours, contact_info, 
+            created_at, updated_at
+          ) VALUES (
+            $<name>, $<address>, $<cuisine_type>, $<price_range>, $<rating>,
+            $<longitude>, $<latitude>, $<open_hours>, $<contact_info>,
+            CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+          )
+        `,
+          restaurant
+        );
+      });
+
+      return t.batch(queries);
+    });
   }
 
   async getRestaurantById(id: number) {

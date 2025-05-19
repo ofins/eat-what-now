@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { inject, injectable } from 'tsyringe';
-import { RestaurantService } from '../db/restaurant';
+import { RestaurantService } from '../db/restaurant/restaurant.service';
 import '../di/di.container';
 import { InjectionTokensEnum } from '../di/enums/injection-tokens.enum';
 

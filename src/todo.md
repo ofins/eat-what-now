@@ -2,7 +2,7 @@
 
 ## Bug Issues
 
-- [x] Docker compose up throwing DI error (5.17.2025)
+- [ ] Docker compose up throwing error (5.17.2025)
 
 ## Backend Development
 
@@ -10,7 +10,7 @@
 - [ ] Add unit testing
 - [ ] Setup CI/CD pipeline in Github Actions
 - [ ] Implement error handling middleware
-- [ ] Implement Type-ORM
+- [ ] Implement Type-ORM?
 
 # Database Tasks
 

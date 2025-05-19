@@ -20,7 +20,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: eatwhatnow_dev
+      POSTGRES_DB: my_database
     ports:
       - '5432:5432'
     volumes:
