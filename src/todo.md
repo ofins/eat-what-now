@@ -2,7 +2,7 @@
 
 ## Bug Issues
 
-- [ ] Docker compose up throwing DI error (5.17.2025)
+- [x] Docker compose up throwing DI error (5.17.2025)
 
 ## Backend Development
 
