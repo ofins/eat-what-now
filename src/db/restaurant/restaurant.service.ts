@@ -1,4 +1,9 @@
 import dotenv from 'dotenv';
+import {
+  DEFAULT_LIMIT,
+  DEFAULT_RADIUS_KM,
+  MAX_SEARCH_RADIUS,
+} from 'src/config';
 import cron from 'node-cron';
 import pgPromise, { IDatabase } from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
@@ -24,8 +29,8 @@ export class RestaurantService {
   private readonly config: Required<RestaurantServiceConfig>;
   private readonly defaultConfig: Required<RestaurantServiceConfig> = {
     connectionString: process.env.DATABASE_URL || '',
-    maxSearchRadius: 25, // kilometers
-    defaultLimit: 20,
+    maxSearchRadius: MAX_SEARCH_RADIUS,
+    defaultLimit: DEFAULT_LIMIT,
   };
 
   constructor(config: RestaurantServiceConfig = {}) {
@@ -181,7 +186,7 @@ export class RestaurantService {
       const {
         longitude,
         latitude,
-        radius = 5, // Default 5km radius
+        radius = DEFAULT_RADIUS_KM,
         cuisineType,
         priceRange,
         minRating = 0,
@@ -252,8 +257,6 @@ export class RestaurantService {
         query += ` OFFSET $${paramIndex++}`;
         params.push(offset);
       }
-
-      console.log(query);
 
       const data = await this.db.any<IRestaurant>(query, params);
       const total = await this.db.one(

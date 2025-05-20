@@ -89,7 +89,6 @@ export class FeedController {
         offset: parseFloat(offset as string),
       })
       .then((data) => {
-        console.log('fetched restaurants');
         res.send(data);
       })
       .catch((error) => {

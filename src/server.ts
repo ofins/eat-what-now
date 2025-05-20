@@ -1,15 +1,14 @@
 import 'reflect-metadata';
 
 import cors from 'cors';
-import dotenv from 'dotenv';
+import { validateEnv } from './config';
 import express, { Request, Response } from 'express';
-import { container } from 'tsyringe';
-import { FeedController } from './feed/feed.controller';
-import { authenticateAPIKey } from './middleware/auth';
+import feedRouter from './feed/feed.router';
 import { swaggerUiHandler, swaggerUiSetup } from './swagger';
 import { serveMarkdownFile } from './utils/file';
 
-dotenv.config();
+// Validate environment variables at startup
+validateEnv();
 
 const app = express();
 
@@ -19,9 +18,7 @@ app.use('/docs', swaggerUiHandler, swaggerUiSetup);
 app.use(cors());
 app.use(express.json());
 
-const feedController = container.resolve(FeedController);
-
-app.use('/feed', authenticateAPIKey, feedController.getRestaurants);
+app.use('/feed', feedRouter);
 
 app.get('/notes', async (_, res: Response) => {
   await serveMarkdownFile('src/notes.md', res);
