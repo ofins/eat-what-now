@@ -10,12 +10,14 @@
 - [ ] Add unit testing
 - [ ] Setup CI/CD pipeline in Github Actions
 - [ ] Implement error handling middleware
-- [ ] Implement Type-ORM?
+- [x] Implement Type-ORM
 
 # Database Tasks
 
 - [ ] Optimize PostGIS queries for location-based searches
 - [ ] Create database backup script
+- [ ] Implement initial DB data with migration
+- [x] Setup migrations
 - [x] Initialize PostgreSQL database
 
 ## Documentation

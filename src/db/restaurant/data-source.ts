@@ -1,6 +1,9 @@
+import dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
 import { Restaurant } from './entities/restaurant.entity';
 import { RestaurantDailyFeed } from './entities/restaurantDailyFeed.entity';
+
+dotenv.config();
 
 export const RestaurantDataSource = new DataSource({
   type: 'postgres',
@@ -9,13 +12,13 @@ export const RestaurantDataSource = new DataSource({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  synchronize: true,
+  synchronize: false,
   logging: false,
   entities: [
     __dirname + '/entities/*.{ts,js}',
     Restaurant,
     RestaurantDailyFeed,
   ],
-  migrations: [__dirname + '/migrations/*.{ts,js}'],
+  migrations: ['src/migrations/**/*.{ts,js}'],
   subscribers: [],
 });

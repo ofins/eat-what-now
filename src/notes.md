@@ -1,3 +1,17 @@
+### 21th
+
+- setup migrations for initial table data
+
+Issue encountered:
+
+1. Unable to run migrations due to TypeORM CLI not being able to find my `data-source.ts` file at specified path.
+   1. Using the command `ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/db/restaurant/data-source.ts` solved the issue.
+   2. I had to change module in `tsconfig.json` to `commonjs`.
+
+### 20th
+
+- Implement TypeORM
+
 ### 17th
 
 - use absolute path instead of relative path

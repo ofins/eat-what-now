@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { Restaurant } from '../entities/restaurant.entity';
-import restaurantData from '../seed';
+import { Restaurant } from '../restaurant/entities/restaurant.entity';
+import restaurantData from '../restaurant/seed';
 
-export class SeedRestaurants1716336000000 implements MigrationInterface {
+export class CreateRestaurantTable1747843228592 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const restaurantEntities = restaurantData.map((restaurant) => ({
       name: restaurant.name,
