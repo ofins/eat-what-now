@@ -1,31 +1,29 @@
 import dotenv from 'dotenv';
+import { DataSource, Repository } from 'typeorm';
+import { Restaurant } from './entities/restaurant.entity';
+import { RestaurantDailyFeed } from './entities/restaurantDailyFeed.entity';
+import {
+  CreateRestaurantData,
+  RestaurantFilterOptions,
+  RestaurantServiceConfig,
+  UpdateRestaurantData,
+} from './restaurant.type';
 import {
   DEFAULT_LIMIT,
   DEFAULT_RADIUS_KM,
   MAX_SEARCH_RADIUS,
 } from 'src/config';
 import cron from 'node-cron';
-import pgPromise, { IDatabase } from 'pg-promise';
-import { IClient } from 'pg-promise/typescript/pg-subset';
-import 'src/di/di.container';
-import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
-import { injectable } from 'tsyringe';
-import {
-  CreateRestaurantData,
-  IRestaurant,
-  RestaurantFilterOptions,
-  RestaurantServiceConfig,
-  UpdateRestaurantData,
-} from './restaurant.type';
 import restaurantData from './seed';
+import { injectable } from 'tsyringe';
+import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 
 dotenv.config();
 
-const tableName = 'restaurants';
-
 @injectable()
 export class RestaurantService {
-  private db: IDatabase<unknown, IClient>;
+  private restaurantRepository: Repository<Restaurant>;
+  private dailyFeedRepository: Repository<RestaurantDailyFeed>;
   private readonly config: Required<RestaurantServiceConfig>;
   private readonly defaultConfig: Required<RestaurantServiceConfig> = {
     connectionString: process.env.DATABASE_URL || '',
@@ -33,17 +31,19 @@ export class RestaurantService {
     defaultLimit: DEFAULT_LIMIT,
   };
 
-  constructor(config: RestaurantServiceConfig = {}) {
+  constructor(
+    private readonly dataSource: DataSource,
+    config: RestaurantServiceConfig = {}
+  ) {
     this.config = { ...this.defaultConfig, ...config };
+    this.restaurantRepository = this.dataSource.getRepository(Restaurant);
+    this.dailyFeedRepository =
+      this.dataSource.getRepository(RestaurantDailyFeed);
 
-    const pgp = pgPromise();
-
-    this.db = pgp(this.config.connectionString);
     this.initializeDatabase()
-      .then(() => this.createRestaurantDailyFeed())
       .then(() => this.shuffleRestaurantDailyFeed())
       .catch((error) => {
-        console.error('Error initializing database:', error);
+        console.error('Error initializing db:', error);
       });
 
     cron.schedule('0 0 * * *', async () => {
@@ -54,135 +54,90 @@ export class RestaurantService {
 
   private async initializeDatabase(): Promise<void> {
     try {
-      const data = await this.db.one('SELECT NOW() AS current_time');
-      console.log('Database connection successful:', data.current_time);
+      if (!this.dataSource.isInitialized) {
+        await this.dataSource.initialize();
+      }
+      console.log('Database connection successful:', new Date());
 
-      await this.verifyDatabaseStructure();
+      this.seedRestaurantIfEmpty();
     } catch (error) {
-      console.error('Database initialization failed:', error);
-      // Consider a more robust recovery strategy in production
+      console.error('Database Initialize failed:', error);
       throw new Error(
         `Failed to initialize database: ${error instanceof Error ? error.message : String(error)}`
       );
     }
   }
 
-  private async verifyDatabaseStructure(): Promise<void> {
-    try {
-      const tableExists = await this.db.oneOrNone(
-        `SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '${tableName}')`
-      );
+  private async seedRestaurantIfEmpty(): Promise<void> {
+    const count = await this.restaurantRepository.count();
 
-      if (!tableExists || !tableExists.exists) {
-        console.warn(
-          'Restaurants table does not exist, attempting to create it...'
-        );
-        await this.createRestaurantsTable();
+    if (count === 0) {
+      console.log('No restaurants in db, seeding...');
+      await this.seedRestaurantsData();
+    } else {
+      console.log(`Found ${count} restaurants in database, skipping seed.`);
+    }
+  }
+
+  private async seedRestaurantsData(): Promise<void> {
+    try {
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+        const restaurantEntities = restaurantData.map((restaurant) => {
+          const entity = new Restaurant();
+
+          entity.name = restaurant.name;
+          entity.address = restaurant.address;
+          entity.cuisine_type = restaurant.cuisine_type;
+          entity.price_range = restaurant.price_range;
+          entity.rating = restaurant.rating;
+          entity.longitude = restaurant.longitude;
+          entity.latitude = restaurant.latitude;
+          entity.open_hours = restaurant.open_hours;
+          entity.contact_info = restaurant.contact_info;
+
+          return entity;
+        });
+
+        // save all restaurants in a batch
+        await this.restaurantRepository.save(restaurantEntities);
+
+        await queryRunner.commitTransaction();
+        console.log('Restaurant seed data inserted successfully');
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        console.error('Error seeding restaurant data:', error);
+        throw error;
+      } finally {
+        await queryRunner.release();
       }
     } catch (error) {
-      console.error('Error verifying database structure:', error);
+      console.error('Failed to seed restaurant data:', error);
       throw error;
     }
   }
 
-  private async createRestaurantsTable(): Promise<void> {
+  async getRestaurantById(id: number): Promise<Restaurant | null> {
     try {
-      // Create table with schema
-      await this.db.none(`
-        CREATE TABLE IF NOT EXISTS ${tableName} (
-          id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          address TEXT NOT NULL,
-          cuisine_type VARCHAR(100) NOT NULL,
-          price_range DECIMAL(3, 2) NOT NULL CHECK (price_range >= 0 AND price_range <= 5),
-          rating DECIMAL(3, 2) NOT NULL CHECK (rating >= 0 AND rating <= 5),
-          longitude DECIMAL(11, 8) NOT NULL,
-          latitude DECIMAL(10, 8) NOT NULL,
-          open_hours TEXT,
-          contact_info TEXT,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      // Create indexes separately
-      await this.db.none(`
-        CREATE INDEX IF NOT EXISTS idx_${tableName}_location ON ${tableName} (longitude, latitude);
-        CREATE INDEX IF NOT EXISTS idx_${tableName}_cuisine ON ${tableName} (cuisine_type);
-        CREATE INDEX IF NOT EXISTS idx_${tableName}_rating ON ${tableName} (rating);
-      `);
-
-      // Check if data already exists before inserting
-      const existingData = await this.db.oneOrNone(
-        `SELECT COUNT(*) FROM ${tableName}`
-      );
-      if (existingData && parseInt(existingData.count) > 0) {
-        console.log(
-          'Restaurants table already contains data, skipping seed data insertion'
-        );
-        return;
+      if (!Number(id) || id <= 0) {
+        throw new Error('Invalid restaurant id');
       }
-      // Seed data in a separate method for better organization
-      await this.seedRestaurantsData(tableName);
 
-      console.log('Restaurants table created and seeded successfully');
+      return await this.restaurantRepository.findOneBy({ id });
     } catch (error) {
-      console.error('Failed to create restaurants table:', error);
+      console.error(`Error fetching restaurant ID ${id}:`, error);
       throw error;
     }
   }
 
-  private async seedRestaurantsData(tableName: string): Promise<void> {
-    const data = restaurantData;
-
-    // Use a transaction for bulk insert
-    this.db.tx(async (t) => {
-      const queries = data.map((restaurant) => {
-        return t.none(
-          `
-          INSERT INTO ${tableName} (
-            name, address, cuisine_type, price_range, rating, 
-            longitude, latitude, open_hours, contact_info, 
-            created_at, updated_at
-          ) VALUES (
-            $<name>, $<address>, $<cuisine_type>, $<price_range>, $<rating>,
-            $<longitude>, $<latitude>, $<open_hours>, $<contact_info>,
-            CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-          )
-        `,
-          restaurant
-        );
-      });
-
-      return t.batch(queries);
-    });
-  }
-
-  async getRestaurantById(id: number) {
-    try {
-      if (!Number.isInteger(id) || id <= 0) {
-        throw new Error('Invalid restaurant ID');
-      }
-
-      return await this.db.oneOrNone<IRestaurant>(
-        `SELECT * FROM ${tableName} WHERE id = $1`,
-        [id]
-      );
-    } catch (error) {
-      console.error(`Error fetching restaurant by ID ${id}:`, error);
-    }
-  }
-
-  /**
-   * Get restaurants by location within a radius
-   * @param options Filter options for the search
-   * @returns Array of restaurants matching the criteria
-   */
   async getRestaurants(
     options: RestaurantFilterOptions = {}
-  ): Promise<PaginatedResponse<IRestaurant>> {
+  ): Promise<PaginatedResponse<Restaurant>> {
     try {
-      // Validate inputs
+      // validate inputs
       const {
         longitude,
         latitude,
@@ -204,71 +159,58 @@ export class RestaurantService {
         );
       }
 
-      // Build query based on provided filters
-      let query = `
-      SELECT r.*
-      FROM restaurant_daily_feed f
-      JOIN restaurants r on r.id = f.restaurant_id
-      WHERE f.date = current_date
-    `;
-      const params: unknown[] = [];
-      let paramIndex = 1;
+      //   create query builder to join with daily feed
+      const queryBuilder = this.dailyFeedRepository
+        .createQueryBuilder('feed')
+        .innerJoinAndSelect('feed.restaurant', 'restaurant')
+        .where('feed.date = CURRENT_DATE');
 
-      // If location is provided, search by proximity
-      if (longitude !== undefined && latitude !== undefined) {
-        // Use Haversine formula to calculate distance
-        query += `
-        AND (
-          6371 * acos(
-            cos(radians($${paramIndex++})) * 
-            cos(radians(latitude)) * 
-            cos(radians(longitude) - radians($${paramIndex++})) + 
-            sin(radians($${paramIndex++})) * 
-            sin(radians(latitude))
-          )
-        ) <= $${paramIndex++}
-      `;
-        params.push(latitude, longitude, latitude, radius);
-      }
-
+      // Apply filters
       if (cuisineType) {
-        query += ` AND cuisine_type = $${paramIndex++}`;
-        params.push(cuisineType);
+        queryBuilder.andWhere('restaurant.cuisine_type = :cuisineType', {
+          cuisineType,
+        });
       }
 
       if (priceRange) {
-        query += ` AND price_range = $${paramIndex++}`;
-        params.push(priceRange);
+        queryBuilder.andWhere('restaurant.price_range = :priceRange', {
+          priceRange,
+        });
       }
 
       if (minRating > 0) {
-        query += ` AND rating >= $${paramIndex++}`;
-        params.push(minRating);
+        queryBuilder.andWhere('restaurant.rating >= :minRating', { minRating });
       }
 
-      query += ' ORDER BY f.position';
-
-      if (limit > 0) {
-        query += ` LIMIT $${paramIndex++}`;
-        params.push(limit);
+      // Apply location filter if provided
+      if (longitude !== undefined && latitude !== undefined) {
+        // Using Haversine formula in TypeORM query
+        queryBuilder.andWhere(
+          `
+          (6371 * acos(
+            cos(radians(:latitude)) * 
+            cos(radians(restaurant.latitude)) * 
+            cos(radians(restaurant.longitude) - radians(:longitude)) + 
+            sin(radians(:latitude)) * 
+            sin(radians(restaurant.latitude))
+          )) <= :radius
+        `,
+          { latitude, longitude, radius }
+        );
       }
 
-      if (offset > 0) {
-        query += ` OFFSET $${paramIndex++}`;
-        params.push(offset);
-      }
+      //   apply sorting, pagination
+      queryBuilder.orderBy('feed.position', 'ASC').skip(offset).take(limit);
 
-      const data = await this.db.any<IRestaurant>(query, params);
-      const total = await this.db.one(
-        'SELECT COUNT(*) FROM restaurants',
-        [],
-        (row) => +row.count
-      );
+      //   execute query
+      const [restaurants, total] = await queryBuilder.getManyAndCount();
 
-      return paginateResponse<IRestaurant>(
-        data,
+      // Map to Restaurant objects
+      const mappedResults = restaurants.map((feed) => feed.restaurant);
+
+      return paginateResponse<Restaurant>(
+        mappedResults,
         total,
-        // todo: doesn't seem like the best solution but it works
         Number.isInteger(limit) ? limit : 10,
         Number.isInteger(offset) ? offset : 0
       );
@@ -283,29 +225,22 @@ export class RestaurantService {
    * @param data Restaurant data
    * @returns Created restaurant
    */
-  async createRestaurant(data: CreateRestaurantData): Promise<IRestaurant> {
+  async createRestaurant(data: CreateRestaurantData): Promise<Restaurant> {
     try {
       this.validateRestaurantData(data);
 
-      return await this.db.one<IRestaurant>(
-        `INSERT INTO restaurants (
-          name, address, cuisine_type, price_range, rating, 
-          longitude, latitude, open_hours, contact_info
-        ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9
-        ) RETURNING *`,
-        [
-          data.name,
-          data.address,
-          data.cuisine_type,
-          data.price_range,
-          data.rating,
-          data.longitude,
-          data.latitude,
-          data.open_hours || null,
-          data.contact_info || null,
-        ]
-      );
+      const restaurant = new Restaurant();
+      restaurant.name = data.name;
+      restaurant.address = data.address;
+      restaurant.cuisine_type = data.cuisine_type;
+      restaurant.price_range = data.price_range;
+      restaurant.rating = data.rating;
+      restaurant.longitude = data.longitude;
+      restaurant.latitude = data.latitude;
+      restaurant.open_hours = data.open_hours || null;
+      restaurant.contact_info = data.contact_info || null;
+
+      return await this.restaurantRepository.save(restaurant);
     } catch (error) {
       console.error('Error creating restaurant:', error);
       throw error;
@@ -321,7 +256,7 @@ export class RestaurantService {
   async updateRestaurant(
     id: number,
     data: UpdateRestaurantData
-  ): Promise<IRestaurant | null> {
+  ): Promise<Restaurant | null> {
     try {
       if (!Number.isInteger(id) || id <= 0) {
         throw new Error('Invalid restaurant ID');
@@ -331,34 +266,15 @@ export class RestaurantService {
         throw new Error('No update data provided');
       }
 
-      // Prepare update query
-      const updateColumns: string[] = [];
-      const values: unknown[] = [];
-      let paramIndex = 1;
-
-      // Build update statement dynamically based on provided fields
-      for (const [key, value] of Object.entries(data)) {
-        if (value !== undefined) {
-          updateColumns.push(`${key} = $${paramIndex++}`);
-          values.push(value);
-        }
+      const restaurant = await this.restaurantRepository.findOneBy({ id });
+      if (!restaurant) {
+        return null;
       }
 
-      // Add updated_at timestamp
-      updateColumns.push(`updated_at = $${paramIndex++}`);
-      values.push(new Date());
+      //   Update only provided fields
+      Object.assign(restaurant, data);
 
-      // Add WHERE clause parameter
-      values.push(id);
-
-      const query = `
-        UPDATE restaurants 
-        SET ${updateColumns.join(', ')} 
-        WHERE id = $${paramIndex} 
-        RETURNING *
-      `;
-
-      return await this.db.oneOrNone<IRestaurant>(query, values);
+      return await this.restaurantRepository.save(restaurant);
     } catch (error) {
       console.error(`Error updating restaurant with ID ${id}:`, error);
       throw error;
@@ -370,19 +286,18 @@ export class RestaurantService {
    * @param id Restaurant ID
    * @returns True if restaurant was deleted, false if not found
    */
-  async deleteRestaurant(id: number): Promise<boolean> {
+  async deleteRestaurant(id: number) {
     try {
       if (!Number.isInteger(id) || id <= 0) {
         throw new Error('Invalid restaurant ID');
       }
 
-      const result = await this.db.result(
-        'DELETE FROM restaurants WHERE id = $1',
-        [id],
-        (r) => r.rowCount
+      const result = await this.restaurantRepository.delete(id);
+      return (
+        result.affected !== undefined &&
+        result.affected !== null &&
+        result.affected > 0
       );
-
-      return result > 0;
     } catch (error) {
       console.error(`Error deleting restaurant with ID ${id}:`, error);
       throw error;
@@ -398,14 +313,14 @@ export class RestaurantService {
     limit = 10
   ): Promise<{ cuisine_type: string; count: number }[]> {
     try {
-      return await this.db.any(
-        `SELECT cuisine_type, COUNT(*) as count 
-         FROM restaurants 
-         GROUP BY cuisine_type 
-         ORDER BY count DESC 
-         LIMIT $1`,
-        [limit]
-      );
+      return await this.restaurantRepository
+        .createQueryBuilder('restaurant')
+        .select('restaurant.cuisine_type', 'cuisine_type')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('restaurant.cuisine_type')
+        .orderBy('count', 'DESC')
+        .limit(limit)
+        .getRawMany();
     } catch (error) {
       console.error('Error fetching popular cuisines:', error);
       throw error;
@@ -417,54 +332,17 @@ export class RestaurantService {
    * @param limit Maximum number of restaurants to return
    * @returns Array of top rated restaurants
    */
-  async getTopRatedRestaurants(limit = 10): Promise<IRestaurant[]> {
+  async getTopRatedRestaurants(limit = 10): Promise<Restaurant[]> {
     try {
-      return await this.db.any<IRestaurant>(
-        'SELECT * FROM restaurants ORDER BY rating DESC LIMIT $1',
-        [limit]
-      );
+      return await this.restaurantRepository.find({
+        order: {
+          rating: 'DESC',
+        },
+        take: limit,
+      });
     } catch (error) {
       console.error('Error fetching top rated restaurants:', error);
       throw error;
-    }
-  }
-
-  /**
-   * Close the database connection
-   */
-  async close(): Promise<void> {
-    try {
-      await this.db.$pool.end();
-      console.log('Database connection closed');
-    } catch (error) {
-      console.error('Error closing database connection:', error);
-      throw error;
-    }
-  }
-
-  async createRestaurantDailyFeed() {
-    await this.db.none(`
-      CREATE TABLE IF NOT EXISTS restaurant_daily_feed (
-      date DATE NOT NULL,
-      position INT NOT NULL,
-      restaurant_id INTEGER NOT NULL,
-      PRIMARY KEY (date, position),
-      FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
-    );
-      `);
-  }
-
-  async shuffleRestaurantDailyFeed(): Promise<void> {
-    try {
-      await this.db.none(`DELETE FROM restaurant_daily_feed;`);
-      await this.db.none(`
-        INSERT INTO restaurant_daily_feed (date, position, restaurant_id)
-        SELECT current_date, row_number() OVER (ORDER BY RANDOM()), id
-        FROM restaurants
-        ORDER BY RANDOM();
-      `);
-    } catch (error) {
-      console.error(`Error inserting daily feed:`, error);
     }
   }
 
@@ -500,6 +378,72 @@ export class RestaurantService {
 
     if (data.latitude < -90 || data.latitude > 90) {
       throw new Error('Latitude must be between -90 and 90');
+    }
+  }
+
+  // * shuffle restaurants for daily feed
+  async shuffleRestaurantDailyFeed(): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      try {
+        // clear existing feeds
+        await this.dailyFeedRepository.clear();
+
+        //   get all restaurant IDs
+        const restaurants = await this.restaurantRepository.find({
+          select: ['id'],
+        });
+
+        const shuffled = [...restaurants].sort(() => Math.random() - 0.5);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const feedEntries: RestaurantDailyFeed[] = shuffled.map(
+          (restaurant, index) => {
+            const feed = new RestaurantDailyFeed();
+
+            feed.date = today;
+            feed.position = index + 1;
+            feed.restaurant_id = restaurant.id;
+            return feed;
+          }
+        );
+
+        await this.dailyFeedRepository.save(feedEntries);
+
+        await queryRunner.commitTransaction();
+        console.log(
+          `Daily feed updated for ${today.toISOString().split('T')[0]} with ${feedEntries.length} restaurants`
+        );
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        console.error('Error updating daily feed:', error);
+        throw error;
+      } finally {
+        await queryRunner.release();
+      }
+    } catch (error) {
+      console.error(`Error shuffling daily feed:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Close the database connection
+   */
+  async close(): Promise<void> {
+    try {
+      if (this.dataSource.isInitialized) {
+        await this.dataSource.destroy();
+      }
+      console.log('Database connection closed');
+    } catch (error) {
+      console.error('Error closing database connection:', error);
+      throw error;
     }
   }
 }

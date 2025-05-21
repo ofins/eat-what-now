@@ -4,15 +4,15 @@ import { Restaurant } from './restaurant.entity';
 @Entity('restaurant_daily_feed')
 export class RestaurantDailyFeed {
   @PrimaryColumn({ type: 'date' })
-  date: Date;
+  date!: Date;
 
   @PrimaryColumn()
-  position: number;
+  position!: number;
 
   @Column()
-  restaurant_id: number;
+  restaurant_id!: number;
 
   @ManyToOne(() => Restaurant)
   @JoinColumn({ name: 'restaurant_id' })
-  restaurant: Restaurant;
+  restaurant!: Restaurant;
 }
