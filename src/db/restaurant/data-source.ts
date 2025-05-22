@@ -19,6 +19,6 @@ export const RestaurantDataSource = new DataSource({
     Restaurant,
     RestaurantDailyFeed,
   ],
-  migrations: ['src/migrations/**/*.{ts,js}'],
+  migrations: ['src/db/migrations/**/*.{ts,js}'],
   subscribers: [],
 });

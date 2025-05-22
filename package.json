@@ -7,7 +7,7 @@
     "lint": "tsc --noEmit && eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write .",
-    "compose:up": "docker-compose up",
+    "compose:up": "docker-compose up --build",
     "compose:down": "docker-compose down",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/db/restaurant/data-source.ts"
