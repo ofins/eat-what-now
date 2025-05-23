@@ -7,6 +7,13 @@ Issue encountered:
 1. Unable to run migrations due to TypeORM CLI not being able to find my `data-source.ts` file at specified path.
    1. Using the command `ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/db/restaurant/data-source.ts` solved the issue.
    2. I had to change module in `tsconfig.json` to `commonjs`.
+2. Unable to connect to DB when running `docker-compose up` locally.
+   1. Error thrown `Error initializing db: Error: Failed to initialize database: password authentication failed for user "postgres"`.
+      1. Solved using `docker-compose down -v` likely because Postgres password in `docker-compose.yml` was changed after db was already created, therefore old password is still in the persisted volume.
+   2. Error thrown `ERROR: relation "restaurants" does not exist at character 31`.
+      1. Solved by running migrations before start server.
+3. Trouble connecting to db in Docker via DBeaver.
+   1. Error `thrown: psql: error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  password authentication failed for user "postgres"`
 
 ### 20th
 

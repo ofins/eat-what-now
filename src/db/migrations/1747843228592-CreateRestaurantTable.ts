@@ -21,6 +21,16 @@ export class CreateRestaurantTable1747843228592 implements MigrationInterface {
       );
     `);
 
+    await queryRunner.query(`
+      CREATE TABLE IF NOT EXISTS restaurant_daily_feed (
+        date DATE NOT NULL,
+        position INT NOT NULL,
+        restaurant_id INTEGER NOT NULL,
+        PRIMARY KEY (date, position),
+        FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
+    )
+      `);
+
     const restaurantEntities = restaurantData.map((restaurant) => ({
       name: restaurant.name,
       address: restaurant.address,
