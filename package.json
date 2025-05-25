@@ -6,11 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tsc --noEmit && eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "format": "prettier --write .",
-    "compose:up": "docker-compose up --build",
-    "compose:down": "docker-compose down",
-    "typeorm": "typeorm-ts-node-commonjs",
-    "migration:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/db/restaurant/data-source.ts"
+    "format": "prettier --write ."
   },
   "name": "ewn-backend",
   "version": "1.0.0",
@@ -28,9 +24,7 @@
     "reflect-metadata": "^0.2.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "tsc-alias": "^1.8.16",
-    "tsyringe": "^4.10.0",
-    "typeorm": "^0.3.24"
+    "tsc-alias": "^1.8.16"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
