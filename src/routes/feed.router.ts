@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { RestaurantRepository } from 'src/db/restaurant/restaurant.repo';
 import { authenticateAPIKey } from '../middleware/auth';
 
@@ -6,7 +6,7 @@ const router = express.Router();
 
 const restaurantService = new RestaurantRepository();
 
-router.get('/', authenticateAPIKey, (req, res) => {
+router.get('/', authenticateAPIKey, (req: Request, res: Response) => {
   const {
     longitude,
     latitude,
@@ -35,6 +35,38 @@ router.get('/', authenticateAPIKey, (req, res) => {
     .catch((error) => {
       console.log(`Error fetching restaurants:${error}`);
       res.status(500).send({ error: 'Internal Server Error' });
+    });
+});
+
+router.post('/', authenticateAPIKey, (req: Request, res: Response) => {
+  restaurantService
+    .createRestaurant(req.body)
+    .then((data) => res.send(data))
+    .catch((error) => {
+      console.log(`Error creating restaurant: ${error}`);
+      res.status(500).send({ error: `Internal Server Error` });
+    });
+});
+
+router.put('/:id', authenticateAPIKey, (req: Request, res: Response) => {
+  const { id } = req.params;
+  restaurantService
+    .updateRestaurant(Number(id), req.body)
+    .then((data) => res.send(data))
+    .catch((error) => {
+      console.log(`Error updating restaurant: ${error}`);
+      res.status(500).send({ error: `Internal Server Error` });
+    });
+});
+
+router.delete('/:id', authenticateAPIKey, (req: Request, res: Response) => {
+  const { id } = req.params;
+  restaurantService
+    .deleteRestaurant(Number(id))
+    .then((data) => res.send(data))
+    .catch((error) => {
+      console.log(`Error deleting restaurant: ${error}`);
+      res.status(500).send({ error: `Internal Server Error` });
     });
 });
 

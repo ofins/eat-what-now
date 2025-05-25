@@ -1,13 +1,12 @@
 import dotenv from 'dotenv';
-import cron from 'node-cron';
-import pgPromise, { IDatabase, IMain } from 'pg-promise';
-import { IClient } from 'pg-promise/typescript/pg-subset';
+import pgPromise, { IMain } from 'pg-promise';
 import {
   DEFAULT_LIMIT,
   DEFAULT_RADIUS_KM,
   MAX_SEARCH_RADIUS,
 } from 'src/config';
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
+import BaseRepository from '../base.repo';
 import {
   CreateRestaurantData,
   IRestaurant,
@@ -21,66 +20,44 @@ dotenv.config();
 
 const tableName = 'restaurants';
 
-export class RestaurantRepository {
-  private db: IDatabase<unknown, IClient>;
+export class RestaurantRepository extends BaseRepository {
   private readonly config: Required<RestaurantServiceConfig>;
-  private readonly defaultConfig: Required<RestaurantServiceConfig> = {
-    connectionString: process.env.DATABASE_URL || '',
-    maxSearchRadius: MAX_SEARCH_RADIUS,
-    defaultLimit: DEFAULT_LIMIT,
-  };
+  // private readonly defaultConfig: Required<RestaurantServiceConfig> = {
+  //   connectionString: process.env.DATABASE_URL || '',
+  //   maxSearchRadius: MAX_SEARCH_RADIUS,
+  //   defaultLimit: DEFAULT_LIMIT,
+  // };
 
   constructor(config: RestaurantServiceConfig = {}) {
-    this.config = { ...this.defaultConfig, ...config };
-
+    const mergedConfig = {
+      ...{
+        connectionString: process.env.DATABASE_URL || '',
+        maxSearchRadius: MAX_SEARCH_RADIUS,
+        defaultLimit: DEFAULT_LIMIT,
+      },
+      ...config,
+    };
     const pgp: IMain = pgPromise();
-    this.db = pgp(this.config.connectionString);
+    const db = pgp(mergedConfig.connectionString);
+    super(db, tableName);
+    this.config = mergedConfig;
 
     this.initializeDatabase()
       .then(() => this.verifyDatabaseStructure())
       .then(() => this.createRestaurantDailyFeed())
       .then(() => this.shuffleRestaurantDailyFeed())
+      // .then(() => {
+      //   cron.schedule('0 0 * * *', async () => {
+      //     console.log('Running daily restaurant shuffle...');
+      //     this.shuffleRestaurantDailyFeed();
+      //   });
+      // })
       .catch((error) => {
         console.error('Error initializing database:', error);
       });
-
-    cron.schedule('0 0 * * *', async () => {
-      console.log('Running daily restaurant shuffle...');
-      this.shuffleRestaurantDailyFeed();
-    });
   }
 
-  private async initializeDatabase(): Promise<void> {
-    try {
-      const data = await this.db.one('SELECT NOW() AS current_time');
-      console.log('Database connection successful:', data.current_time);
-    } catch (error) {
-      console.error('Database initialization failed:', error);
-      throw new Error(
-        `Failed to initialize database: ${error instanceof Error ? error.message : String(error)}`
-      );
-    }
-  }
-
-  private async verifyDatabaseStructure(): Promise<void> {
-    try {
-      const tableExists = await this.db.oneOrNone(
-        `SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '${tableName}')`
-      );
-
-      if (!tableExists || !tableExists.exists) {
-        console.warn(
-          'Restaurants table does not exist, attempting to create it...'
-        );
-        await this.createRestaurantsTable();
-      }
-    } catch (error) {
-      console.error('Error verifying database structure:', error);
-      throw error;
-    }
-  }
-
-  private async createRestaurantsTable(): Promise<void> {
+  protected async createTable(): Promise<void> {
     try {
       // Create table with schema
       await this.db.none(`
@@ -370,14 +347,23 @@ export class RestaurantRepository {
       if (!Number.isInteger(id) || id <= 0) {
         throw new Error('Invalid restaurant ID');
       }
+      const result = await this.db.tx(async (t) => {
+        const dailyFeedDelete = await t.result(
+          `DELETE FROM restaurant_daily_feed WHERE restaurant_id = $1`,
+          [id],
+          (r) => r.rowCount
+        );
 
-      const result = await this.db.result(
-        'DELETE FROM restaurants WHERE id = $1',
-        [id],
-        (r) => r.rowCount
-      );
+        const restaurantDelete = await t.result(
+          `DELETE FROM restaurants WHERE id = $1`,
+          [id],
+          (r) => r.rowCount
+        );
 
-      return result > 0;
+        return dailyFeedDelete + restaurantDelete;
+      });
+
+      return result > 1;
     } catch (error) {
       console.error(`Error deleting restaurant with ID ${id}:`, error);
       throw error;
