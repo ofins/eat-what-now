@@ -15,6 +15,10 @@ Issue encountered:
 3. Trouble connecting to db in Docker via DBeaver.
    1. Error `thrown: psql: error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  password authentication failed for user "postgres"`
 
+Things I learned:
+
+1. TypeORM recommends not importing `entity` classes or seed data directly in migration files. Migration should use raw SQL or the `queryRunner` API because entity code can change and break old migrations.
+
 ### 20th
 
 - Implement TypeORM

@@ -1,4 +1,12 @@
 import dotenv from 'dotenv';
+import cron from 'node-cron';
+import {
+  DEFAULT_LIMIT,
+  DEFAULT_RADIUS_KM,
+  MAX_SEARCH_RADIUS,
+} from 'src/config';
+import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
+import { injectable } from 'tsyringe';
 import { DataSource, Repository } from 'typeorm';
 import { Restaurant } from './entities/restaurant.entity';
 import { RestaurantDailyFeed } from './entities/restaurantDailyFeed.entity';
@@ -8,15 +16,6 @@ import {
   RestaurantServiceConfig,
   UpdateRestaurantData,
 } from './restaurant.type';
-import {
-  DEFAULT_LIMIT,
-  DEFAULT_RADIUS_KM,
-  MAX_SEARCH_RADIUS,
-} from 'src/config';
-import cron from 'node-cron';
-import restaurantData from './seed';
-import { injectable } from 'tsyringe';
-import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 
 dotenv.config();
 
@@ -59,7 +58,7 @@ export class RestaurantService {
       }
       console.log('Database connection successful:', new Date());
 
-      this.seedRestaurantIfEmpty();
+      // this.seedRestaurantIfEmpty();
     } catch (error) {
       console.error('Database Initialize failed:', error);
       throw new Error(
@@ -68,57 +67,57 @@ export class RestaurantService {
     }
   }
 
-  private async seedRestaurantIfEmpty(): Promise<void> {
-    const count = await this.restaurantRepository.count();
+  // private async seedRestaurantIfEmpty(): Promise<void> {
+  //   const count = await this.restaurantRepository.count();
 
-    if (count === 0) {
-      console.log('No restaurants in db, seeding...');
-      await this.seedRestaurantsData();
-    } else {
-      console.log(`Found ${count} restaurants in database, skipping seed.`);
-    }
-  }
+  //   if (count === 0) {
+  //     console.log('No restaurants in db, seeding...');
+  //     await this.seedRestaurantsData();
+  //   } else {
+  //     console.log(`Found ${count} restaurants in database, skipping seed.`);
+  //   }
+  // }
 
-  private async seedRestaurantsData(): Promise<void> {
-    try {
-      const queryRunner = this.dataSource.createQueryRunner();
-      await queryRunner.connect();
-      await queryRunner.startTransaction();
+  // private async seedRestaurantsData(): Promise<void> {
+  //   try {
+  //     const queryRunner = this.dataSource.createQueryRunner();
+  //     await queryRunner.connect();
+  //     await queryRunner.startTransaction();
 
-      try {
-        const restaurantEntities = restaurantData.map((restaurant) => {
-          const entity = new Restaurant();
+  //     try {
+  //       const restaurantEntities = restaurantData.map((restaurant) => {
+  //         const entity = new Restaurant();
 
-          entity.name = restaurant.name;
-          entity.address = restaurant.address;
-          entity.cuisine_type = restaurant.cuisine_type;
-          entity.price_range = restaurant.price_range;
-          entity.rating = restaurant.rating;
-          entity.longitude = restaurant.longitude;
-          entity.latitude = restaurant.latitude;
-          entity.open_hours = restaurant.open_hours;
-          entity.contact_info = restaurant.contact_info;
+  //         entity.name = restaurant.name;
+  //         entity.address = restaurant.address;
+  //         entity.cuisine_type = restaurant.cuisine_type;
+  //         entity.price_range = restaurant.price_range;
+  //         entity.rating = restaurant.rating;
+  //         entity.longitude = restaurant.longitude;
+  //         entity.latitude = restaurant.latitude;
+  //         entity.open_hours = restaurant.open_hours;
+  //         entity.contact_info = restaurant.contact_info;
 
-          return entity;
-        });
+  //         return entity;
+  //       });
 
-        // save all restaurants in a batch
-        await this.restaurantRepository.save(restaurantEntities);
+  //       // save all restaurants in a batch
+  //       await this.restaurantRepository.save(restaurantEntities);
 
-        await queryRunner.commitTransaction();
-        console.log('Restaurant seed data inserted successfully');
-      } catch (error) {
-        await queryRunner.rollbackTransaction();
-        console.error('Error seeding restaurant data:', error);
-        throw error;
-      } finally {
-        await queryRunner.release();
-      }
-    } catch (error) {
-      console.error('Failed to seed restaurant data:', error);
-      throw error;
-    }
-  }
+  //       await queryRunner.commitTransaction();
+  //       console.log('Restaurant seed data inserted successfully');
+  //     } catch (error) {
+  //       await queryRunner.rollbackTransaction();
+  //       console.error('Error seeding restaurant data:', error);
+  //       throw error;
+  //     } finally {
+  //       await queryRunner.release();
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to seed restaurant data:', error);
+  //     throw error;
+  //   }
+  // }
 
   async getRestaurantById(id: number): Promise<Restaurant | null> {
     try {

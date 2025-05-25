@@ -1,34 +1,34 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
-import { Restaurant } from '../entities/restaurant.entity';
-import restaurantData from '../seed';
+// import { MigrationInterface, QueryRunner } from 'typeorm';
+// import { Restaurant } from '../entities/restaurant.entity';
+// import restaurantData from '../seed';
 
-export class SeedRestaurants1716336000000 implements MigrationInterface {
-  public async up(queryRunner: QueryRunner): Promise<void> {
-    const restaurantEntities = restaurantData.map((restaurant) => ({
-      name: restaurant.name,
-      address: restaurant.address,
-      cuisine_type: restaurant.cuisine_type,
-      price_range: restaurant.price_range,
-      rating: restaurant.rating,
-      longitude: restaurant.longitude,
-      latitude: restaurant.latitude,
-      open_hours: restaurant.open_hours,
-      contact_info: restaurant.contact_info,
-    }));
+// export class SeedRestaurants1716336000000 implements MigrationInterface {
+//   public async up(queryRunner: QueryRunner): Promise<void> {
+//     const restaurantEntities = restaurantData.map((restaurant) => ({
+//       name: restaurant.name,
+//       address: restaurant.address,
+//       cuisine_type: restaurant.cuisine_type,
+//       price_range: restaurant.price_range,
+//       rating: restaurant.rating,
+//       longitude: restaurant.longitude,
+//       latitude: restaurant.latitude,
+//       open_hours: restaurant.open_hours,
+//       contact_info: restaurant.contact_info,
+//     }));
 
-    await queryRunner.manager
-      .createQueryBuilder()
-      .insert()
-      .into(Restaurant)
-      .values(restaurantEntities)
-      .execute();
-  }
+//     await queryRunner.manager
+//       .createQueryBuilder()
+//       .insert()
+//       .into(Restaurant)
+//       .values(restaurantEntities)
+//       .execute();
+//   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.manager
-      .createQueryBuilder()
-      .delete()
-      .from(Restaurant)
-      .execute();
-  }
-}
+//   public async down(queryRunner: QueryRunner): Promise<void> {
+//     await queryRunner.manager
+//       .createQueryBuilder()
+//       .delete()
+//       .from(Restaurant)
+//       .execute();
+//   }
+// }
