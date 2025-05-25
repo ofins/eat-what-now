@@ -9,7 +9,8 @@
 - [ ] Setup Logger for API and DB
 - [ ] Add unit testing
 - [ ] Setup CI/CD pipeline in Github Actions
-- [ ] Implement error handling middleware
+- [ ] Setup `/login` API
+- [ ] Setup `/user` API
 - [x] Containerize server/Db with Docker
 - [x] Implement Type-ORM
 

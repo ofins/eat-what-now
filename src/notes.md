@@ -1,3 +1,7 @@
+### 25th
+
+- remove TypeORM and TSyringe, unnecessary initialially for small projects. Adds unncessary overhead.
+
 ### 21th
 
 - setup migrations for initial table data
