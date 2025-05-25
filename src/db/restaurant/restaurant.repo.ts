@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import cron from 'node-cron';
-import pgPromise, { IDatabase } from 'pg-promise';
+import pgPromise, { IDatabase, IMain } from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
 import {
   DEFAULT_LIMIT,
@@ -21,7 +21,7 @@ dotenv.config();
 
 const tableName = 'restaurants';
 
-export class RestaurantService {
+export class RestaurantRepository {
   private db: IDatabase<unknown, IClient>;
   private readonly config: Required<RestaurantServiceConfig>;
   private readonly defaultConfig: Required<RestaurantServiceConfig> = {
@@ -33,10 +33,11 @@ export class RestaurantService {
   constructor(config: RestaurantServiceConfig = {}) {
     this.config = { ...this.defaultConfig, ...config };
 
-    const pgp = pgPromise();
-
+    const pgp: IMain = pgPromise();
     this.db = pgp(this.config.connectionString);
+
     this.initializeDatabase()
+      .then(() => this.verifyDatabaseStructure())
       .then(() => this.createRestaurantDailyFeed())
       .then(() => this.shuffleRestaurantDailyFeed())
       .catch((error) => {
@@ -53,11 +54,8 @@ export class RestaurantService {
     try {
       const data = await this.db.one('SELECT NOW() AS current_time');
       console.log('Database connection successful:', data.current_time);
-
-      await this.verifyDatabaseStructure();
     } catch (error) {
       console.error('Database initialization failed:', error);
-      // Consider a more robust recovery strategy in production
       throw new Error(
         `Failed to initialize database: ${error instanceof Error ? error.message : String(error)}`
       );

@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 
 import cors from 'cors';
-import { validateEnv } from './config';
 import express, { Request, Response } from 'express';
-import feedRouter from './feed/feed.router';
+import { validateEnv } from './config';
+import feedRouter from './routes/feed.router';
 import { swaggerUiHandler, swaggerUiSetup } from './swagger';
 import { serveMarkdownFile } from './utils/file';
 

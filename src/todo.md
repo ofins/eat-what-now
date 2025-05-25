@@ -9,7 +9,7 @@
 - [ ] Setup Logger for API and DB
 - [ ] Add unit testing
 - [ ] Setup CI/CD pipeline in Github Actions
-- [ ] Setup `/login` API
+- [ ] Setup `/login` API with JWT
 - [ ] Setup `/user` API
 - [x] Containerize server/Db with Docker
 - [x] Implement Type-ORM
