@@ -13,7 +13,10 @@ export default abstract class BaseRepository {
   protected async initializeDatabase(): Promise<void> {
     try {
       const data = await this.db.one('SELECT NOW() AS current_time');
-      console.log('Database connection successful:', data.current_time);
+      console.log(
+        `Database ${this.tableName} connection successful:`,
+        data.current_time
+      );
     } catch (error) {
       console.error('Database initialization failed:', error);
       throw new Error(
@@ -34,6 +37,7 @@ export default abstract class BaseRepository {
         );
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (this as any).createTable(); // Subclass should implement this
+        console.log(`Successfully created ${this.tableName} table`);
       }
     } catch (error) {
       console.error('Error verifying database structure:', error);

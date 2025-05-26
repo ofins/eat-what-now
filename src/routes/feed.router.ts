@@ -4,7 +4,7 @@ import { authenticateAPIKey } from '../middleware/auth';
 
 const router = express.Router();
 
-const restaurantService = new RestaurantRepository();
+const restaurantRepository = new RestaurantRepository();
 
 router.get('/', authenticateAPIKey, (req: Request, res: Response) => {
   const {
@@ -18,7 +18,7 @@ router.get('/', authenticateAPIKey, (req: Request, res: Response) => {
     offset,
   } = req.query;
 
-  restaurantService
+  restaurantRepository
     .getRestaurants({
       longitude: parseFloat(longitude as string),
       latitude: parseFloat(latitude as string),
@@ -39,7 +39,7 @@ router.get('/', authenticateAPIKey, (req: Request, res: Response) => {
 });
 
 router.post('/', authenticateAPIKey, (req: Request, res: Response) => {
-  restaurantService
+  restaurantRepository
     .createRestaurant(req.body)
     .then((data) => res.send(data))
     .catch((error) => {
@@ -50,7 +50,7 @@ router.post('/', authenticateAPIKey, (req: Request, res: Response) => {
 
 router.put('/:id', authenticateAPIKey, (req: Request, res: Response) => {
   const { id } = req.params;
-  restaurantService
+  restaurantRepository
     .updateRestaurant(Number(id), req.body)
     .then((data) => res.send(data))
     .catch((error) => {
@@ -61,7 +61,7 @@ router.put('/:id', authenticateAPIKey, (req: Request, res: Response) => {
 
 router.delete('/:id', authenticateAPIKey, (req: Request, res: Response) => {
   const { id } = req.params;
-  restaurantService
+  restaurantRepository
     .deleteRestaurant(Number(id))
     .then((data) => res.send(data))
     .catch((error) => {

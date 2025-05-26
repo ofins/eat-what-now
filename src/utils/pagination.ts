@@ -12,8 +12,8 @@ export interface PaginatedResponse<T> {
 export function paginateResponse<T>(
   data: T[],
   total: number,
-  limit: number,
-  offset: number
+  limit: number = 10,
+  offset: number = 0
 ) {
   return {
     data,
