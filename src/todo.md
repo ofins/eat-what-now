@@ -10,7 +10,8 @@
 - [ ] Add unit testing
 - [ ] Setup CI/CD pipeline in Github Actions
 - [ ] Setup `/login` API with JWT
-- [ ] Setup `/user` API
+- [x] Setup `/restaurants` API
+- [x] Setup `/user` API
 - [x] Setup CRUD functionality for `/feed` API
 - [x] Containerize server/Db with Docker
 - [x] Implement Type-ORM

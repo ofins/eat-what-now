@@ -1,6 +1,11 @@
+### Challenges
+
+1. Currently, restaurant metadata are queried through `restaurant-user` join table relationships. What would be the best method to query in batches for `feeds`.
+
 ### 27th
 
 - Setup join tables for `restaurant-user`
+- Setup `restaurants` API and CRUD
 
 ### 26th
 

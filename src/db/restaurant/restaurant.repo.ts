@@ -428,7 +428,8 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
         INSERT INTO restaurant_daily_feed (date, position, restaurant_id)
         SELECT current_date, row_number() OVER (ORDER BY RANDOM()), id
         FROM restaurants
-        ORDER BY RANDOM();
+        ON CONFLICT (date, position) DO UPDATE
+        SET restaurant_id = EXCLUDED.restaurant_id
       `);
     } catch (error) {
       console.error(`Error inserting daily feed:`, error);

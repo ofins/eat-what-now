@@ -1,3 +1,11 @@
 {
-  "cSpell.words": ["Nominatim", "psql", "tsyringe"]
+  "cSpell.words": [
+    "downvoted",
+    "Downvotes",
+    "favorited",
+    "Nominatim",
+    "psql",
+    "tsyringe",
+    "Upvotes"
+  ]
 }

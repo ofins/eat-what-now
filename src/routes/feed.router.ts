@@ -38,36 +38,4 @@ router.get('/', authenticateAPIKey, (req: Request, res: Response) => {
     });
 });
 
-router.post('/', authenticateAPIKey, (req: Request, res: Response) => {
-  restaurantRepository
-    .createRestaurant(req.body)
-    .then((data) => res.send(data))
-    .catch((error) => {
-      console.log(`Error creating restaurant: ${error}`);
-      res.status(500).send({ error: `Internal Server Error` });
-    });
-});
-
-router.put('/:id', authenticateAPIKey, (req: Request, res: Response) => {
-  const { id } = req.params;
-  restaurantRepository
-    .updateRestaurant(Number(id), req.body)
-    .then((data) => res.send(data))
-    .catch((error) => {
-      console.log(`Error updating restaurant: ${error}`);
-      res.status(500).send({ error: `Internal Server Error` });
-    });
-});
-
-router.delete('/:id', authenticateAPIKey, (req: Request, res: Response) => {
-  const { id } = req.params;
-  restaurantRepository
-    .deleteRestaurant(Number(id))
-    .then((data) => res.send(data))
-    .catch((error) => {
-      console.log(`Error deleting restaurant: ${error}`);
-      res.status(500).send({ error: `Internal Server Error` });
-    });
-});
-
 export default router;
