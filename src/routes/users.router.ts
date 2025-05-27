@@ -1,10 +1,10 @@
 import express, { Request, Response } from 'express';
-import { UserRepository } from 'src/db/users/users.repo';
+import { UsersRepository } from 'src/db/users/users.repo';
 import { authenticateAPIKey } from 'src/middleware/auth';
 
 const router = express.Router();
 
-const usersRepository = new UserRepository();
+const usersRepository = new UsersRepository();
 
 router.get('/', authenticateAPIKey, (req: Request, res: Response) => {
   const { limit, offset } = req.query;

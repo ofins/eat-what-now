@@ -1,3 +1,5 @@
+import { BaseRepositoryConfig } from '../base.repo';
+
 export interface IRestaurant {
   id: number;
   name: string;
@@ -60,8 +62,8 @@ export interface UpdateRestaurantData {
 /**
  * Configuration options for the RestaurantService
  */
-export interface RestaurantServiceConfig {
-  connectionString?: string;
-  maxSearchRadius?: number; // Maximum search radius in kilometers
-  defaultLimit?: number;
+export interface RestaurantsRepositoryConfig extends BaseRepositoryConfig {
+  // connectionString?: string;
+  maxSearchRadius: number; // Maximum search radius in kilometers
+  defaultLimit: number;
 }

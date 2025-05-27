@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import pgPromise, { IMain } from 'pg-promise';
 import {
   DEFAULT_LIMIT,
   DEFAULT_RADIUS_KM,
@@ -11,36 +10,25 @@ import {
   CreateRestaurantData,
   IRestaurant,
   RestaurantFilterOptions,
-  RestaurantServiceConfig,
+  RestaurantsRepositoryConfig,
   UpdateRestaurantData,
 } from './restaurant.type';
-import restaurantData from './seed';
+import restaurantData from './seed.json';
 
 dotenv.config();
 
-const tableName = 'restaurants';
+const TABLE_NAME = 'restaurants';
 
-export class RestaurantRepository extends BaseRepository {
-  private readonly config: Required<RestaurantServiceConfig>;
-  // private readonly defaultConfig: Required<RestaurantServiceConfig> = {
-  //   connectionString: process.env.DATABASE_URL || '',
-  //   maxSearchRadius: MAX_SEARCH_RADIUS,
-  //   defaultLimit: DEFAULT_LIMIT,
-  // };
-
-  constructor(config: RestaurantServiceConfig = {}) {
-    const mergedConfig = {
-      ...{
-        connectionString: process.env.DATABASE_URL || '',
-        maxSearchRadius: MAX_SEARCH_RADIUS,
-        defaultLimit: DEFAULT_LIMIT,
-      },
-      ...config,
-    };
-    const pgp: IMain = pgPromise();
-    const db = pgp(mergedConfig.connectionString);
-    super(db, tableName);
-    this.config = mergedConfig;
+export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryConfig> {
+  constructor(
+    config: RestaurantsRepositoryConfig = {
+      connectionString: process.env.DATABASE_URL || '',
+      maxSearchRadius: MAX_SEARCH_RADIUS,
+      defaultLimit: DEFAULT_LIMIT,
+    }
+  ) {
+    super(config.connectionString, TABLE_NAME);
+    this.config = config;
 
     this.initializeDatabase()
       .then(() => this.verifyDatabaseStructure())
@@ -61,7 +49,7 @@ export class RestaurantRepository extends BaseRepository {
     try {
       // Create table with schema
       await this.db.none(`
-        CREATE TABLE IF NOT EXISTS ${tableName} (
+        CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
           id SERIAL PRIMARY KEY,
           name VARCHAR(255) NOT NULL,
           address TEXT NOT NULL,
@@ -79,14 +67,14 @@ export class RestaurantRepository extends BaseRepository {
 
       // Create indexes separately
       await this.db.none(`
-        CREATE INDEX IF NOT EXISTS idx_${tableName}_location ON ${tableName} (longitude, latitude);
-        CREATE INDEX IF NOT EXISTS idx_${tableName}_cuisine ON ${tableName} (cuisine_type);
-        CREATE INDEX IF NOT EXISTS idx_${tableName}_rating ON ${tableName} (rating);
+        CREATE INDEX IF NOT EXISTS idx_${TABLE_NAME}_location ON ${TABLE_NAME} (longitude, latitude);
+        CREATE INDEX IF NOT EXISTS idx_${TABLE_NAME}_cuisine ON ${TABLE_NAME} (cuisine_type);
+        CREATE INDEX IF NOT EXISTS idx_${TABLE_NAME}_rating ON ${TABLE_NAME} (rating);
       `);
 
       // Check if data already exists before inserting
       const existingData = await this.db.oneOrNone(
-        `SELECT COUNT(*) FROM ${tableName}`
+        `SELECT COUNT(*) FROM ${TABLE_NAME}`
       );
       if (existingData && parseInt(existingData.count) > 0) {
         console.log(
@@ -95,7 +83,7 @@ export class RestaurantRepository extends BaseRepository {
         return;
       }
       // Seed data in a separate method for better organization
-      await this.seedRestaurantsData(tableName);
+      await this.seedRestaurantsData(TABLE_NAME);
 
       console.log('Restaurants table created and seeded successfully');
     } catch (error) {
@@ -104,15 +92,13 @@ export class RestaurantRepository extends BaseRepository {
     }
   }
 
-  private async seedRestaurantsData(tableName: string): Promise<void> {
-    const data = restaurantData;
-
+  private async seedRestaurantsData(TABLE_NAME: string): Promise<void> {
     // Use a transaction for bulk insert
     this.db.tx(async (t) => {
-      const queries = data.map((restaurant) => {
+      const queries = restaurantData.map((restaurant) => {
         return t.none(
           `
-          INSERT INTO ${tableName} (
+          INSERT INTO ${TABLE_NAME} (
             name, address, cuisine_type, price_range, rating,
             longitude, latitude, open_hours, contact_info,
             created_at, updated_at
@@ -137,7 +123,7 @@ export class RestaurantRepository extends BaseRepository {
       }
 
       return await this.db.oneOrNone<IRestaurant>(
-        `SELECT * FROM ${tableName} WHERE id = $1`,
+        `SELECT * FROM ${TABLE_NAME} WHERE id = $1`,
         [id]
       );
     } catch (error) {

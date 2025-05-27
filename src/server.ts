@@ -30,7 +30,7 @@ app.get('/todo', async (_, res: Response) => {
   await serveMarkdownFile('src/todo.md', res);
 });
 
-app.get('/api/test', (req: Request, res: Response) => {
+app.get('/api/test', (_: Request, res: Response) => {
   res.json({ message: 'CORS is working!' });
 });
 

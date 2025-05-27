@@ -1,20 +1,32 @@
-import { IDatabase } from 'pg-promise';
+import pgPromise, { IDatabase, IMain } from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
 
-export default abstract class BaseRepository {
+export interface BaseRepositoryConfig {
+  connectionString: string;
+}
+export default abstract class BaseRepository<
+  T extends BaseRepositoryConfig = BaseRepositoryConfig,
+> {
+  protected config: Required<T>;
   protected db: IDatabase<unknown, IClient>;
-  protected tableName: string;
+  protected TABLE_NAME: string;
 
-  constructor(db: IDatabase<unknown, IClient>, tableName: string) {
-    this.db = db;
-    this.tableName = tableName;
+  // constructor(db: IDatabase<unknown, IClient>, TABLE_NAME: string) {
+  //   this.db = db;
+  //   this.TABLE_NAME = TABLE_NAME;
+  // }
+  constructor(connectionString: string, TABLE_NAME: string) {
+    const pgp: IMain = pgPromise();
+    this.db = pgp(connectionString);
+    this.config = { connectionString } as Required<T>;
+    this.TABLE_NAME = TABLE_NAME;
   }
 
   protected async initializeDatabase(): Promise<void> {
     try {
       const data = await this.db.one('SELECT NOW() AS current_time');
       console.log(
-        `Database ${this.tableName} connection successful:`,
+        `Database ${this.TABLE_NAME} connection successful:`,
         data.current_time
       );
     } catch (error) {
@@ -28,16 +40,16 @@ export default abstract class BaseRepository {
   protected async verifyDatabaseStructure(): Promise<void> {
     try {
       const tableExists = await this.db.oneOrNone(
-        `SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '${this.tableName}')`
+        `SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '${this.TABLE_NAME}')`
       );
 
       if (!tableExists || !tableExists.exists) {
         console.warn(
-          `${this.tableName} table does not exist, attempting to create it...`
+          `${this.TABLE_NAME} table does not exist, attempting to create it...`
         );
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (this as any).createTable(); // Subclass should implement this
-        console.log(`Successfully created ${this.tableName} table`);
+        console.log(`Successfully created ${this.TABLE_NAME} table`);
       }
     } catch (error) {
       console.error('Error verifying database structure:', error);

@@ -1,23 +1,17 @@
-import pgPromise, { IMain } from 'pg-promise';
 import BaseRepository from '../base.repo';
 import seed from './seed.json';
 import { IUser, UserFilterOptions } from './users.type';
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 
-const tableName = 'users';
-export class UserRepository extends BaseRepository {
-  private readonly config: Required<unknown>;
-
-  constructor(config = {}) {
-    const mergedConfig = {
-      ...config,
-      connectionString: process.env.DATABASE_URL,
-    };
-
-    const pgp: IMain = pgPromise();
-    const db = pgp(mergedConfig.connectionString as string);
-    super(db, tableName);
-    this.config = mergedConfig;
+const TABLE_NAME = 'users';
+export class UsersRepository extends BaseRepository {
+  constructor(
+    config = {
+      connectionString: process.env.DATABASE_URL || '',
+    }
+  ) {
+    super(config.connectionString, TABLE_NAME);
+    this.config = config;
 
     this.initializeDatabase().then(() => this.verifyDatabaseStructure());
   }
@@ -25,7 +19,7 @@ export class UserRepository extends BaseRepository {
   protected async createTable(): Promise<void> {
     try {
       await this.db.none(`
-        CREATE TABLE IF NOT EXISTS ${tableName} (
+        CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
           email VARCHAR(255) NOT NULL UNIQUE,
           username VARCHAR(32) UNIQUE,
@@ -40,7 +34,7 @@ export class UserRepository extends BaseRepository {
         `);
 
       const existingData = await this.db.oneOrNone(
-        `SELECT COUNT(*) FROM ${tableName}`
+        `SELECT COUNT(*) FROM ${TABLE_NAME}`
       );
 
       if (existingData && parseInt(existingData.count) > 0) {
@@ -63,7 +57,7 @@ export class UserRepository extends BaseRepository {
       const queries = seed.map((user) => {
         return t.none(
           `
-          INSERT INTO ${tableName} (
+          INSERT INTO ${TABLE_NAME} (
             id, email, username, password_hash, full_name,
             avatar_url, is_active, is_verified, created_at, updated_at
           ) VALUES (
@@ -85,7 +79,7 @@ export class UserRepository extends BaseRepository {
       }
 
       return await this.db.oneOrNone<IUser>(
-        `SELECT * FROM ${tableName} WHERE id = $1`,
+        `SELECT * FROM ${TABLE_NAME} WHERE id = $1`,
         [id]
       );
     } catch (error) {

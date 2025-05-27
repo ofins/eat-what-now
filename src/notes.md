@@ -1,3 +1,11 @@
+### 27th
+
+- Setup join tables for `restaurant-user`
+
+### 26th
+
+- Setup `users` table and feature CRUD
+
 ### 25th
 
 - remove TypeORM and TSyringe, unnecessary initialially for small projects. Adds unncessary overhead.
