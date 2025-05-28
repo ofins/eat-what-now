@@ -1,10 +1,8 @@
 import express, { Request, Response } from 'express';
-import { RestaurantsRepository } from 'src/db/restaurant/restaurant.repo';
 import { authenticateAPIKey } from '../middleware/auth';
+import { restaurantRepository } from 'src/server';
 
 const router = express.Router();
-
-const restaurantRepository = new RestaurantsRepository();
 
 router.get('/', authenticateAPIKey, (req: Request, res: Response) => {
   const {

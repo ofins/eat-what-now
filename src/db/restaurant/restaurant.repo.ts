@@ -14,6 +14,7 @@ import {
   UpdateRestaurantData,
 } from './restaurant.type';
 import restaurantData from './seed.json';
+import cron from 'node-cron';
 
 dotenv.config();
 
@@ -34,6 +35,15 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
       .then(() => this.verifyDatabaseStructure())
       .then(() => this.createRestaurantDailyFeed())
       .then(() => this.shuffleRestaurantDailyFeed())
+      .then(() => {
+        cron.schedule('0 * * * *', async () => {
+          try {
+            this.aggregateVotes();
+          } catch (error) {
+            console.error('Error running CRON in restaurantRepo:', error);
+          }
+        });
+      })
       // .then(() => {
       //   cron.schedule('0 0 * * *', async () => {
       //     console.log('Running daily restaurant shuffle...');
@@ -60,6 +70,8 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
           latitude DECIMAL(10, 8) NOT NULL,
           open_hours TEXT,
           contact_info TEXT,
+          total_upvotes INT DEFAULT 0,
+          total_downvotes INT DEFAULT 0,
           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         )
@@ -468,6 +480,28 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
 
     if (data.latitude < -90 || data.latitude > 90) {
       throw new Error('Latitude must be between -90 and 90');
+    }
+  }
+
+  private async aggregateVotes(): Promise<void> {
+    try {
+      await this.db.none(`
+        UPDATE ${TABLE_NAME} r
+        SET total_upvotes = (
+          SELECT COUNT(*)
+          FROM restaurant_users ru
+          WHERE ru.restaurant_id = r.id AND ru.upvoted = true
+        ),
+        total_downvotes = (
+          SELECT COUNT(*)
+          FROM restaurant_users ru
+          WHERE ru.restaurant_id = r.id AND ru.downvoted = true
+        )
+        `);
+      console.log('Votes aggregated successfully');
+    } catch (error) {
+      console.error('Error aggregating votes:', error);
+      throw error;
     }
   }
 }

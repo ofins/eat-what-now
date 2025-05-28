@@ -2,6 +2,12 @@
 
 1. Currently, restaurant metadata are queried through `restaurant-user` join table relationships. What would be the best method to query in batches for `feeds`.
 
+### 28th
+
+- Aggregate `total_upvotes` and `total_downvotes` in `restaurants` repo.
+- Setup CRON service to update such data every hour.
+- Setup `singleton` for services.
+
 ### 27th
 
 - Setup join tables for `restaurant-user`

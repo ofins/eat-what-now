@@ -56,7 +56,8 @@ export class RestaurantUserRepository extends BaseRepository {
             updated_at TIMESTAMP DEFAULT now(),
             UNIQUE (user_id, restaurant_id),
             FOREIGN KEY (user_id) REFERENCES users(id),
-            FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
+            FOREIGN KEY (restaurant_id) REFERENCES restaurants(id),
+            CHECK (NOT (upvoted AND downvoted))
           );
             `);
     } catch (error) {

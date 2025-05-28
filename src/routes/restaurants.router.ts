@@ -1,14 +1,9 @@
 import express, { Request, Response } from 'express';
-import {
-  CreateRestaurantUserData,
-  RestaurantUserRepository,
-} from 'src/db/restaurant-user.repo';
-import { RestaurantsRepository } from 'src/db/restaurant/restaurant.repo';
+import { CreateRestaurantUserData } from 'src/db/restaurant-user.repo';
 import { authenticateAPIKey } from 'src/middleware/auth';
+import { restaurantRepository, restaurantUserRepository } from 'src/server';
 
 const router = express.Router();
-const restaurantRepository = new RestaurantsRepository();
-const restaurantUserRepository = new RestaurantUserRepository();
 
 router.post('/', authenticateAPIKey, (req: Request, res: Response) => {
   restaurantRepository
