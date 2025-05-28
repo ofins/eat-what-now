@@ -9,7 +9,7 @@ import restaurantsRouter from './routes/restaurants.router';
 import { swaggerUiHandler, swaggerUiSetup } from './swagger';
 import { serveMarkdownFile } from './utils/file';
 import { RestaurantUserRepository } from './db/restaurant-user.repo';
-import { RestaurantsRepository } from './db/restaurant/restaurant.repo';
+import { RestaurantsRepository } from './db/restaurants/restaurants.repo';
 import { UsersRepository } from './db/users/users.repo';
 
 // Validate environment variables at startup

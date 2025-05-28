@@ -20,6 +20,8 @@
 
 - [ ] Optimize PostGIS queries for location-based searches
 - [ ] Create database backup script
+- [x] Setup `restaurants-users` table
+- [x] Setup `users` and `restaurants` table
 - [x] Implement initial DB data with migration
 - [x] Setup migrations
 - [x] Initialize PostgreSQL database

@@ -37,7 +37,7 @@ router.delete('/:id', authenticateAPIKey, (req: Request, res: Response) => {
     });
 });
 
-router.post('/like', authenticateAPIKey, (req: Request, res: Response) => {
+router.post('/user', authenticateAPIKey, (req: Request, res: Response) => {
   const data: CreateRestaurantUserData = {
     user_id: req.body.user_id,
     restaurant_id: req.body.restaurant_id,

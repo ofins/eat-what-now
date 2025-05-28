@@ -1,12 +1,19 @@
 ### Challenges
 
-1. Currently, restaurant metadata are queried through `restaurant-user` join table relationships. What would be the best method to query in batches for `feeds`.
-
 ### 28th
 
 - Aggregate `total_upvotes` and `total_downvotes` in `restaurants` repo.
 - Setup CRON service to update such data every hour.
 - Setup `singleton` for services.
+
+Issue encountered:
+
+1. Setting `average_ratings` in my restaurants table to `NOT NULL` constraint. Then aggregating causing `null` to appear if ratings are 0.
+   1. use `COALESCE` to provide fallback of 0.
+
+What I learned:
+
+1. Use `restaurant-user` join tables to aggregate metadata and save it to `restaurants` table for efficient queries.
 
 ### 27th
 

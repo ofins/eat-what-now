@@ -12,7 +12,7 @@ import {
   RestaurantFilterOptions,
   RestaurantsRepositoryConfig,
   UpdateRestaurantData,
-} from './restaurant.type';
+} from './restaurants.type';
 import restaurantData from './seed.json';
 import cron from 'node-cron';
 
@@ -36,9 +36,10 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
       .then(() => this.createRestaurantDailyFeed())
       .then(() => this.shuffleRestaurantDailyFeed())
       .then(() => {
+        this.aggregateUserData();
         cron.schedule('0 * * * *', async () => {
           try {
-            this.aggregateVotes();
+            this.aggregateUserData();
           } catch (error) {
             console.error('Error running CRON in restaurantRepo:', error);
           }
@@ -72,6 +73,9 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
           contact_info TEXT,
           total_upvotes INT DEFAULT 0,
           total_downvotes INT DEFAULT 0,
+          total_favorites INT DEFAULT 0,
+          total_comments INT DEFAULT 0,
+          average_ratings DECIMAL(3, 2) NOT NULL CHECK (average_ratings >=0 AND average_ratings <= 5),
           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         )
@@ -483,24 +487,39 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
     }
   }
 
-  private async aggregateVotes(): Promise<void> {
+  private async aggregateUserData(): Promise<void> {
     try {
       await this.db.none(`
         UPDATE ${TABLE_NAME} r
         SET total_upvotes = (
           SELECT COUNT(*)
-          FROM restaurant_users ru
+          FROM restaurant_user ru
           WHERE ru.restaurant_id = r.id AND ru.upvoted = true
         ),
         total_downvotes = (
           SELECT COUNT(*)
-          FROM restaurant_users ru
+          FROM restaurant_user ru
           WHERE ru.restaurant_id = r.id AND ru.downvoted = true
+        ),
+        total_favorites = (
+          SELECT COUNT(*)
+          FROM restaurant_user ru
+          WHERE ru.restaurant_id = r.id AND ru.favorited = true
+        ),
+        total_comments = (
+          SELECT COUNT(*)
+          FROM restaurant_user ru 
+          WHERE ru.restaurant_id = r.id AND comment IS NOT NULL AND ru.comment <> ''
+        ),
+        average_ratings = (
+          SELECT COALESCE(AVG(ru.rating), 0)
+          FROM restaurant_user ru
+          WHERE ru.restaurant_id = r.id AND ru.rating IS NOT NULL
         )
         `);
-      console.log('Votes aggregated successfully');
+      console.log('Users data aggregated successfully');
     } catch (error) {
-      console.error('Error aggregating votes:', error);
+      console.error('Error aggregating Users data:', error);
       throw error;
     }
   }

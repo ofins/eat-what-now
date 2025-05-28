@@ -1,6 +1,6 @@
 import BaseRepository from './base.repo';
 
-const TABLE_NAME = 'restaurant_users';
+const TABLE_NAME = 'restaurant_user';
 
 export interface RestaurantUser {
   id: number;
