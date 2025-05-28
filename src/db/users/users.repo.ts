@@ -87,6 +87,17 @@ export class UsersRepository extends BaseRepository {
     }
   }
 
+  async getUserByEmail(email: string) {
+    try {
+      return await this.db.oneOrNone<IUser>(
+        `SELECT * FROM ${TABLE_NAME} WHERE email = $1`,
+        [email]
+      );
+    } catch (error) {
+      console.error(`Error fetching user by email ${email}:`, error);
+    }
+  }
+
   async getUsers(
     options: UserFilterOptions
   ): Promise<PaginatedResponse<IUser>> {

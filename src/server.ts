@@ -6,6 +6,7 @@ import { validateEnv } from './config';
 import feedRouter from './routes/feed.router';
 import usersRouter from './routes/users.router';
 import restaurantsRouter from './routes/restaurants.router';
+import authRouter from './routes/auth.router';
 import { swaggerUiHandler, swaggerUiSetup } from './swagger';
 import { serveMarkdownFile } from './utils/file';
 import { RestaurantUserRepository } from './db/restaurant-user.repo';
@@ -30,6 +31,7 @@ app.use(express.json());
 app.use('/feed', feedRouter);
 app.use('/users', usersRouter);
 app.use('/restaurants', restaurantsRouter);
+app.use('/auth', authRouter);
 
 app.get('/notes', async (_, res: Response) => {
   await serveMarkdownFile('src/notes.md', res);

@@ -6,7 +6,12 @@ export const DEFAULT_RADIUS_KM = 5;
 export const DEFAULT_LIMIT = 20;
 export const MAX_SEARCH_RADIUS = 25;
 
-export const REQUIRED_ENV_VARS = ['PORT', 'SIGNATURE', 'DATABASE_URL'];
+export const REQUIRED_ENV_VARS = [
+  'PORT',
+  'SIGNATURE',
+  'DATABASE_URL',
+  'JWT_SECRET',
+];
 
 export function validateEnv() {
   const missing = REQUIRED_ENV_VARS.filter((key) => !process.env[key]);

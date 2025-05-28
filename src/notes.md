@@ -5,6 +5,7 @@
 - Aggregate `total_upvotes` and `total_downvotes` in `restaurants` repo.
 - Setup CRON service to update such data every hour.
 - Setup `singleton` for services.
+- Feat `/login` with JWT
 
 Issue encountered:
 
