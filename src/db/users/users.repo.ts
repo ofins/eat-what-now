@@ -145,4 +145,30 @@ export class UsersRepository extends BaseRepository {
       throw error;
     }
   }
+
+  async createUser(data: IUser) {
+    try {
+      // validate user data
+
+      return await this.db.one<IUser>(
+        `INSERT INTO ${TABLE_NAME} (
+          email, username, password_hash, full_name, avatar_url,
+          is_active, is_verified, created_at, updated_at
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9
+        ) RETURNING *`,
+        [
+          data.email,
+          data.username,
+          data.password_hash,
+          data.avatar_url,
+          data.is_active,
+          data.is_verified,
+        ]
+      );
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
+  }
 }

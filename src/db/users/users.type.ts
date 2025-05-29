@@ -22,3 +22,10 @@ export interface UserFilterOptions extends PaginationTypes {
   created_at?: Date;
   updated_at?: Date;
 }
+
+export interface CreateUser {
+  email: string;
+  username: string;
+  password_hash: string;
+  full_name: string;
+}

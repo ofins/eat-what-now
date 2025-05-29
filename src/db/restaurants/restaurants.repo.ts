@@ -262,7 +262,7 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
       this.validateRestaurantData(data);
 
       return await this.db.one<IRestaurant>(
-        `INSERT INTO restaurants (
+        `INSERT INTO ${TABLE_NAME} (
           name, address, cuisine_type, price_range, rating,
           longitude, latitude, open_hours, contact_info
         ) VALUES (
