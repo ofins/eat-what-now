@@ -1,7 +1,6 @@
 import { PaginationTypes } from 'src/types';
 
 export interface IUser {
-  id: string;
   email: string;
   username: string;
   password_hash: string;

@@ -161,9 +161,12 @@ export class UsersRepository extends BaseRepository {
           data.email,
           data.username,
           data.password_hash,
+          data.full_name,
           data.avatar_url,
           data.is_active,
           data.is_verified,
+          data.created_at,
+          data.updated_at,
         ]
       );
     } catch (error) {
