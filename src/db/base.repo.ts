@@ -22,7 +22,7 @@ export default abstract class BaseRepository<
     this.TABLE_NAME = TABLE_NAME;
   }
 
-  protected async initializeDatabase(): Promise<void> {
+  public async initializeDatabase(): Promise<void> {
     try {
       const data = await this.db.one('SELECT NOW() AS current_time');
       console.log(

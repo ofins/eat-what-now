@@ -1,5 +1,5 @@
-import BaseRepository from './base.repo';
-
+import BaseRepository from '../base.repo';
+import restaurantUserData from './restaurant-user-seed.json';
 const TABLE_NAME = 'restaurant_user';
 
 export interface RestaurantUser {
@@ -64,6 +64,25 @@ export class RestaurantUserRepository extends BaseRepository {
       console.error('Failed to create restaurant_user table:', error);
       throw error;
     }
+  }
+
+  public async seedData(): Promise<void> {
+    this.db.tx((t) => {
+      const queries = restaurantUserData.map((r) => {
+        return t.none(
+          `
+          INSERT INTO ${TABLE_NAME} (
+            user_id, restaurant_id, upvoted, downvoted, favorited, rating, comment, visited_at, created_at, updated_at
+          ) VALUES (
+            $<user_id>, $<restaurant_id>, $<upvoted>, $<downvoted>, $<favorited>, $<rating>, $<comment>, $<visited_at>,
+            CURRENT_TIMESTAMP, CURRENT_TIMESTAMP 
+          ) 
+          `,
+          r
+        );
+      });
+      return t.batch(queries);
+    });
   }
 
   async addRelationship(

@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { CreateRestaurantUserData } from 'src/db/restaurant-user.repo';
+import { CreateRestaurantUserData } from 'src/db/restaurant-user/restaurant-user.repo';
 import { authenticateAPIKey } from 'src/middleware/auth';
 import { restaurantRepository, restaurantUserRepository } from 'src/server';
 

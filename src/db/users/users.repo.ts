@@ -1,7 +1,7 @@
+import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 import BaseRepository from '../base.repo';
 import seed from './seed.json';
 import { IUser, UserFilterOptions } from './users.type';
-import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 
 const TABLE_NAME = 'users';
 export class UsersRepository extends BaseRepository {
@@ -52,7 +52,7 @@ export class UsersRepository extends BaseRepository {
     }
   }
 
-  private async seedData(): Promise<void> {
+  public async seedData(): Promise<void> {
     this.db.tx((t) => {
       const queries = seed.map((user) => {
         return t.none(

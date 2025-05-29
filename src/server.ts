@@ -3,15 +3,15 @@ import 'reflect-metadata';
 import cors from 'cors';
 import express, { Response } from 'express';
 import { validateEnv } from './config';
-import feedRouter from './routes/feed.router';
-import usersRouter from './routes/users.router';
-import restaurantsRouter from './routes/restaurants.router';
-import authRouter from './routes/auth.router';
-import { swaggerUiHandler, swaggerUiSetup } from './swagger';
-import { serveMarkdownFile } from './utils/file';
-import { RestaurantUserRepository } from './db/restaurant-user.repo';
+import { RestaurantUserRepository } from './db/restaurant-user/restaurant-user.repo';
 import { RestaurantsRepository } from './db/restaurants/restaurants.repo';
 import { UsersRepository } from './db/users/users.repo';
+import authRouter from './routes/auth.router';
+import feedRouter from './routes/feed.router';
+import restaurantsRouter from './routes/restaurants.router';
+import usersRouter from './routes/users.router';
+import { swaggerUiHandler, swaggerUiSetup } from './swagger';
+import { serveMarkdownFile } from './utils/file';
 
 // Validate environment variables at startup
 validateEnv();
@@ -21,8 +21,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 export const restaurantRepository = new RestaurantsRepository();
-export const restaurantUserRepository = new RestaurantUserRepository();
 export const usersRepository = new UsersRepository();
+export const restaurantUserRepository = new RestaurantUserRepository();
 
 app.use('/docs', swaggerUiHandler, swaggerUiSetup);
 app.use(cors());

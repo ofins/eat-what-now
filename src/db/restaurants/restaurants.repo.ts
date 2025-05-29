@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import cron from 'node-cron';
 import {
   DEFAULT_LIMIT,
   DEFAULT_RADIUS_KM,
@@ -14,7 +15,6 @@ import {
   UpdateRestaurantData,
 } from './restaurants.type';
 import restaurantData from './seed.json';
-import cron from 'node-cron';
 
 dotenv.config();
 
@@ -99,7 +99,7 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
         return;
       }
       // Seed data in a separate method for better organization
-      await this.seedRestaurantsData(TABLE_NAME);
+      await this.seedData();
 
       console.log('Restaurants table created and seeded successfully');
     } catch (error) {
@@ -108,7 +108,7 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
     }
   }
 
-  private async seedRestaurantsData(TABLE_NAME: string): Promise<void> {
+  public async seedData(): Promise<void> {
     // Use a transaction for bulk insert
     this.db.tx(async (t) => {
       const queries = restaurantData.map((restaurant) => {
@@ -117,10 +117,12 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
           INSERT INTO ${TABLE_NAME} (
             name, address, cuisine_type, price_range, rating,
             longitude, latitude, open_hours, contact_info,
+            total_upvotes, total_downvotes, total_favorites, total_comments, average_ratings,
             created_at, updated_at
           ) VALUES (
             $<name>, $<address>, $<cuisine_type>, $<price_range>, $<rating>,
             $<longitude>, $<latitude>, $<open_hours>, $<contact_info>,
+            $<total_upvotes>, $<total_downvotes>, $<total_favorites>, $<total_comments>, $<average_ratings>,
             CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
           )
         `,
