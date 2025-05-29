@@ -44,6 +44,27 @@ router.post('/register', (req: Request, res: Response): any => {
   }
 
   // hash password
+
+  usersRepository.getUserByEmail(email).then((user) => {
+    if (user) {
+      return res.status(409).json({ error: 'Email already registered' });
+    }
+
+    bcrypt.hash(password, 10).then((passwordHash) => {
+      usersRepository.createUser({
+        email,
+        password_hash: passwordHash,
+        full_name,
+        avatar_url: '',
+        is_active: true,
+        is_verified: false,
+        id: '',
+        username: '',
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
+    });
+  });
 });
 
 export default router;
