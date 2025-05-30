@@ -2,6 +2,8 @@
 
 ## Bug Issues
 
+- [ ] Application shuts down if errors are thrown in creating DB (5.30.2025)
+  - `try/catch` blocks are used and issue still occurs
 - [ ] Docker compose up throwing error (5.17.2025)
 
 ## Backend Development
@@ -9,7 +11,9 @@
 - [ ] Setup Logger for API and DB
 - [ ] Add unit testing
 - [ ] Setup CI/CD pipeline in Github Actions
-- [ ] Setup `/login` API with JWT
+- [ ] Add `phone` and `website` column for restaurant
+- [x] Integrate Schema validation
+- [x] Setup `/login` and `/register` API with JWT
 - [x] Setup `/restaurants` API
 - [x] Setup `/user` API
 - [x] Setup CRUD functionality for `/feed` API

@@ -1,5 +1,15 @@
 ### Challenges
 
+### 30th
+
+- Display list of API in Swagger Doc for current API endpoints
+- Integrate `zod` for schema declaration and input validation
+
+### 29th
+
+- Setup `/auth` and API `login` and `register`
+- Test JWT token and password auth
+
 ### 28th
 
 - Aggregate `total_upvotes` and `total_downvotes` in `restaurants` repo.

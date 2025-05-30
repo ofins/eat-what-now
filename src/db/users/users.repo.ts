@@ -1,7 +1,7 @@
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 import BaseRepository from '../base.repo';
 import seed from './seed.json';
-import { IUser, UserFilterOptions } from './users.type';
+import { CreateUserDBSchema, IUser, UserFilterOptions } from './users.schema';
 
 const TABLE_NAME = 'users';
 export class UsersRepository extends BaseRepository {
@@ -146,10 +146,9 @@ export class UsersRepository extends BaseRepository {
     }
   }
 
-  async createUser(data: IUser) {
+  async createUser(data: CreateUserDBSchema) {
     try {
-      // validate user data
-
+      const now = new Date();
       return await this.db.one<IUser>(
         `INSERT INTO ${TABLE_NAME} (
           email, username, password_hash, full_name, avatar_url,
@@ -162,11 +161,11 @@ export class UsersRepository extends BaseRepository {
           data.username,
           data.password_hash,
           data.full_name,
-          data.avatar_url,
-          data.is_active,
-          data.is_verified,
-          data.created_at,
-          data.updated_at,
+          '', // avatar_url default
+          true, // is_active default
+          false, // is_verified default
+          now, // created_at
+          now, // updated_at
         ]
       );
     } catch (error) {

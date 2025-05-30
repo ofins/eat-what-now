@@ -1,13 +1,11 @@
 import { BaseRepositoryConfig } from '../base.repo';
 
 export interface IRestaurant {
-  id: number;
   name: string;
   latitude: number;
   longitude: number;
   image_url: string;
   description: string;
-
   address: string;
   cuisine_type: string;
   price_range: number;
