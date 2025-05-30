@@ -4,6 +4,8 @@
 
 - Display list of API in Swagger Doc for current API endpoints
 - Integrate `zod` for schema declaration and input validation
+- Test `/users` endpoint with schema validation
+- Design `/users/profile` endpoint so that users logged in can only see his/her own profile details
 
 ### 29th
 

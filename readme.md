@@ -2,6 +2,12 @@
 
 Backend API for EatWhatNow — a restaurant discovery and user engagement platform.
 
+_EatWhatNow is the first backend project I am building to become more familiar with server and system design as a frontend engineer._
+
+## Overview
+
+Struggling to find a place to eat tonight? Try EatWhatNow, the app that makes dining decisions easy! Visit the site, and it instantly suggests top-rated restaurants near you.
+
 ## Project Preferences
 
 - `then/catch` instead of `async/await` because I write all my projects in the latter.
@@ -93,6 +99,32 @@ DATABASE_URL=postgres://postgres:password@localhost:5432/database
 - Tables: `users`, `restaurants`, `restaurant_user`, `restaurant_daily_feed`
 - Seed data is loaded on first run
 - Aggregated stats (upvotes, downvotes, etc.) are updated hourly via CRON
+
+## API Data Formats
+
+**Single-data**
+
+```typescript
+interface SingleData<T> {
+  data?: T;
+  message?: string;
+  error?: string;
+}
+```
+
+**List data**
+
+```typescript
+interface ListData<T> {
+  data: T[];
+  total: number;
+  limit: number;
+  offset: number;
+  page: number;
+  totalPages: number;
+  error?: string;
+}
+```
 
 ## Development
 
