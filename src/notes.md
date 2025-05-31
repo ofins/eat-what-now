@@ -1,8 +1,8 @@
-### Challenges
-
 ### 31th
 
 - Test `/users/profile` and fix minor bugs of not being able to find user
+- Update Swagger for `/feed`, `/auth`, `/restuarants`, `/users`
+- implement schema validation for `/feed` and `/restaurants`
 
 What I learned:
 

@@ -9,8 +9,7 @@
 ## Backend Development
 
 - [ ] Setup Logger for API and DB
-- [ ] Add unit testing
-- [ ] Setup CI/CD pipeline in Github Actions
+- [ ] Implement unit testing using Jest
 - [ ] Add `phone` and `website` column for restaurant
 - [x] Setup `/users/profile` and ensure user can only access own data
 - [x] Integrate Schema validation
@@ -21,20 +20,28 @@
 - [x] Containerize server/Db with Docker
 - [x] Implement Type-ORM
 
-# Database Tasks
+## Database Tasks
 
 - [ ] Optimize PostGIS queries for location-based searches
 - [ ] Create database backup script
+- [ ] Setup a form of migration
 - [x] Setup `restaurants-users` table
 - [x] Setup `users` and `restaurants` table
 - [x] Implement initial DB data with migration
-- [x] Setup migrations
 - [x] Initialize PostgreSQL database
+
+## DevOps Tasks
+
+- [ ] Setup CDN for images
+- [ ] Test PROD env
+- [ ] Setup site via AWS ECS with Docker
+- [ ] Purchase domain
+- [ ] Setup CI/CD pipeline in Github Actions
 
 ## Documentation
 
-- [ ] Write README.md for project setup instructions
 - [ ] Document authentication middleware usage
+- [x] Write README.md for project setup instructions
 - [x] Integrate Swagger for API documentation
 
 ## Refactoring
