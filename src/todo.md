@@ -12,6 +12,7 @@
 - [ ] Add unit testing
 - [ ] Setup CI/CD pipeline in Github Actions
 - [ ] Add `phone` and `website` column for restaurant
+- [x] Setup `/users/profile` and ensure user can only access own data
 - [x] Integrate Schema validation
 - [x] Setup `/login` and `/register` API with JWT
 - [x] Setup `/restaurants` API

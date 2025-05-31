@@ -1,3 +1,4 @@
+import { isUUID } from 'src/utils/misc';
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 import BaseRepository from '../base.repo';
 import seed from './seed.json';
@@ -72,9 +73,9 @@ export class UsersRepository extends BaseRepository {
     });
   }
 
-  async getUserById(id: number) {
+  async getUserById(id: string) {
     try {
-      if (!Number.isInteger(id) || id <= 0) {
+      if (!isUUID(id)) {
         throw new Error('Invalid user ID');
       }
 

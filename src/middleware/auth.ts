@@ -45,13 +45,17 @@ export const authenticateToken = (
   if (!secret)
     throw new Error('JWT_SECRET is not defined in environment variables');
 
-  jwt.verify(token, secret, (err) => {
-    if (err) {
-      res.sendStatus(403);
-      return; // forbidden
+  try {
+    const decoded = jwt.verify(token, secret) as jwt.JwtPayload;
+    console.log('Decoded JWT:', decoded);
+    if (decoded && typeof decoded === 'object' && 'user_id' in decoded) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (req as any).userId = decoded.user_id;
     }
     next();
-  });
+  } catch (error) {
+    res.sendStatus(403).send({ error }); // forbidden
+  }
 };
 
 export const signToken = (user: string | object): string => {

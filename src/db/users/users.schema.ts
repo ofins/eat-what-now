@@ -4,6 +4,7 @@ import z from 'zod';
 
 // * Schemas
 export const userSchema = z.object({
+  id: z.string().describe('uuid for the user'),
   email: z.string().email().describe('Email address of the user'),
   username: z.string().describe('Username of the user'),
   password_hash: z

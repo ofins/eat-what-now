@@ -23,6 +23,29 @@ router.get('/', authenticateAPIKey, (req: Request, res: Response) => {
 });
 
 // * Public
-router.get('/:id', authenticateToken, () => {});
+router.get('/profile', authenticateToken, (req: Request, res: Response) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userId = (req as any).userId;
+  console.log(userId);
+
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  usersRepository
+    .getUserById(userId)
+    .then((user) => {
+      if (!user) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+      res.json({ data: user });
+    })
+    .catch((error) => {
+      console.error('Error fetching user profile:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
 
 export default router;

@@ -1,5 +1,13 @@
 ### Challenges
 
+### 31th
+
+- Test `/users/profile` and fix minor bugs of not being able to find user
+
+What I learned:
+
+1. By signing JWT with user data and `JWT_SECRET`, it can ensure that user can only access his/her information with that same token.
+
 ### 30th
 
 - Display list of API in Swagger Doc for current API endpoints
