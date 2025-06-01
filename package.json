@@ -7,11 +7,18 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"npm run dev --prefix client\" \"npm run server --prefix server\"",
     "dev:server": "npm run server --prefix server",
-    "dev:client": "npm run dev --prefix client"
+    "dev:client": "npm run dev --prefix client",
+    "build": "concurrently \"npm run build --prefix client\" \"npm run build --prefix server\"",
+    "build:server": "npm run build --prefix server",
+    "build:client": "npm run build --prefix client"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^9.1.2"
-  }
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ]
 }
