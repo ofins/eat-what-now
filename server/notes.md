@@ -1,3 +1,11 @@
+### 2th
+
+- Setup **Types** folder in root level so both client and server can access
+
+### June 1th
+
+- Combined client and server into one folder, for a small sized project this is ideal.
+
 ### 31th
 
 - Test `/users/profile` and fix minor bugs of not being able to find user

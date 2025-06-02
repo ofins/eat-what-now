@@ -13,7 +13,7 @@ import {
   IRestaurant,
   RestaurantFilterOptions,
   RestaurantsRepositoryConfig,
-} from './restaurants.type';
+} from '../../../../shared/types/restaurants.type';
 import restaurantData from './seed.json';
 
 dotenv.config();
@@ -22,7 +22,7 @@ const TABLE_NAME = 'restaurants';
 
 export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryConfig> {
   constructor(
-    config: RestaurantsRepositoryConfig = {
+    config = {
       connectionString: process.env.DATABASE_URL || '',
       maxSearchRadius: MAX_SEARCH_RADIUS,
       defaultLimit: DEFAULT_LIMIT,
@@ -155,7 +155,10 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
    * @returns Array of restaurants matching the criteria
    */
   async getRestaurants(
-    options: RestaurantFilterOptions = {}
+    options: RestaurantFilterOptions = {
+      limit: this.config.defaultLimit,
+      offset: 0,
+    }
   ): Promise<PaginatedResponse<IRestaurant>> {
     try {
       // Validate inputs

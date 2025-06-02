@@ -1,4 +1,4 @@
-import { BaseRepositoryConfig } from '../base.repo';
+import { PaginationTypes } from "./index";
 
 export interface IRestaurant {
   name: string;
@@ -16,15 +16,13 @@ export interface IRestaurant {
   contact_info?: string;
 }
 
-export interface RestaurantFilterOptions {
+export interface RestaurantFilterOptions extends PaginationTypes {
   longitude?: number;
   latitude?: number;
   radius?: number; // in kilometers
   cuisineType?: string;
   priceRange?: string;
   minRating?: number;
-  limit?: number;
-  offset?: number;
 }
 
 /**
@@ -61,7 +59,10 @@ export interface UpdateRestaurantData {
  * Configuration options for the RestaurantService
  */
 export interface RestaurantsRepositoryConfig extends BaseRepositoryConfig {
-  // connectionString?: string;
   maxSearchRadius: number; // Maximum search radius in kilometers
   defaultLimit: number;
+}
+
+export interface BaseRepositoryConfig {
+  connectionString: string;
 }

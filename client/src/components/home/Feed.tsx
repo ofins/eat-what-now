@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import type { IRestaurant } from "../../../../shared/types/restaurants.type";
 
 // type FeedItem = {
 //   id: string | number;
@@ -8,8 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 // };
 
 type FeedResponse = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any[];
+  data: IRestaurant[];
 };
 
 const Feed = () => {
@@ -27,8 +27,8 @@ const Feed = () => {
       <ul>
         {data?.data.map((r) => {
           return (
-            <li key={r.id} className="p-2 m-2 border rounded">
-              <h3 className="text-lg font-bold">{r.title}</h3>
+            <li key={r.name} className="p-2 m-2 border rounded">
+              <h3 className="text-lg font-bold">{r.name}</h3>
               <p>{r.name}</p>
               <span className="text-sm text-gray-500">
                 location:{r.address}

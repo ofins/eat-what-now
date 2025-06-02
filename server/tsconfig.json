@@ -2,7 +2,8 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "src/*": ["*"]
+      "src/*": ["*"],
+      "@/types/*": ["../shared/types/*"]
     },
     "moduleResolution": "node",
     "target": "ES2020",

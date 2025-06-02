@@ -2,7 +2,11 @@ import { isUUID } from 'src/utils/misc';
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 import BaseRepository from '../base.repo';
 import seed from './seed.json';
-import { CreateUserDBSchema, IUser, UserFilterOptions } from './users.schema';
+import {
+  CreateUserDBSchema,
+  IUser,
+  UserFilterOptions,
+} from '../../../../shared/types/users.type';
 
 const TABLE_NAME = 'users';
 export class UsersRepository extends BaseRepository {

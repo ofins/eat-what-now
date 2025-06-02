@@ -7,7 +7,7 @@ This repository contains both the **backend server** and **frontend client** pro
 - **/server**: Node.js/TypeScript backend API
 
   - Handles authentication, user management, restaurant data, and API documentation (Swagger).
-  - Uses PostgreSQL, Docker Compose, TypeORM, pg-promise, and Zod for validation.
+  - Uses PostgreSQL, Docker Compose, pg-promise, and Zod for validation.
   - See [`server/readme.md`](server/readme.md) for setup, environment variables, and API usage details.
 
 - **/client**: React TypeScript frontend
@@ -17,23 +17,22 @@ This repository contains both the **backend server** and **frontend client** pro
 
 ## Getting Started
 
-1. **Install dependencies**
+```bash
+nvm use 20
+npm install
 
-   ```powershell
-   npm install
-   ```
+cp server/.env.example server/.env
+cp client/.env.example client/.env
 
-2. **Run both client and server in development**
+npm run dev
+```
 
-   ```powershell
-   npm run dev
-   ```
+This will start both the backend API and frontend app concurrently.
 
-   This will start both the backend API and frontend app concurrently.
+**For more details**
 
-3. **For more details**
-   - See [`server/readme.md`](server/readme.md) for backend setup, environment variables, and API documentation.
-   - See [`client/README.md`](client/README.md) for frontend setup and usage.
+- See [`server/readme.md`](server/readme.md) for backend setup, environment variables, and API documentation.
+- See [`client/README.md`](client/README.md) for frontend setup and usage.
 
 ---
 

@@ -1,0 +1,1 @@
+- [ ] Implement absolute path for `types` for server and client
