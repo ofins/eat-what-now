@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { IRestaurant } from "../../../../shared/types/restaurants.type";
+import type { IRestaurant } from "@ewn/types/restaurants.type";
 
 // type FeedItem = {
 //   id: string | number;

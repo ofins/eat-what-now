@@ -10,6 +10,7 @@ import {
 import {
   createUserSchema,
   userFilterOptionsSchema,
+  userLoginSchema,
   userSchema,
 } from './db/users/users.schema';
 
@@ -25,6 +26,7 @@ const updateRestaurantSchemaJson = zodToJsonSchema(updateRestaurantSchema);
 const createRestaurantUserSchemaJson = zodToJsonSchema(
   createRestaurantUserSchema
 );
+const userLoginSchemaJson = zodToJsonSchema(userLoginSchema);
 
 const options = {
   definition: {
@@ -37,6 +39,7 @@ const options = {
     components: {
       schemas: {
         UserSchema: userSchemaJson,
+        UserLoginSchema: userLoginSchemaJson,
         UserFilterOptionsSchema: userFilterOptionsSchemaJson,
         CreateUserSchema: createUserSchemaJson,
         RestaurantSchema: restaurantSchemaJson,

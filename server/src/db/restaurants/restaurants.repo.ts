@@ -13,7 +13,7 @@ import {
   IRestaurant,
   RestaurantFilterOptions,
   RestaurantsRepositoryConfig,
-} from '../../../../shared/types/restaurants.type';
+} from '@ewn/types/restaurants.type';
 import restaurantData from './seed.json';
 
 dotenv.config();

@@ -1,7 +1,7 @@
 import BaseRepository from '../base.repo';
 import { CreateRestaurantUser } from '../restaurants/restaurants.schema';
 import restaurantUserData from './restaurant-user-seed.json';
-import type { IRestaurantUser } from '../../../../shared/types/restaurant-user.type';
+import type { IRestaurantUser } from '@ewn/types/restaurant-user.type';
 
 const TABLE_NAME = 'restaurant_user';
 

@@ -3,7 +3,7 @@
     "baseUrl": "./src",
     "paths": {
       "src/*": ["*"],
-      "@/types/*": ["../shared/types/*"]
+      "@/types/*": ["../packages/types/*"]
     },
     "moduleResolution": "node",
     "target": "ES2020",

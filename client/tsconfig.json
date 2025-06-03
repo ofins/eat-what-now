@@ -8,7 +8,7 @@
     "baseUrl": ".",
     "paths": {
       "src/*": ["*"],
-      "@types/*": ["../shared/types/*"]
+      "@types/*": ["../packages/types/*"]
     }
   }
 }

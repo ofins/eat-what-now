@@ -125,7 +125,7 @@ export default router;
  *                   type: object
  *                   properties:
  *                     user:
- *                       $ref: '#/components/schemas/User'
+ *                       $ref: '#/components/schemas/UserLoginSchema'
  *                     token:
  *                       type: string
  *       400:

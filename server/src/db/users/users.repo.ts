@@ -6,7 +6,7 @@ import {
   CreateUserDBSchema,
   IUser,
   UserFilterOptions,
-} from '../../../../shared/types/users.type';
+} from '@ewn/types/users.type';
 
 const TABLE_NAME = 'users';
 export class UsersRepository extends BaseRepository {

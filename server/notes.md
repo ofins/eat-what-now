@@ -1,6 +1,15 @@
+### 3th
+
+-
+
 ### 2th
 
 - Setup **Types** folder in root level so both client and server can access
+
+Issue encountered:
+
+1. Unable to use path `alias` for `types` folder in packages for unknown reason. TS cannot find module.
+   1. Solved by utilizing npm workspaces and making making packages folder its own module that can be used as dependency by client and server.
 
 ### June 1th
 

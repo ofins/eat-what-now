@@ -5,20 +5,22 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"npm run dev --prefix client\" \"npm run server --prefix server\"",
-    "dev:server": "npm run server --prefix server",
-    "dev:client": "npm run dev --prefix client",
-    "build": "concurrently \"npm run build --prefix client\" \"npm run build --prefix server\"",
-    "build:server": "npm run build --prefix server",
-    "build:client": "npm run build --prefix client"
+    "dev": "concurrently \"npm run dev --workspace=client\" \"npm run server --workspace=server\"",
+    "dev:server": "npm run server --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "build": "concurrently \"npm run build --workspace=client\" \"npm run build --workspace=server\"",
+    "build:server": "npm run build --workspace=server",
+    "build:client": "npm run build --workspace=client"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^9.1.2"
   },
+  "private": true,
   "workspaces": [
     "client",
-    "server"
+    "server",
+    "packages/*"
   ]
 }

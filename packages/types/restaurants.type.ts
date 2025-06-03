@@ -1,4 +1,4 @@
-import { PaginationTypes } from "./index";
+import type { PaginationTypes } from "./index";
 
 export interface IRestaurant {
   name: string;

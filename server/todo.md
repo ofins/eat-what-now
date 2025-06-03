@@ -11,6 +11,7 @@
 - [ ] Setup Logger for API and DB
 - [ ] Implement unit testing using Jest
 - [ ] Add `phone` and `website` column for restaurant
+- [x] Move `types` to root level packages to share with client and server
 - [x] Setup `/users/profile` and ensure user can only access own data
 - [x] Integrate Schema validation
 - [x] Setup `/login` and `/register` API with JWT

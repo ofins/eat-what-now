@@ -84,7 +84,7 @@ export default router;
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/User'
+ *                     $ref: '#/components/schemas/UserFilterOptionsSchema'
  *                 total:
  *                   type: integer
  *                 limit:
@@ -112,8 +112,6 @@ export default router;
  *             schema:
  *               type: object
  *               properties:
- *                 data:
- *                   $ref: '#/components/schemas/User'
  *       401:
  *         description: Unauthorized
  *       404:
