@@ -1,1 +1,2 @@
-- [ ] Implement absolute path for `types` for server and client
+- [x] Setup CI/CD
+- [x] Implement absolute path for `types` for server and client
