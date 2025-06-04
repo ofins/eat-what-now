@@ -1,17 +1,17 @@
-version: '3.8'
+# version: "3.8"
 
 services:
   app:
     build: .
     ports:
-      - '3000:3000'
-    env_file:
-      - .env
+      - "3000:3000"
+    # env_file:
+    #   - .env
     depends_on:
       - db
-    volumes:
-      - .:/usr/src
-      # - /usr/src/node_modules # avoid overwriting node_modules
+    # volumes:
+    #   - .:/usr/src
+    #   - /usr/src/node_modules # avoid overwriting node_modules
     command: npm run start
 
   db:
@@ -22,9 +22,9 @@ services:
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: my_database
     ports:
-      - '5432:5432'
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+      - "5432:5432"
+    # volumes:
+    #   - pgdata:/var/lib/postgresql/data
 
 volumes:
   pgdata:

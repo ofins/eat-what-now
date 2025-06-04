@@ -10,7 +10,10 @@
     "dev:client": "npm run dev --workspace=client",
     "build": "concurrently \"npm run build --workspace=client\" \"npm run build --workspace=server\"",
     "build:server": "npm run build --workspace=server",
-    "build:client": "npm run build --workspace=client"
+    "build:client": "npm run build --workspace=client",
+    "start:server": "npm run start --workspace=server",
+    "compose:up": "docker-compose up --build",
+    "compose:down": "docker-compose down"
   },
   "author": "",
   "license": "ISC",

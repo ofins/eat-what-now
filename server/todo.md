@@ -2,9 +2,10 @@
 
 ## Bug Issues
 
+- [ ] Unable to connect to Docker DB using dbeaver (6.4.2025)
 - [ ] Application shuts down if errors are thrown in creating DB (5.30.2025)
   - `try/catch` blocks are used and issue still occurs
-- [ ] Docker compose up throwing error (5.17.2025)
+- [x] Docker compose up throwing error (5.17.2025)
 
 ## Backend Development
 

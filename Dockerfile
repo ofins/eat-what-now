@@ -2,9 +2,12 @@
 FROM node:18
 
 # Create app directory
-WORKDIR /usr/src
+WORKDIR /usr/src/app
 
 COPY package*.json ./
+COPY client/package.json ./client/
+COPY server/package.json ./server/
+COPY packages/types/package.json ./packages/types/
 
 RUN npm install 
 
@@ -13,7 +16,9 @@ COPY . .
 
 # Build TypeScript if needed
 # RUN npm install -g ts-node typescript
-RUN npm run build
+RUN npm run build --workspace=server
+
+WORKDIR /usr/src/app/server
 
 # Expose port
 EXPOSE 3000
