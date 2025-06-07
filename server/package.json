@@ -9,7 +9,9 @@
     "format": "prettier --write .",
     "init": "node dist/db/init.js",
     "compose:up": "docker compose up --build",
-    "compose:down": "docker-compose down"
+    "compose:down": "docker-compose down",
+    "db:migrate": "knex migrate:latest",
+    "db:seed": "knex seed:run"
   },
   "name": "ewn-backend",
   "version": "1.0.0",
@@ -25,6 +27,7 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "knex": "^3.1.0",
     "node-cron": "^4.0.0",
     "pg": "^8.16.0",
     "pg-promise": "^11.13.0",
@@ -37,6 +40,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
+    "@ewn/types": "^1.0.0",
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.1",
     "@types/node": "^22.15.19",
@@ -51,7 +55,6 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.32.0",
-    "@ewn/types": "^1.0.0"
+    "typescript-eslint": "^8.32.0"
   }
 }
