@@ -18,10 +18,11 @@ COPY . .
 # RUN npm install -g ts-node typescript
 RUN npm run build --workspace=server
 
-WORKDIR /usr/src/app/server
+COPY wait-for-it.sh /usr/src/app/wait-for-it.sh
+RUN chmod +x /usr/src/app/wait-for-it.sh
 
 # Expose port
 EXPOSE 3000
 
 # Start app
-CMD ["node", "dist/server.js"]
+CMD ["./wait-for-it.sh", "db:5432", "--", "sh", "-c", "node server/dist/db/init.js && node server/dist/server.js"]

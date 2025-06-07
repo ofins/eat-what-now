@@ -1,3 +1,9 @@
+import {
+  CreateRestaurantData,
+  IRestaurant,
+  RestaurantFilterOptions,
+  RestaurantsRepositoryConfig,
+} from '@ewn/types/restaurants.type';
 import dotenv from 'dotenv';
 import cron from 'node-cron';
 import {
@@ -8,12 +14,6 @@ import {
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 import BaseRepository from '../base.repo';
 import { CreateRestaurant, UpdateRestaurant } from './restaurants.schema';
-import {
-  CreateRestaurantData,
-  IRestaurant,
-  RestaurantFilterOptions,
-  RestaurantsRepositoryConfig,
-} from '@ewn/types/restaurants.type';
 import restaurantData from './seed.json';
 
 dotenv.config();
@@ -99,7 +99,7 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
         return;
       }
       // Seed data in a separate method for better organization
-      await this.seedData();
+      // await this.seedData();
 
       console.log('Restaurants table created and seeded successfully');
     } catch (error) {

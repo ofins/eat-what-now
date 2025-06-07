@@ -5,14 +5,17 @@ import {
 } from '../server';
 
 async function initializeAllTables() {
-  await restaurantRepository.initializeDatabase();
-  await restaurantRepository.seedData();
-
+  // Ensure users table is created first
   await usersRepository.initializeDatabase();
-  await usersRepository.seedData();
+  // await usersRepository.seedData();
 
+  // Then restaurants table
+  await restaurantRepository.initializeDatabase();
+  // await restaurantRepository.seedData();
+
+  // Then restaurant_user table
   await restaurantUserRepository.initializeDatabase();
-  await restaurantUserRepository.seedData();
+  // await restaurantUserRepository.seedData();
 }
 
 initializeAllTables();

@@ -1,12 +1,12 @@
-import { isUUID } from 'src/utils/misc';
-import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
-import BaseRepository from '../base.repo';
-import seed from './seed.json';
 import {
   CreateUserDBSchema,
   IUser,
   UserFilterOptions,
 } from '@ewn/types/users.type';
+import { isUUID } from 'src/utils/misc';
+import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
+import BaseRepository from '../base.repo';
+import seed from './seed.json';
 
 const TABLE_NAME = 'users';
 export class UsersRepository extends BaseRepository {
@@ -50,7 +50,7 @@ export class UsersRepository extends BaseRepository {
       }
 
       // seed
-      await this.seedData();
+      // await this.seedData();
     } catch (error) {
       console.error('Failed to create users table:', error);
       throw error;
