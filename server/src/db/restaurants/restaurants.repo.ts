@@ -14,44 +14,42 @@ import {
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 import BaseRepository from '../base.repo';
 import { CreateRestaurant, UpdateRestaurant } from './restaurants.schema';
+import db from 'src/db/db';
+import { IDatabase } from 'pg-promise';
+import { IClient } from 'pg-promise/typescript/pg-subset';
 
 dotenv.config();
 
 const TABLE_NAME = 'restaurants';
 
-export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryConfig> {
+export class RestaurantsRepository extends BaseRepository {
+  private config: RestaurantsRepositoryConfig;
+  protected db: IDatabase<unknown, IClient>;
+
   constructor(
     config = {
-      connectionString: process.env.DATABASE_URL || '',
       maxSearchRadius: MAX_SEARCH_RADIUS,
       defaultLimit: DEFAULT_LIMIT,
     }
   ) {
-    super(config.connectionString, TABLE_NAME);
+    super(db, TABLE_NAME);
     this.config = config;
+    this.db = db;
 
-    this.initializeDatabase()
-      .then(() => this.verifyDatabaseStructure())
-      .then(() => this.shuffleRestaurantDailyFeed())
-      .then(() => {
+    this.aggregateUserData();
+    cron.schedule('0 * * * *', async () => {
+      try {
         this.aggregateUserData();
-        cron.schedule('0 * * * *', async () => {
-          try {
-            this.aggregateUserData();
-          } catch (error) {
-            console.error('Error running CRON in restaurantRepo:', error);
-          }
-        });
-      })
-      // .then(() => {
-      //   cron.schedule('0 0 * * *', async () => {
-      //     console.log('Running daily restaurant shuffle...');
-      //     this.shuffleRestaurantDailyFeed();
-      //   });
-      // })
-      .catch((error) => {
-        console.error('Error initializing database:', error);
-      });
+      } catch (error) {
+        console.error('Error running CRON in restaurantRepo:', error);
+      }
+    });
+
+    this.shuffleRestaurantDailyFeed();
+    cron.schedule('0 0 * * *', async () => {
+      console.log('Running daily restaurant shuffle...');
+      this.shuffleRestaurantDailyFeed();
+    });
   }
 
   async getRestaurantById(id: number) {

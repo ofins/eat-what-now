@@ -1,18 +1,14 @@
 import BaseRepository from '../base.repo';
 import { CreateRestaurantUser } from '../restaurants/restaurants.schema';
 import type { IRestaurantUser } from '@ewn/types/restaurant-user.type';
+import db from 'src/db/db';
 
 const TABLE_NAME = 'restaurant_user';
 
 export class RestaurantUserRepository extends BaseRepository {
-  constructor(
-    config = {
-      connectionString: process.env.DATABASE_URL || '',
-    }
-  ) {
-    super(config.connectionString, TABLE_NAME);
-    this.config = config;
-
+  constructor() {
+    super(db, TABLE_NAME);
+    this.db = db;
     this.initializeDatabase().then(() => this.verifyDatabaseStructure());
   }
 

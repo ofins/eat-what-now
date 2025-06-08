@@ -58,11 +58,7 @@ export interface UpdateRestaurantData {
 /**
  * Configuration options for the RestaurantService
  */
-export interface RestaurantsRepositoryConfig extends BaseRepositoryConfig {
+export interface RestaurantsRepositoryConfig {
   maxSearchRadius: number; // Maximum search radius in kilometers
   defaultLimit: number;
-}
-
-export interface BaseRepositoryConfig {
-  connectionString: string;
 }

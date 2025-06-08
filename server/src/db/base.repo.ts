@@ -1,21 +1,21 @@
-import pgPromise, { IDatabase, IMain } from 'pg-promise';
+import { IDatabase } from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
 
 export interface BaseRepositoryConfig {
   connectionString: string;
 }
-export default abstract class BaseRepository<
-  T extends BaseRepositoryConfig = BaseRepositoryConfig,
-> {
-  protected config: Required<T>;
+export default abstract class BaseRepository {
   protected db: IDatabase<unknown, IClient>;
   protected TABLE_NAME: string;
 
-  constructor(connectionString: string, TABLE_NAME: string) {
-    const pgp: IMain = pgPromise();
-    this.db = pgp(connectionString);
-    this.config = { connectionString } as Required<T>;
+  constructor(db: IDatabase<unknown, IClient>, TABLE_NAME: string) {
+    this.db = db;
     this.TABLE_NAME = TABLE_NAME;
+    this.initializeDatabase()
+      .then(() => this.verifyDatabaseStructure())
+      .catch((error) => {
+        console.error('Error during database initialization:', error);
+      });
   }
 
   public async initializeDatabase(): Promise<void> {

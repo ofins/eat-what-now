@@ -6,18 +6,17 @@ import {
 import { isUUID } from 'src/utils/misc';
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 import BaseRepository from '../base.repo';
+import db from 'src/db/db';
+import { IDatabase } from 'pg-promise';
+import { IClient } from 'pg-promise/typescript/pg-subset';
 
 const TABLE_NAME = 'users';
 export class UsersRepository extends BaseRepository {
-  constructor(
-    config = {
-      connectionString: process.env.DATABASE_URL || '',
-    }
-  ) {
-    super(config.connectionString, TABLE_NAME);
-    this.config = config;
+  protected db: IDatabase<unknown, IClient>;
 
-    this.initializeDatabase().then(() => this.verifyDatabaseStructure());
+  constructor() {
+    super(db, TABLE_NAME);
+    this.db = db;
   }
 
   async getUserById(id: string) {

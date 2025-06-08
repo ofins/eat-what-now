@@ -1,6 +1,7 @@
 ### 8th
 
 - Setup migrations and seeding using `Knex.js`
+- Fix duplicate database instance connection error by having all repo connect with same db instance
 
 Things I learned:
 

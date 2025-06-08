@@ -10,7 +10,7 @@ export const REQUIRED_ENV_VARS = [
   'PORT',
   'SIGNATURE',
   'JWT_SECRET',
-  'DATABASE_URL',
+  // 'DATABASE_URL',
   'DB_DATABASE',
   'DB_USER',
   'DB_PASSWORD',

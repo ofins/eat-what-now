@@ -47,7 +47,6 @@ Copy `.env.example` to `.env` and fill in the required values:
 PORT=3000
 SIGNATURE=your_api_key
 JWT_SECRET=your_jwt_secret
-DATABASE_URL=postgres://postgres:password@localhost:5432/database
 ```
 
 ### Local Development - Getting started
