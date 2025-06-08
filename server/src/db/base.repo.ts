@@ -11,10 +11,6 @@ export default abstract class BaseRepository<
   protected db: IDatabase<unknown, IClient>;
   protected TABLE_NAME: string;
 
-  // constructor(db: IDatabase<unknown, IClient>, TABLE_NAME: string) {
-  //   this.db = db;
-  //   this.TABLE_NAME = TABLE_NAME;
-  // }
   constructor(connectionString: string, TABLE_NAME: string) {
     const pgp: IMain = pgPromise();
     this.db = pgp(connectionString);
@@ -44,18 +40,11 @@ export default abstract class BaseRepository<
       );
 
       if (!tableExists || !tableExists.exists) {
-        console.warn(
-          `${this.TABLE_NAME} table does not exist, attempting to create it...`
-        );
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (this as any).createTable(); // Subclass should implement this
-        console.log(`Successfully created ${this.TABLE_NAME} table`);
+        console.warn(`${this.TABLE_NAME} table does not exist`);
       }
     } catch (error) {
       console.error('Error verifying database structure:', error);
       throw error;
     }
   }
-
-  protected abstract createTable(): Promise<void>;
 }

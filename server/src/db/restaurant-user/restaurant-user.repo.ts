@@ -1,6 +1,5 @@
 import BaseRepository from '../base.repo';
 import { CreateRestaurantUser } from '../restaurants/restaurants.schema';
-import restaurantUserData from './restaurant-user-seed.json';
 import type { IRestaurantUser } from '@ewn/types/restaurant-user.type';
 
 const TABLE_NAME = 'restaurant_user';
@@ -15,52 +14,6 @@ export class RestaurantUserRepository extends BaseRepository {
     this.config = config;
 
     this.initializeDatabase().then(() => this.verifyDatabaseStructure());
-  }
-
-  protected async createTable(): Promise<void> {
-    try {
-      await this.db.none(`
-          CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
-            id SERIAL PRIMARY KEY,
-            user_id UUID NOT NULL,
-            restaurant_id INT NOT NULL,
-            upvoted BOOLEAN DEFAULT FALSE,
-            downvoted BOOLEAN DEFAULT FALSE,
-            favorited BOOLEAN DEFAULT FALSE,
-            rating INT CHECK (rating BETWEEN 1 AND 5),
-            comment TEXT,
-            visited_at TIMESTAMP,
-            created_at TIMESTAMP DEFAULT now(),
-            updated_at TIMESTAMP DEFAULT now(),
-            UNIQUE (user_id, restaurant_id),
-            FOREIGN KEY (user_id) REFERENCES users(id),
-            FOREIGN KEY (restaurant_id) REFERENCES restaurants(id),
-            CHECK (NOT (upvoted AND downvoted))
-          );
-            `);
-    } catch (error) {
-      console.error('Failed to create restaurant_user table:', error);
-      throw error;
-    }
-  }
-
-  public async seedData(): Promise<void> {
-    this.db.tx((t) => {
-      const queries = restaurantUserData.map((r) => {
-        return t.none(
-          `
-          INSERT INTO ${TABLE_NAME} (
-            user_id, restaurant_id, upvoted, downvoted, favorited, rating, comment, visited_at, created_at, updated_at
-          ) VALUES (
-            $<user_id>, $<restaurant_id>, $<upvoted>, $<downvoted>, $<favorited>, $<rating>, $<comment>, $<visited_at>,
-            CURRENT_TIMESTAMP, CURRENT_TIMESTAMP 
-          ) 
-          `,
-          r
-        );
-      });
-      return t.batch(queries);
-    });
   }
 
   async addRelationship(data: CreateRestaurantUser): Promise<IRestaurantUser> {

@@ -12,15 +12,11 @@ export const restaurantSchema = z.object({
   image_url: z.string().url(),
   description: z.string().optional().describe('Description of the restaurant'),
   address: z.string().describe('Physical address of the restaurant'),
-  //   phone: z
-  //     .string()
-  //     .optional()
-  //     .describe('Contact phone number of the restaurant'),
-  //   website: z
-  //     .string()
-  //     .url()
-  //     .optional()
-  //     .describe('Website URL of the restaurant'),
+  website: z
+    .string()
+    .url()
+    .optional()
+    .describe('Website URL of the restaurant'),
   cuisine_type: z
     .string()
     .describe('Type of cuisine offered by the restaurant'),
@@ -64,6 +60,7 @@ export const createRestaurantSchema = z.object({
   latitude: z.number(),
   open_hours: z.string().optional(),
   contact_info: z.string().optional(),
+  website: z.string().url().optional(),
 });
 
 export const updateRestaurantSchema = z.object({

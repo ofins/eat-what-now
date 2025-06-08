@@ -14,7 +14,6 @@ import {
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 import BaseRepository from '../base.repo';
 import { CreateRestaurant, UpdateRestaurant } from './restaurants.schema';
-import restaurantData from './seed.json';
 
 dotenv.config();
 
@@ -33,7 +32,6 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
 
     this.initializeDatabase()
       .then(() => this.verifyDatabaseStructure())
-      .then(() => this.createRestaurantDailyFeed())
       .then(() => this.shuffleRestaurantDailyFeed())
       .then(() => {
         this.aggregateUserData();
@@ -54,84 +52,6 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
       .catch((error) => {
         console.error('Error initializing database:', error);
       });
-  }
-
-  protected async createTable(): Promise<void> {
-    try {
-      // Create table with schema
-      await this.db.none(`
-        CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
-          id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          address TEXT NOT NULL,
-          cuisine_type VARCHAR(100) NOT NULL,
-          price_range DECIMAL(3, 2) NOT NULL CHECK (price_range >= 0 AND price_range <= 5),
-          rating DECIMAL(3, 2) NOT NULL CHECK (rating >= 0 AND rating <= 5),
-          longitude DECIMAL(11, 8) NOT NULL,
-          latitude DECIMAL(10, 8) NOT NULL,
-          open_hours TEXT,
-          contact_info TEXT,
-          total_upvotes INT DEFAULT 0,
-          total_downvotes INT DEFAULT 0,
-          total_favorites INT DEFAULT 0,
-          total_comments INT DEFAULT 0,
-          average_ratings DECIMAL(3, 2) NOT NULL CHECK (average_ratings >=0 AND average_ratings <= 5),
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      // Create indexes separately
-      await this.db.none(`
-        CREATE INDEX IF NOT EXISTS idx_${TABLE_NAME}_location ON ${TABLE_NAME} (longitude, latitude);
-        CREATE INDEX IF NOT EXISTS idx_${TABLE_NAME}_cuisine ON ${TABLE_NAME} (cuisine_type);
-        CREATE INDEX IF NOT EXISTS idx_${TABLE_NAME}_rating ON ${TABLE_NAME} (rating);
-      `);
-
-      // Check if data already exists before inserting
-      const existingData = await this.db.oneOrNone(
-        `SELECT COUNT(*) FROM ${TABLE_NAME}`
-      );
-      if (existingData && parseInt(existingData.count) > 0) {
-        console.log(
-          'Restaurants table already contains data, skipping seed data insertion'
-        );
-        return;
-      }
-      // Seed data in a separate method for better organization
-      // await this.seedData();
-
-      console.log('Restaurants table created and seeded successfully');
-    } catch (error) {
-      console.error('Failed to create restaurants table:', error);
-      throw error;
-    }
-  }
-
-  public async seedData(): Promise<void> {
-    // Use a transaction for bulk insert
-    this.db.tx(async (t) => {
-      const queries = restaurantData.map((restaurant) => {
-        return t.none(
-          `
-          INSERT INTO ${TABLE_NAME} (
-            name, address, cuisine_type, price_range, rating,
-            longitude, latitude, open_hours, contact_info,
-            total_upvotes, total_downvotes, total_favorites, total_comments, average_ratings,
-            created_at, updated_at
-          ) VALUES (
-            $<name>, $<address>, $<cuisine_type>, $<price_range>, $<rating>,
-            $<longitude>, $<latitude>, $<open_hours>, $<contact_info>,
-            $<total_upvotes>, $<total_downvotes>, $<total_favorites>, $<total_comments>, $<average_ratings>,
-            CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-          )
-        `,
-          restaurant
-        );
-      });
-
-      return t.batch(queries);
-    });
   }
 
   async getRestaurantById(id: number) {
@@ -186,7 +106,7 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
       // Build query based on provided filters
       let query = `
       SELECT r.*
-      FROM restaurant_daily_feed f
+      FROM restaurants_daily_feed f
       JOIN restaurants r on r.id = f.restaurant_id
       WHERE f.date = current_date
     `;
@@ -356,7 +276,7 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
       }
       const result = await this.db.tx(async (t) => {
         const dailyFeedDelete = await t.result(
-          `DELETE FROM restaurant_daily_feed WHERE restaurant_id = $1`,
+          `DELETE FROM restaurants_daily_feed WHERE restaurant_id = $1`,
           [id],
           (r) => r.rowCount
         );
@@ -430,23 +350,11 @@ export class RestaurantsRepository extends BaseRepository<RestaurantsRepositoryC
     }
   }
 
-  async createRestaurantDailyFeed() {
-    await this.db.none(`
-      CREATE TABLE IF NOT EXISTS restaurant_daily_feed (
-      date DATE NOT NULL,
-      position INT NOT NULL,
-      restaurant_id INTEGER NOT NULL,
-      PRIMARY KEY (date, position),
-      FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
-    );
-      `);
-  }
-
   async shuffleRestaurantDailyFeed(): Promise<void> {
     try {
-      await this.db.none(`DELETE FROM restaurant_daily_feed;`);
+      await this.db.none(`DELETE FROM restaurants_daily_feed;`);
       await this.db.none(`
-        INSERT INTO restaurant_daily_feed (date, position, restaurant_id)
+        INSERT INTO restaurants_daily_feed (date, position, restaurant_id)
         SELECT current_date, row_number() OVER (ORDER BY RANDOM()), id
         FROM restaurants
         ON CONFLICT (date, position) DO UPDATE

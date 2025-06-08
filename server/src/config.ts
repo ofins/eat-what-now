@@ -9,8 +9,11 @@ export const MAX_SEARCH_RADIUS = 25;
 export const REQUIRED_ENV_VARS = [
   'PORT',
   'SIGNATURE',
-  'DATABASE_URL',
   'JWT_SECRET',
+  'DATABASE_URL',
+  'DB_DATABASE',
+  'DB_USER',
+  'DB_PASSWORD',
 ];
 
 export function validateEnv() {

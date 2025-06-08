@@ -1,6 +1,10 @@
-### 3th
+### 8th
 
--
+- Setup migrations and seeding using `Knex.js`
+
+Things I learned:
+
+- how to setup basic migration scripts and seeding
 
 ### 2th
 
@@ -115,7 +119,7 @@ Things I learned:
 ### 11th
 
 - create basic functionality of `GET /feed` so that it returns restaurants sorted randomly to get the API working.
-- precompute and cache randomized list with `restaurant_daily_feed` table and use CRON job to update it daily.
+- precompute and cache randomized list with `restaurants_daily_feed` table and use CRON job to update it daily.
 - integrate swagger doc for API
 - add pagination to response data
 

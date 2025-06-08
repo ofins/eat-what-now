@@ -1,4 +1,6 @@
-// Update with your config settings.
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
@@ -6,9 +8,9 @@
 export const development = {
   client: 'postgresql',
   connection: {
-    database: 'my_database',
-    user: 'jack.w',
-    password: 'password',
+    database: process.env.DB_DATABASE,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
   },
   migrations: {
     tableName: 'knex_migrations',

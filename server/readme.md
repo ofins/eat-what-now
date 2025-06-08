@@ -96,7 +96,7 @@ npm run server
 
 ## Database
 
-- Tables: `users`, `restaurants`, `restaurant_user`, `restaurant_daily_feed`
+- Tables: `users`, `restaurants`, `restaurant_user`, `restaurants_daily_feed`
 - Seed data is loaded on first run
 - Aggregated stats (upvotes, downvotes, etc.) are updated hourly via CRON
 

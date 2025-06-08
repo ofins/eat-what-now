@@ -11,7 +11,7 @@
 
 - [ ] Setup Logger for API and DB
 - [ ] Implement unit testing using Jest
-- [ ] Add `phone` and `website` column for restaurant
+- [x] Add and `website` column for restaurant
 - [x] Move `types` to root level packages to share with client and server
 - [x] Setup `/users/profile` and ensure user can only access own data
 - [x] Integrate Schema validation
@@ -26,7 +26,7 @@
 
 - [ ] Optimize PostGIS queries for location-based searches
 - [ ] Create database backup script
-- [ ] Setup a form of migration
+- [x] Setup a form of migration
 - [x] Setup `restaurants-users` table
 - [x] Setup `users` and `restaurants` table
 - [x] Implement initial DB data with migration
