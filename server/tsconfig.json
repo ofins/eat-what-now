@@ -18,6 +18,11 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "knexfile.ts", "migrations/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "knexfile.ts",
+    "migrations/**/*.ts",
+    "migrations/20250607174407_create_restaurants_table.js"
+  ],
   "exclude": ["node_modules"]
 }

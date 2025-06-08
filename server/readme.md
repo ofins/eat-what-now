@@ -21,7 +21,7 @@ Struggling to find a place to eat tonight? Try EatWhatNow, the app that makes di
 - **Feed API**: Location-based, filterable restaurant feed
 - **Restaurant-User Join Table**: Track upvotes, downvotes, favorites, ratings, comments, and visits
 - **Swagger API Docs**: `/docs` endpoint
-- **PostgreSQL**: Data storage with seed data and migrations
+- **PostgreSQL**: Data storage with migrations/seed using `Knex.js`
 - **CRON Jobs**: Aggregates restaurant stats hourly
 
 ## Tech Stack
@@ -50,16 +50,16 @@ JWT_SECRET=your_jwt_secret
 DATABASE_URL=postgres://postgres:password@localhost:5432/database
 ```
 
-### Local Development
+### Local Development - Getting started
 
-1. **Install dependencies:**
-   ```sh
-   npm install
-   ```
-2. **Run the backend:**
-   ```sh
-   npm run server
-   ```
+```sh
+cp .env.example .env
+npm install
+npm run migrate:up
+npm run seed # optional
+npm run server
+```
+
 3. **Access API docs:**
    - [http://localhost:3000/docs](http://localhost:3000/docs)
 

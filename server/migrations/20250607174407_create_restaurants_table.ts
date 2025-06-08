@@ -5,7 +5,7 @@ import { Knex } from 'knex';
  * @returns { Promise<void> }
  */
 export function up(knex: Knex): Promise<void> {
-  return knex.schema.createTable('restaurants_test_1', function (table) {
+  return knex.schema.createTable('restaurants', function (table) {
     table.increments('id').primary();
     table.string('name', 255).notNullable();
     table.text('address').notNullable();
