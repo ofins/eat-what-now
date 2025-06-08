@@ -1,8 +1,10 @@
+import { Knex } from 'knex';
+
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function (knex) {
+export function up(knex: Knex): Promise<void> {
   return knex.schema.createTable('restaurants_test_1', function (table) {
     table.increments('id').primary();
     table.string('name', 255).notNullable();
@@ -22,12 +24,12 @@ exports.up = function (knex) {
     table.timestamp('created_at', { useTz: true }).defaultTo(knex.fn.now());
     table.timestamp('updated_at', { useTz: true }).defaultTo(knex.fn.now());
   });
-};
+}
 
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function (knex) {
+export function down(knex: Knex): Promise<void> {
   return knex.schema.dropTableIfExists('restaurants');
-};
+}

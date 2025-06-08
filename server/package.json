@@ -10,7 +10,9 @@
     "init": "node dist/db/init.js",
     "compose:up": "docker compose up --build",
     "compose:down": "docker-compose down",
-    "db:migrate": "knex migrate:latest",
+    "migrate:make": "knex migrate:make --esm --migrations-directory ./migrations",
+    "migrate:up": "knex migrate:latest",
+    "migrate:down": "knex migrate:rollback",
     "db:seed": "knex seed:run"
   },
   "name": "ewn-backend",
