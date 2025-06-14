@@ -1,3 +1,7 @@
+### 14th
+
+- Setup basic `server-side-events` for uni-communication from server to client.
+
 ### 8th
 
 - Setup migrations and seeding using `Knex.js`

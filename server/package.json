@@ -7,7 +7,6 @@
     "lint": "tsc --noEmit && eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write .",
-    "init": "node dist/db/init.js",
     "compose:up": "docker compose up --build",
     "compose:down": "docker-compose down",
     "migrate:make": "knex migrate:make --esm --migrations-directory ./migrations",

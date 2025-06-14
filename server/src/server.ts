@@ -7,12 +7,12 @@ import { RestaurantUserRepository } from './db/restaurant-user/restaurant-user.r
 import { RestaurantsRepository } from './db/restaurants/restaurants.repo';
 import { UsersRepository } from './db/users/users.repo';
 import authRouter from './routes/auth.router';
+import eventsRouter from './routes/events.router';
 import feedRouter from './routes/feed.router';
 import restaurantsRouter from './routes/restaurants.router';
 import usersRouter from './routes/users.router';
 import { swaggerUiHandler, swaggerUiSetup } from './swagger';
 import { serveMarkdownFile } from './utils/file';
-
 // Validate environment variables at startup
 validateEnv();
 
@@ -32,6 +32,7 @@ app.use('/feed', feedRouter);
 app.use('/users', usersRouter);
 app.use('/restaurants', restaurantsRouter);
 app.use('/auth', authRouter);
+app.use('/events', eventsRouter);
 
 app.get('/notes', async (_, res: Response) => {
   await serveMarkdownFile('src/notes.md', res);
