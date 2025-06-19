@@ -11,6 +11,8 @@
 
 - [ ] Setup Logger for API and DB
 - [ ] Implement unit testing using Jest
+- [ ] Implement rate limiting to prevent abuse
+- [ ] Reviews management endpoints CRUD
 - [x] Add and `website` column for restaurant
 - [x] Move `types` to root level packages to share with client and server
 - [x] Setup `/users/profile` and ensure user can only access own data
@@ -24,6 +26,9 @@
 
 ## Database Tasks
 
+- [ ] Explore basic failure mechanism to integrate in DB
+- [ ] Ensure database has proper normalization technique
+- [ ] Setup caching system - Redis
 - [ ] Optimize PostGIS queries for location-based searches
 - [ ] Create database backup script
 - [x] Setup a form of migration
@@ -34,6 +39,8 @@
 
 ## DevOps Tasks
 
+- [ ] Setup basic Nginx for distribution of loads
+- [ ] Host server on AWS
 - [ ] Setup CDN for images
 - [ ] Test PROD env
 - [ ] Setup site via AWS ECS with Docker
