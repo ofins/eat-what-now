@@ -161,7 +161,7 @@ const Feed = () => {
   const currentRestaurant = restaurants[currentIndex];
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-50 p-4">
+    <div className="flex flex-col items-center justify-center h-screen w-full p-4">
       {/* Card Counter */}
       <div className="mb-4 text-sm text-gray-600">
         {currentIndex + 1} of {restaurants.length}
@@ -169,7 +169,7 @@ const Feed = () => {
       </div>
 
       {/* Swipeable Card Container */}
-      <div className="relative w-full max-w-sm h-96 perspective-1000">
+      <div className="relative w-full h-120 shadow-sm rounded-2xl">
         <div
           ref={cardRef}
           className="absolute inset-0 cursor-grab active:cursor-grabbing"
@@ -186,7 +186,7 @@ const Feed = () => {
           onTouchEnd={handleTouchEnd}
         >
           {/* Current Card */}
-          <div className="w-full h-full bg-white rounded-xl shadow-lg p-6 border">
+          <div className="w-full h-full bg-white rounded-xl shadow-lg p-6">
             <div className="h-full flex flex-col justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">
@@ -211,55 +211,32 @@ const Feed = () => {
                   {"$".repeat(Math.floor(currentRestaurant?.price_range || 1))}
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-center gap-4 mt-6">
-                <button
-                  onClick={() =>
-                    currentIndex > 0 && setCurrentIndex((prev) => prev - 1)
-                  }
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
-                  disabled={currentIndex === 0}
-                >
-                  ← Previous
-                </button>
-                <button
-                  onClick={() =>
-                    currentIndex < restaurants.length - 1 &&
-                    setCurrentIndex((prev) => prev + 1)
-                  }
-                  className="px-4 py-2 bg-[#EF2A39] text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
-                  disabled={
-                    currentIndex >= restaurants.length - 1 && !hasNextPage
-                  }
-                >
-                  Next →
-                </button>
-              </div>
             </div>
           </div>
         </div>
-
-        {/* Next card preview (slightly behind) */}
-        {currentIndex < restaurants.length - 1 && (
-          <div
-            className="absolute inset-0 bg-white rounded-xl shadow-lg border opacity-50 -z-10"
-            style={{
-              transform: "translateX(10px) translateY(10px) scale(0.95)",
-            }}
-          >
-            <div className="w-full h-full p-6">
-              <h3 className="text-xl font-bold text-gray-800">
-                {restaurants[currentIndex + 1]?.name}
-              </h3>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Swipe Instructions */}
-      <div className="mt-4 text-sm text-gray-500 text-center">
-        Swipe left/right or use buttons to navigate
+      {/* Action Buttons */}
+      <div className="flex justify-center gap-4 mt-6">
+        <button
+          onClick={() =>
+            currentIndex > 0 && setCurrentIndex((prev) => prev - 1)
+          }
+          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 shadow-sm"
+          disabled={currentIndex === 0}
+        >
+          ← Previous
+        </button>
+        <button
+          onClick={() =>
+            currentIndex < restaurants.length - 1 &&
+            setCurrentIndex((prev) => prev + 1)
+          }
+          className="px-4 py-2 bg-[#EF2A39] text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 shadow-sm"
+          disabled={currentIndex >= restaurants.length - 1 && !hasNextPage}
+        >
+          Next →
+        </button>
       </div>
 
       {/* Loading indicator for next page */}
