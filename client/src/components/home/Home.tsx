@@ -7,7 +7,7 @@ interface ILocation {
 }
 
 const Home = () => {
-  const [message, setMessage] = useState<string[]>([]);
+  // const [message, setMessage] = useState<string[]>([]);
   const [location, setLocation] = useState<ILocation | null>(null);
 
   useEffect(() => {
@@ -29,31 +29,32 @@ const Home = () => {
     );
   }, []);
 
-  useEffect(() => {
-    const eventSource = new EventSource("http://localhost:3000/events");
+  // useEffect(() => {
+  //   const eventSource = new EventSource("http://localhost:3000/events");
 
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setMessage((prev) => [...prev, data.message]);
-    };
+  //   eventSource.onmessage = (event) => {
+  //     const data = JSON.parse(event.data);
+  //     setMessage((prev) => [...prev, data.message]);
+  //   };
 
-    eventSource.onerror = (error) => {
-      console.error("EventSource failed:", error);
-      eventSource.close();
-    };
+  //   eventSource.onerror = (error) => {
+  //     console.error("EventSource failed:", error);
+  //     eventSource.close();
+  //   };
 
-    return () => {
-      eventSource.close();
-    };
-  }, []);
+  //   return () => {
+  //     eventSource.close();
+  //   };
+  // }, []);
+
+  console.log("Location:", location);
 
   return (
-    <div className=" w-full h-full flex flex-col justify-center items-center overflow-y-scroll">
-      Home
-      <span>
-        Latitude: {location?.latitude}, Longitude: {location?.longitude}
-      </span>
-      <span>Current time is {message.at(-1)}</span>
+    <div
+      id="Home"
+      className="w-full h-full flex flex-col justify-center items-center overflow-y-scroll"
+    >
+      <span className="font-[lobster] text-2xl">EatWhatNow</span>
       <Feed />
     </div>
   );

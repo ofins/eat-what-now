@@ -46,8 +46,8 @@ export const restaurantFilterOptionsSchema = z.object({
   cuisineType: z.string().optional(),
   priceRange: z.string().optional(),
   minRating: z.number().min(0).max(5).optional(),
-  limit: z.number().int().min(1).max(100).optional(),
-  offset: z.number().int().min(0).optional(),
+  limit: z.coerce.number().int().min(1).max(100),
+  offset: z.coerce.number().int().min(0).optional(),
 });
 
 export const createRestaurantSchema = z.object({
