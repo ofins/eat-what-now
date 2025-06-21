@@ -13,7 +13,7 @@ type FeedResponse = {
   };
 };
 
-const PAGE_LIMIT = 2;
+const PAGE_LIMIT = 10;
 
 const Feed = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -84,23 +84,21 @@ const Feed = () => {
     const deltaX = clientX - dragStart.x;
     const deltaY = clientY - dragStart.y;
 
-    // Only allow horizontal swiping (ignore if more vertical than horizontal)
-    if (Math.abs(deltaY) > Math.abs(deltaX)) return;
-
-    setDragOffset({ x: deltaX, y: 0 });
+    // Allow both horizontal and slight vertical movement for natural feel
+    setDragOffset({ x: deltaX, y: deltaY * 0.1 }); // Reduce vertical movement
   };
 
   const handleEnd = () => {
     if (!isDragging) return;
 
-    const threshold = 100; // Minimum swipe distance
+    const threshold = 80; // Minimum swipe distance (reduced for easier swiping)
 
-    if (dragOffset.x < -threshold && currentIndex < restaurants.length - 1) {
-      // Swipe left - next card
+    if (
+      Math.abs(dragOffset.x) > threshold &&
+      currentIndex < restaurants.length - 1
+    ) {
+      // Both left and right swipes go to next card
       setCurrentIndex((prev) => prev + 1);
-    } else if (dragOffset.x > threshold && currentIndex > 0) {
-      // Swipe right - previous card
-      setCurrentIndex((prev) => prev - 1);
     }
 
     // Reset drag state
@@ -159,23 +157,75 @@ const Feed = () => {
     );
 
   const currentRestaurant = restaurants[currentIndex];
+  const nextRestaurant = restaurants[currentIndex + 1];
+  const nextNextRestaurant = restaurants[currentIndex + 2];
+
+  // Calculate rotation and opacity based on drag
+  const rotation = dragOffset.x * 0.1; // Max 10 degrees rotation per 100px drag
+  const opacity = 1 - Math.abs(dragOffset.x) / 300; // Fade out as we swipe
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-full p-4">
+    <div className="flex flex-col items-center justify-center h-screen min-h-[400px] p-4">
       {/* Card Counter */}
-      <div className="mb-4 text-sm text-gray-600">
+      <div className="mb-6 text-sm text-gray-600 font-medium">
         {currentIndex + 1} of {restaurants.length}
         {hasNextPage && " (loading more...)"}
       </div>
 
-      {/* Swipeable Card Container */}
-      <div className="relative w-full h-120 shadow-sm rounded-2xl">
+      {/* Tinder-like Card Stack Container */}
+      <div className="relative w-80 h-96 max-w-sm">
+        {/* Third card (background) */}
+        {nextNextRestaurant && (
+          <div
+            className="absolute inset-0 bg-white rounded-2xl shadow-md"
+            style={{
+              transform: "translateY(8px) scale(0.92)",
+              zIndex: 1,
+            }}
+          >
+            <div className="w-full h-full p-6 rounded-2xl">
+              <h3 className="text-lg font-bold text-gray-400">
+                {nextNextRestaurant.name}
+              </h3>
+            </div>
+          </div>
+        )}
+
+        {/* Second card (middle) */}
+        {nextRestaurant && (
+          <div
+            className="absolute inset-0 bg-white rounded-2xl shadow-lg border"
+            style={{
+              transform: "translateY(4px) scale(0.96)",
+              zIndex: 2,
+            }}
+          >
+            <div className="w-full h-full p-6 rounded-2xl">
+              <h3 className="text-xl font-bold text-gray-600">
+                {nextRestaurant.name}
+              </h3>
+              <p className="text-gray-500 mt-2">
+                {nextRestaurant.cuisine_type}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Current card (top) */}
         <div
           ref={cardRef}
           className="absolute inset-0 cursor-grab active:cursor-grabbing"
           style={{
-            transform: `translateX(${dragOffset.x}px) ${dragOffset.x !== 0 ? `rotateY(${dragOffset.x * 0.1}deg)` : ""}`,
-            transition: isDragging ? "none" : "transform 0.3s ease-out",
+            transform: `
+              translateX(${dragOffset.x}px) 
+              translateY(${dragOffset.y}px) 
+              rotate(${rotation}deg)
+            `,
+            opacity: opacity,
+            transition: isDragging
+              ? "none"
+              : "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+            zIndex: 3,
           }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -185,9 +235,8 @@ const Feed = () => {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Current Card */}
-          <div className="w-full h-full bg-white rounded-xl shadow-lg p-6">
-            <div className="h-full flex flex-col justify-between">
+          <div className="w-full h-full bg-white rounded-2xl shadow-xl border-2 border-gray-100">
+            <div className="h-full flex flex-col justify-between p-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">
                   {currentRestaurant?.name}
@@ -196,52 +245,79 @@ const Feed = () => {
                   {currentRestaurant?.address}
                 </p>
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                     {currentRestaurant?.cuisine_type}
                   </span>
-                  <span className="text-yellow-500">
+                  <span className="text-yellow-500 text-lg">
                     {"★".repeat(Math.floor(currentRestaurant?.rating || 0))}
                   </span>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 font-medium">
                     {currentRestaurant?.rating}
                   </span>
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-600 font-medium">
                   Price:{" "}
                   {"$".repeat(Math.floor(currentRestaurant?.price_range || 1))}
                 </div>
               </div>
+
+              {/* Swipe indicators */}
+              {isDragging && (
+                <div className="absolute top-4 left-4 right-4 flex justify-between pointer-events-none">
+                  <div
+                    className={`px-4 py-2 rounded-full font-bold text-white transition-opacity ${
+                      dragOffset.x > 50
+                        ? "opacity-100 bg-green-500"
+                        : "opacity-0"
+                    }`}
+                  >
+                    LIKE
+                  </div>
+                  <div
+                    className={`px-4 py-2 rounded-full font-bold text-white transition-opacity ${
+                      dragOffset.x < -50
+                        ? "opacity-100 bg-red-500"
+                        : "opacity-0"
+                    }`}
+                  >
+                    PASS
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex justify-center gap-4 mt-6">
-        <button
-          onClick={() =>
-            currentIndex > 0 && setCurrentIndex((prev) => prev - 1)
-          }
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 shadow-sm"
-          disabled={currentIndex === 0}
-        >
-          ← Previous
-        </button>
-        <button
-          onClick={() =>
-            currentIndex < restaurants.length - 1 &&
-            setCurrentIndex((prev) => prev + 1)
-          }
-          className="px-4 py-2 bg-[#EF2A39] text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 shadow-sm"
-          disabled={currentIndex >= restaurants.length - 1 && !hasNextPage}
-        >
-          Next →
-        </button>
+      {/* Swipe Instructions */}
+      <div className="mt-8 text-center">
+        {/* Action Buttons */}
+        <div className="flex justify-center gap-4 mt-6">
+          <button
+            onClick={() =>
+              currentIndex > 0 && setCurrentIndex((prev) => prev - 1)
+            }
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 shadow-sm"
+            disabled={currentIndex === 0}
+          >
+            ← Previous
+          </button>
+          <button
+            onClick={() =>
+              currentIndex < restaurants.length - 1 &&
+              setCurrentIndex((prev) => prev + 1)
+            }
+            className="px-4 py-2 bg-[#EF2A39] text-white rounded-lg hover:bg-red-600 disabled:opacity-50 shadow-sm"
+            disabled={currentIndex >= restaurants.length - 1 && !hasNextPage}
+          >
+            Next →
+          </button>
+        </div>
       </div>
 
       {/* Loading indicator for next page */}
       {isFetchingNextPage && (
-        <div className="mt-2 text-sm text-blue-500">
+        <div className="mt-4 text-sm text-blue-500 font-medium">
           Loading more restaurants...
         </div>
       )}

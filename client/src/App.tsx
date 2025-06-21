@@ -66,7 +66,7 @@ function App() {
             </Route>
           </Routes>
         </main>
-        <footer className="fixed bottom-0 bg-[#EF2A39] w-full flex justify-around p-4 text-white">
+        <footer className="fixed bottom-0 bg-[#EF2A39] w-full flex justify-around p-4 text-white z-[3]">
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
           <Link to="/login">Login</Link>
