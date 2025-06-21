@@ -1,13 +1,14 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
+import "./Auth.css";
 
 const Login = () => {
   const { login } = useAuth(); // Assuming useAuth is defined in your hooks
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // Use useNavigate from react-router
+  // const navigate = useNavigate(); // Use useNavigate from react-router
 
   const mutation = useMutation({
     mutationFn: (variables: {
@@ -31,7 +32,7 @@ const Login = () => {
       }),
     onSuccess: (data) => {
       login(data.token);
-      navigate("/"); // Redirect to home after successful login
+      // navigate("/"); // Redirect to home after successful login
 
       console.log("Login successful:", data);
     },
@@ -44,44 +45,77 @@ const Login = () => {
 
   return (
     <div className="auth-container">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+      <div className="auth-card">
+        <div className="auth-header">
+          <h2 className="auth-title">Welcome Back</h2>
+          <p className="auth-subtitle">Sign in to continue your food journey</p>
         </div>
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              className="form-input"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              className="form-input"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="auth-button"
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? (
+              <span className="loading-spinner">Signing in...</span>
+            ) : (
+              "Sign In"
+            )}
+          </button>
+
+          {mutation.isError && (
+            <div className="auth-error">
+              {(mutation.error as Error).message}
+            </div>
+          )}
+
+          {mutation.isSuccess && (
+            <div className="auth-success">Login successful! Redirecting...</div>
+          )}
+        </form>
+
+        <div className="auth-footer">
+          <p className="auth-link-text">
+            Don't have an account?
+            <Link to="/register" className="auth-link">
+              Create one here
+            </Link>
+          </p>
         </div>
-        <button type="submit" disabled={mutation.isPending}>
-          Login
-        </button>
-        {mutation.isPending && <p>Logging in...</p>}
-        {mutation.isError && (
-          <p style={{ color: "red" }}>{(mutation.error as Error).message}</p>
-        )}
-        {mutation.isSuccess && (
-          <p style={{ color: "green" }}>Login successful!</p>
-        )}
-      </form>
-      <p>
-        Don't have an account? <a href="/register">Register here</a>
-      </p>
+      </div>
     </div>
   );
 };

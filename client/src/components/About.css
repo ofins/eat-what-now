@@ -1,0 +1,117 @@
+/* Profile Page Styling */
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.profile-section {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+}
+
+.profile-section-title {
+  color: #2c3e50;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #ef2a39;
+  display: inline-block;
+}
+
+.profile-info-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.profile-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e1e8ed;
+  transition: all 0.2s ease;
+}
+
+.profile-info-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: #ef2a39;
+}
+
+.profile-label {
+  color: #34495e;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
+}
+
+.profile-value {
+  color: #2c3e50;
+  font-weight: 500;
+  text-align: right;
+}
+
+.profile-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.profile-status.active {
+  background: #d5f4e6;
+  color: #27ae60;
+  border: 1px solid #a3e4c7;
+}
+
+.profile-status.inactive {
+  background: #fce4ec;
+  color: #e91e63;
+  border: 1px solid #f8bbd9;
+}
+
+.profile-status.verified {
+  background: #e3f2fd;
+  color: #2196f3;
+  border: 1px solid #bbdefb;
+}
+
+.profile-status.unverified {
+  background: #fff3e0;
+  color: #ff9800;
+  border: 1px solid #ffcc02;
+}
+
+/* Profile Page Responsive Design */
+@media (max-width: 768px) {
+  .profile-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .profile-value {
+    text-align: left;
+  }
+
+  .profile-section {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-content {
+    gap: 1.5rem;
+  }
+
+  .profile-section-title {
+    font-size: 1.125rem;
+  }
+}
