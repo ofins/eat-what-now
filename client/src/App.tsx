@@ -1,4 +1,4 @@
-import { BrowserRouter, Link, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
 import "./App.css";
 import About from "./components/About";
 import Login from "./components/auth/Login";
@@ -7,6 +7,8 @@ import Home from "./components/home/Home";
 import AuthLayout from "./layouts/AuthLayout";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Footer from "./components/Footer";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,19 +60,28 @@ function App() {
         <main className="h-screen flex justify-center items-center">
           <Routes>
             <Route index element={<Home />} />
-            <Route path="about" element={<About />} />
+            <Route
+              path="about"
+              element={
+                <ProtectedRoute>
+                  <About />
+                </ProtectedRoute>
+              }
+            />
 
-            <Route element={<AuthLayout />}>
+            <Route
+              element={
+                <ProtectedRoute requireAuth={false} redirectTo="/">
+                  <AuthLayout />
+                </ProtectedRoute>
+              }
+            >
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
             </Route>
           </Routes>
         </main>
-        <footer className="fixed bottom-0 bg-[#EF2A39] w-full flex justify-around p-4 text-white z-[3]">
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-          <Link to="/login">Login</Link>
-        </footer>
+        <Footer />
       </QueryClientProvider>
     </BrowserRouter>
   );

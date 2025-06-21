@@ -1,9 +1,14 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useNavigate } from "react-router";
+import { useAuth } from "../../hooks/useAuth";
 
 const Login = () => {
+  const { login } = useAuth(); // Assuming useAuth is defined in your hooks
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate(); // Use useNavigate from react-router
+
   const mutation = useMutation({
     mutationFn: (variables: {
       endpoint: string;
@@ -22,11 +27,14 @@ const Login = () => {
       }).then(async (res) => {
         if (!res.ok) throw new Error("Login failed");
         const data = await res.json();
-        // Optionally save token here if your API returns it in the body:
-        localStorage.setItem("token", data.token || "");
-        console.log("Login successful:", data);
         return data;
       }),
+    onSuccess: (data) => {
+      login(data.token);
+      navigate("/"); // Redirect to home after successful login
+
+      console.log("Login successful:", data);
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
