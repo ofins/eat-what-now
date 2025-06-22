@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import "./About.css";
 
-type UserProfileResponse = {
+export type UserProfileResponse = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
 };

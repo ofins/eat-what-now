@@ -1,6 +1,8 @@
 import type { IRestaurant } from "@ewn/types/restaurants.type";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
+import { updateRestaurantVote } from "../../api/restaurants-user";
+import type { UserProfileResponse } from "../About";
 
 type FeedResponse = {
   data: IRestaurant[];
@@ -23,6 +25,10 @@ const Feed = () => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+
+  const { data: userData } = useQuery<UserProfileResponse>({
+    queryKey: ["users/profile"],
+  });
 
   // Efficient infinite data fetching
   const {
@@ -52,7 +58,8 @@ const Feed = () => {
     initialPageParam: 0,
   });
 
-  // Flatten all pages into a single array
+  const mutation = useMutation({ mutationFn: updateRestaurantVote });
+
   const restaurants = data?.pages.flatMap((page) => page.data) || [];
 
   // Prefetch next page when user is near the end
@@ -97,8 +104,12 @@ const Feed = () => {
       Math.abs(dragOffset.x) > threshold &&
       currentIndex < restaurants.length - 1
     ) {
-      // Both left and right swipes go to next card
       setCurrentIndex((prev) => prev + 1);
+      if (dragOffset.x > 0) {
+        handleSwipeRight();
+      } else {
+        handleSwipeLeft();
+      }
     }
 
     // Reset drag state
@@ -136,6 +147,21 @@ const Feed = () => {
   const handleTouchEnd = () => {
     handleEnd();
   };
+
+  const handleSwipeLeft = () => {
+    console.log("Swiped left");
+  };
+
+  const handleSwipeRight = () => {
+    console.log("Swiped right");
+    mutation.mutate({
+      upvoted: true,
+      user_id: userData?.data.id,
+      restaurant_id: restaurants[currentIndex].id,
+    });
+  };
+
+  console.log(restaurants[currentIndex]);
 
   if (isLoading)
     return (
@@ -295,12 +321,13 @@ const Feed = () => {
         <div className="flex justify-center gap-4 mt-6">
           <button
             onClick={() =>
-              currentIndex > 0 && setCurrentIndex((prev) => prev - 1)
+              currentIndex < restaurants.length - 1 &&
+              setCurrentIndex((prev) => prev + 1)
             }
             className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 shadow-sm"
-            disabled={currentIndex === 0}
+            disabled={currentIndex >= restaurants.length - 1 && !hasNextPage}
           >
-            ← Previous
+            PASS
           </button>
           <button
             onClick={() =>
@@ -310,7 +337,7 @@ const Feed = () => {
             className="px-4 py-2 bg-[#EF2A39] text-white rounded-lg hover:bg-red-600 disabled:opacity-50 shadow-sm"
             disabled={currentIndex >= restaurants.length - 1 && !hasNextPage}
           >
-            Next →
+            LIKE
           </button>
         </div>
       </div>

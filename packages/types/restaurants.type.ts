@@ -1,6 +1,7 @@
 import type { PaginationTypes } from "./index";
 
 export interface IRestaurant {
+  id: number;
   name: string;
   latitude: number;
   longitude: number;

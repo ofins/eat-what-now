@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router";
+import { register } from "../../api/auth";
 import "./Auth.css";
 
 const Register = () => {
@@ -9,31 +10,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [fullname, setFullname] = useState("");
 
-  const mutation = useMutation({
-    mutationFn: (variables: {
-      username: string;
-      email: string;
-      password: string;
-      fullname: string;
-    }) =>
-      fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: variables.username,
-          email: variables.email,
-          password: variables.password,
-          full_name: variables.fullname,
-        }),
-      }).then(async (res) => {
-        if (!res.ok) throw new Error("Registration failed");
-        const data = await res.json();
-        console.log("Registration successful:", data);
-        return data;
-      }),
-  });
+  const mutation = useMutation({ mutationFn: register });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
