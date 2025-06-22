@@ -128,7 +128,7 @@ const Feed = () => {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault(); // Prevent scrolling
+    // e.preventDefault(); // Prevent scrolling, this is causing issues.
     const touch = e.touches[0];
     handleMove(touch.clientX, touch.clientY);
   };
