@@ -1,3 +1,5 @@
+import type { LoginResponse } from "@ewn/types/auth.type";
+import { httpClient } from "./http-client";
 export const login = async ({
   email,
   password,
@@ -5,23 +7,18 @@ export const login = async ({
   email: string;
   password: string;
 }) => {
-  const response = await fetch(
+  const response = await httpClient.post<LoginResponse>(
     `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
     {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
+      email,
+      password,
     }
   );
+  console.log(response);
 
-  if (!response.ok) throw new Error("Failed to Login");
+  if (!response) throw new Error("Failed to Login");
 
-  return response.json();
+  return response;
 };
 
 export const register = async ({
@@ -35,23 +32,17 @@ export const register = async ({
   password: string;
   fullname: string;
 }) => {
-  const response = await fetch(
+  const response = await httpClient.post(
     `${import.meta.env.VITE_API_BASE_URL}/auth/register`,
     {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-        username,
-        fullname,
-      }),
+      email,
+      password,
+      username,
+      fullname,
     }
   );
 
-  if (!response.ok) throw new Error("Failed to register");
+  if (!response) throw new Error("Failed to register");
 
-  return response.json();
+  return response;
 };
