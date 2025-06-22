@@ -1,0 +1,1 @@
+- [ ] Create HOC for feed for users that are logged in and did not log in.

@@ -64,9 +64,17 @@ router.post(
         return;
       }
 
-      const user = await usersRepository.getUserByEmail(email);
-      if (user) {
+      const [existingUserByEmail, existingUserByUsername] = await Promise.all([
+        usersRepository.getUserByEmail(email),
+        usersRepository.getUserByUsername(username),
+      ]);
+
+      if (existingUserByEmail) {
         res.status(409).json({ error: 'Email already registered' });
+        return;
+      }
+      if (existingUserByUsername) {
+        res.status(409).json({ error: 'Username already taken' });
         return;
       }
 

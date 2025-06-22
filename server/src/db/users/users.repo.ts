@@ -3,12 +3,12 @@ import {
   IUser,
   UserFilterOptions,
 } from '@ewn/types/users.type';
+import { IDatabase } from 'pg-promise';
+import { IClient } from 'pg-promise/typescript/pg-subset';
+import db from 'src/db/db';
 import { isUUID } from 'src/utils/misc';
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 import BaseRepository from '../base.repo';
-import db from 'src/db/db';
-import { IDatabase } from 'pg-promise';
-import { IClient } from 'pg-promise/typescript/pg-subset';
 
 const TABLE_NAME = 'users';
 export class UsersRepository extends BaseRepository {
@@ -44,6 +44,17 @@ export class UsersRepository extends BaseRepository {
       );
     } catch (error) {
       console.error(`Error fetching user by email ${email}:`, error);
+    }
+  }
+
+  async getUserByUsername(username: string) {
+    try {
+      return await this.db.oneOrNone<IUser>(
+        `SELECT * FROM ${TABLE_NAME} WHERE username = $1`,
+        [username]
+      );
+    } catch (error) {
+      console.error(`Error fetching user by username ${username}:`, error);
     }
   }
 

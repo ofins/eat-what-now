@@ -28,28 +28,6 @@ const queryClient = new QueryClient({
         return response.json();
       },
     },
-    mutations: {
-      // Default mutationFn expects only 'variables' as argument
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mutationFn: async (variables: any) => {
-        const { endpoint, ...body } = variables;
-        const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/${endpoint}`, // Replace with your default endpoint or use a custom hook for dynamic endpoints
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            body: JSON.stringify(body),
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      },
-    },
   },
 });
 
