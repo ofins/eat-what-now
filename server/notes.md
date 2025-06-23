@@ -1,6 +1,11 @@
+### 23rd
+
+- fix invalid error handling in `auth.ts`
+
 ### 14th
 
 - Setup basic `server-side-events` for uni-communication from server to client.
+- Setup basic `location-service` features to capture user location
 
 ### 8th
 

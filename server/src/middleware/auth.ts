@@ -53,8 +53,9 @@ export const authenticateToken = (
       (req as any).userId = decoded.user_id;
     }
     next();
-  } catch (error) {
-    res.sendStatus(403).send({ error }); // forbidden
+  } catch {
+    res.status(403).json({ error: 'Invalid token' }); // forbidden
+    return;
   }
 };
 
