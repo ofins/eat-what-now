@@ -50,12 +50,11 @@ const Home = () => {
   console.log("Location:", location);
 
   return (
-    <div
-      id="Home"
-      className="w-full h-full flex flex-col justify-center items-center overflow-y-scroll"
-    >
-      <span className="font-[lobster] text-2xl">EatWhatNow</span>
-      <Feed />
+    <div id="Home" className="w-full h-full flex flex-col items-center  px-4">
+      <span className="font-[lobster] text-3xl py-3">EatWhatNow</span>
+      <div className="py-3">
+        <Feed />
+      </div>
     </div>
   );
 };

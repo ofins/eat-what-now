@@ -191,13 +191,7 @@ const Feed = () => {
   const opacity = 1 - Math.abs(dragOffset.x) / 300; // Fade out as we swipe
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen min-h-[400px] p-4">
-      {/* Card Counter */}
-      <div className="mb-6 text-sm text-gray-600 font-medium">
-        {currentIndex + 1} of {restaurants.length}
-        {hasNextPage && " (loading more...)"}
-      </div>
-
+    <div className="flex flex-col items-center h-screen min-h-[400px] px-4">
       {/* Tinder-like Card Stack Container */}
       <div className="relative w-80 h-96 max-w-sm">
         {/* Third card (background) */}
@@ -315,9 +309,14 @@ const Feed = () => {
         </div>
       </div>
 
+      {/* Card Counter */}
+      <div className="mt-6 text-sm text-gray-600 font-medium">
+        {currentIndex + 1} of {restaurants.length}
+        {hasNextPage && " (loading more...)"}
+      </div>
+
       {/* Swipe Instructions */}
-      <div className="mt-8 text-center">
-        {/* Action Buttons */}
+      {/* <div className="mt-8 text-center">
         <div className="flex justify-center gap-4 mt-6">
           <button
             onClick={() =>
@@ -340,7 +339,7 @@ const Feed = () => {
             LIKE
           </button>
         </div>
-      </div>
+      </div> */}
 
       {/* Loading indicator for next page */}
       {isFetchingNextPage && (
