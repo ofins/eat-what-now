@@ -10,9 +10,14 @@
 ## Backend Development
 
 - [ ] Setup Logger for API and DB
+- [ ] Chaos engineering to test resilience
 - [ ] Implement unit testing using Jest
 - [ ] Implement rate limiting to prevent abuse
 - [ ] Reviews management endpoints CRUD
+- [ ] Implement load balancing
+- [ ] Protect against common vulnerabilities (SQL Injections, XSS, CSRF)
+- [ ] Cache mechanism (Redis)
+- [ ] Add logging
 - [x] Add and `website` column for restaurant
 - [x] Move `types` to root level packages to share with client and server
 - [x] Setup `/users/profile` and ensure user can only access own data
@@ -41,7 +46,7 @@
 
 - [ ] Setup basic Nginx for distribution of loads
 - [ ] Host server on AWS
-- [ ] Setup CDN for images
+- [ ] Setup CDN for static assets
 - [ ] Test PROD env
 - [ ] Setup site via AWS ECS with Docker
 - [ ] Purchase domain
