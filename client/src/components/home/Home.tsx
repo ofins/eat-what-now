@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import Feed from "./Feed";
 
@@ -6,9 +7,10 @@ interface ILocation {
   longitude: number | null;
 }
 
-const Home = () => {
+const Home = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   // const [message, setMessage] = useState<string[]>([]);
   const [location, setLocation] = useState<ILocation | null>(null);
+  console.log({ isLoggedIn });
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -59,4 +61,19 @@ const Home = () => {
   );
 };
 
-export default Home;
+const withAuth = (WrappedComponent: React.ComponentType<any>) => {
+  return (props: any) => {
+    const isLoggedIn = localStorage.getItem("token") !== null;
+
+    useEffect(() => {
+      if (isLoggedIn) {
+        console.log("User is logged in");
+      }
+    }, [isLoggedIn]);
+
+    return <WrappedComponent {...props} isLoggedIn={isLoggedIn} />;
+  };
+};
+
+const homeWithAuth = withAuth(Home);
+export default homeWithAuth;

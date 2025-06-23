@@ -26,8 +26,10 @@ const Feed = () => {
   const [isDragging, setIsDragging] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
+  const isLoggedIn = !!localStorage.getItem("token");
   const { data: userData } = useQuery<UserProfileResponse>({
     queryKey: ["users/profile"],
+    enabled: isLoggedIn,
   });
 
   // Efficient infinite data fetching
