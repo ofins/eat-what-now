@@ -13,8 +13,8 @@
 - [ ] Implement unit testing using Jest
 - [ ] Reviews management endpoints CRUD
 - [ ] Implement load balancing
-- [ ] Protect against common vulnerabilities (SQL Injections, XSS, CSRF)
 - [ ] Cache mechanism (Redis)
+- [x] Protect against common vulnerabilities (SQL Injections, XSS, CSRF)
 - [x] Setup Logger for API and DB
 - [x] Implement rate limiting to prevent abuse
 - [x] Add and `website` column for restaurant

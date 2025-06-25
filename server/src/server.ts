@@ -16,6 +16,7 @@ import { serveMarkdownFile } from './utils/file';
 import logger from './log/logger';
 import morganMiddleware from './middleware/morgan';
 import limiter from './middleware/rate-limiter';
+import helmet from 'helmet';
 
 // Validate environment variables at startup
 validateEnv();
@@ -30,6 +31,7 @@ export const restaurantUserRepository = new RestaurantUserRepository();
 
 app.use('/docs', swaggerUiHandler, swaggerUiSetup);
 app.use(cors());
+app.use(helmet());
 app.use(express.json());
 app.use(morganMiddleware);
 app.use(limiter);
