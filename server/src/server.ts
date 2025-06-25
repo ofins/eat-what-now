@@ -15,6 +15,7 @@ import { swaggerUiHandler, swaggerUiSetup } from './swagger';
 import { serveMarkdownFile } from './utils/file';
 import logger from './log/logger';
 import morganMiddleware from './middleware/morgan';
+import limiter from './middleware/rate-limiter';
 
 // Validate environment variables at startup
 validateEnv();
@@ -31,6 +32,7 @@ app.use('/docs', swaggerUiHandler, swaggerUiSetup);
 app.use(cors());
 app.use(express.json());
 app.use(morganMiddleware);
+app.use(limiter);
 
 app.use('/feed', feedRouter);
 app.use('/users', usersRouter);

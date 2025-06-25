@@ -1,3 +1,8 @@
+### 25th
+
+- Setup basic logging system using `winston` and `morgan`
+- Integrate `rate-limiter` to prevent abuse
+
 ### 23rd
 
 - fix invalid error handling in `auth.ts`

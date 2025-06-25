@@ -2,22 +2,21 @@
 
 ## Bug Issues
 
-- [ ] Unable to connect to Docker DB using dbeaver (6.4.2025)
+- [x] Unable to connect to Docker DB using dbeaver (6.4.2025)
 - [ ] Application shuts down if errors are thrown in creating DB (5.30.2025)
   - `try/catch` blocks are used and issue still occurs
 - [x] Docker compose up throwing error (5.17.2025)
 
 ## Backend Development
 
-- [ ] Setup Logger for API and DB
 - [ ] Chaos engineering to test resilience
 - [ ] Implement unit testing using Jest
-- [ ] Implement rate limiting to prevent abuse
 - [ ] Reviews management endpoints CRUD
 - [ ] Implement load balancing
 - [ ] Protect against common vulnerabilities (SQL Injections, XSS, CSRF)
 - [ ] Cache mechanism (Redis)
-- [ ] Add logging
+- [x] Setup Logger for API and DB
+- [x] Implement rate limiting to prevent abuse
 - [x] Add and `website` column for restaurant
 - [x] Move `types` to root level packages to share with client and server
 - [x] Setup `/users/profile` and ensure user can only access own data
