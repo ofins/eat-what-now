@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { validateRestaurantFilterOptionsSchema } from 'src/db/restaurants/restaurants.schema';
+import logger from 'src/log/logger';
 import { restaurantRepository } from 'src/server';
 
 const router = express.Router();
@@ -34,7 +35,7 @@ router.get(
         res.send(data);
       })
       .catch((error) => {
-        console.log(`Error fetching restaurants:${error}`);
+        logger.error(`Error fetching restaurants:${error}`);
         res.status(500).send({ error: 'Internal Server Error' });
       });
   }

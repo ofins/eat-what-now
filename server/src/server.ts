@@ -13,6 +13,9 @@ import restaurantsRouter from './routes/restaurants.router';
 import usersRouter from './routes/users.router';
 import { swaggerUiHandler, swaggerUiSetup } from './swagger';
 import { serveMarkdownFile } from './utils/file';
+import logger from './log/logger';
+import morganMiddleware from './middleware/morgan';
+
 // Validate environment variables at startup
 validateEnv();
 
@@ -27,6 +30,7 @@ export const restaurantUserRepository = new RestaurantUserRepository();
 app.use('/docs', swaggerUiHandler, swaggerUiSetup);
 app.use(cors());
 app.use(express.json());
+app.use(morganMiddleware);
 
 app.use('/feed', feedRouter);
 app.use('/users', usersRouter);
@@ -43,5 +47,5 @@ app.get('/todo', async (_, res: Response) => {
 });
 
 app.listen(port, () => {
-  console.log(`App listening on port ${port}`);
+  logger.info(`App listening on port ${port}`);
 });

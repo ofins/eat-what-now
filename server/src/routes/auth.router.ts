@@ -4,6 +4,7 @@ import {
   validateCreateUser,
   validateUserLogin,
 } from 'src/db/users/users.schema';
+import logger from 'src/log/logger';
 import { signToken } from 'src/middleware/auth';
 import { usersRepository } from 'src/server';
 
@@ -47,7 +48,7 @@ router.post('/login', validateUserLogin, (req: Request, res: Response) => {
       });
     })
     .catch((error) => {
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
       res.status(500).json({ error: 'Internal server error' });
     });
 });
@@ -88,7 +89,7 @@ router.post(
 
       res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-      console.error('Registration error:', error);
+      logger.error('Registration error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }

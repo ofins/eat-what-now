@@ -5,6 +5,7 @@ import {
   validateCreateRestaurantUserSchema,
   validateUpdateRestaurantSchema,
 } from 'src/db/restaurants/restaurants.schema';
+import logger from 'src/log/logger';
 import { authenticateAPIKey } from 'src/middleware/auth';
 import { restaurantRepository, restaurantUserRepository } from 'src/server';
 
@@ -19,7 +20,7 @@ router.post(
       .createRestaurant(req.body)
       .then((data) => res.send(data))
       .catch((error) => {
-        console.log(`Error creating restaurant: ${error}`);
+        logger.error(`Error creating restaurant: ${error}`);
         res.status(500).send({ error: `Internal Server Error` });
       });
   }
@@ -35,7 +36,7 @@ router.put(
       .updateRestaurant(Number(id), req.body)
       .then((data) => res.send(data))
       .catch((error) => {
-        console.log(`Error updating restaurant: ${error}`);
+        logger.error(`Error updating restaurant: ${error}`);
         res.status(500).send({ error: `Internal Server Error` });
       });
   }
@@ -47,7 +48,7 @@ router.delete('/:id', authenticateAPIKey, (req: Request, res: Response) => {
     .deleteRestaurant(Number(id))
     .then((data) => res.send(data))
     .catch((error) => {
-      console.log(`Error deleting restaurant: ${error}`);
+      logger.error(`Error deleting restaurant: ${error}`);
       res.status(500).send({ error: `Internal Server Error` });
     });
 });
@@ -72,7 +73,7 @@ router.post(
       .addRelationship(data)
       .then((data) => res.send(data))
       .catch((error) => {
-        console.log(`Error adding relationship: ${error}`);
+        logger.error(`Error adding relationship: ${error}`);
         res.status(500).send({ error: `Internal Server Error` });
       });
   }

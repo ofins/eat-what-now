@@ -9,6 +9,7 @@ import db from 'src/db/db';
 import { isUUID } from 'src/utils/misc';
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 import BaseRepository from '../base.repo';
+import logger from 'src/log/logger';
 
 const TABLE_NAME = 'users';
 export class UsersRepository extends BaseRepository {
@@ -32,7 +33,7 @@ export class UsersRepository extends BaseRepository {
         [id]
       );
     } catch (error) {
-      console.error(`Error fetching user by ID ${id}:`, error);
+      logger.error(`Error fetching user by ID ${id}:`, error);
     }
   }
 
@@ -43,7 +44,7 @@ export class UsersRepository extends BaseRepository {
         [email]
       );
     } catch (error) {
-      console.error(`Error fetching user by email ${email}:`, error);
+      logger.error(`Error fetching user by email ${email}:`, error);
     }
   }
 
@@ -54,7 +55,7 @@ export class UsersRepository extends BaseRepository {
         [username]
       );
     } catch (error) {
-      console.error(`Error fetching user by username ${username}:`, error);
+      logger.error(`Error fetching user by username ${username}:`, error);
     }
   }
 
@@ -101,7 +102,7 @@ export class UsersRepository extends BaseRepository {
         Number.isInteger(offset) ? offset : 0
       );
     } catch (error) {
-      console.error('Error fetching users:', error);
+      logger.error('Error fetching users:', error);
       throw error;
     }
   }
@@ -129,7 +130,7 @@ export class UsersRepository extends BaseRepository {
         ]
       );
     } catch (error) {
-      console.error('Error creating user:', error);
+      logger.error('Error creating user:', error);
       throw error;
     }
   }

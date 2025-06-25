@@ -1,5 +1,6 @@
 import { IDatabase } from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
+import logger from 'src/log/logger';
 
 export interface BaseRepositoryConfig {
   connectionString: string;
@@ -21,12 +22,12 @@ export default abstract class BaseRepository {
   public async initializeDatabase(): Promise<void> {
     try {
       const data = await this.db.one('SELECT NOW() AS current_time');
-      console.log(
+      logger.info(
         `Database ${this.TABLE_NAME} connection successful:`,
         data.current_time
       );
     } catch (error) {
-      console.error('Database initialization failed:', error);
+      logger.error('Database initialization failed:', error);
       throw new Error(
         `Failed to initialize database: ${error instanceof Error ? error.message : String(error)}`
       );
@@ -40,10 +41,10 @@ export default abstract class BaseRepository {
       );
 
       if (!tableExists || !tableExists.exists) {
-        console.warn(`${this.TABLE_NAME} table does not exist`);
+        logger.warn(`${this.TABLE_NAME} table does not exist`);
       }
     } catch (error) {
-      console.error('Error verifying database structure:', error);
+      logger.error('Error verifying database structure:', error);
       throw error;
     }
   }

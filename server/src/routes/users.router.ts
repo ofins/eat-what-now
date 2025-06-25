@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import logger from 'src/log/logger';
 import { authenticateAPIKey, authenticateToken } from 'src/middleware/auth';
 import { usersRepository } from 'src/server';
 
@@ -17,7 +18,7 @@ router.get('/', authenticateAPIKey, (req: Request, res: Response) => {
       res.send(data);
     })
     .catch((error) => {
-      console.log(`Error fetching users:${error}`);
+      logger.error(`Error fetching users:${error}`);
       res.status(500).send({ error: 'Internal Server Error' });
     });
 });
@@ -26,7 +27,6 @@ router.get('/', authenticateAPIKey, (req: Request, res: Response) => {
 router.get('/profile', authenticateToken, (req: Request, res: Response) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (req as any).userId;
-  console.log(userId);
 
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
@@ -43,7 +43,7 @@ router.get('/profile', authenticateToken, (req: Request, res: Response) => {
       res.json({ data: user });
     })
     .catch((error) => {
-      console.error('Error fetching user profile:', error);
+      logger.error('Error fetching user profile:', error);
       res.status(500).json({ error: 'Internal server error' });
     });
 });

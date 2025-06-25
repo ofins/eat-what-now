@@ -14,7 +14,6 @@ export const login = async ({
       password,
     }
   );
-  console.log(response);
 
   if (!response) throw new Error("Failed to Login");
 

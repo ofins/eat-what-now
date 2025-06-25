@@ -11,8 +11,6 @@ const About = () => {
     queryKey: ["users/profile"], // Path matches API endpoint
   });
 
-  console.log(data);
-
   if (isLoading) {
     return (
       <div className="auth-container">

@@ -17,6 +17,7 @@ import { CreateRestaurant, UpdateRestaurant } from './restaurants.schema';
 import db from 'src/db/db';
 import { IDatabase } from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
+import logger from 'src/log/logger';
 
 dotenv.config();
 
@@ -41,13 +42,13 @@ export class RestaurantsRepository extends BaseRepository {
       try {
         this.aggregateUserData();
       } catch (error) {
-        console.error('Error running CRON in restaurantRepo:', error);
+        logger.error('Error running CRON in restaurantRepo:', error);
       }
     });
 
     this.shuffleRestaurantDailyFeed();
     cron.schedule('0 0 * * *', async () => {
-      console.log('Running daily restaurant shuffle...');
+      logger.info('Running daily restaurant shuffle...');
       this.shuffleRestaurantDailyFeed();
     });
   }
@@ -63,7 +64,7 @@ export class RestaurantsRepository extends BaseRepository {
         [id]
       );
     } catch (error) {
-      console.error(`Error fetching restaurant by ID ${id}:`, error);
+      logger.error(`Error fetching restaurant by ID ${id}:`, error);
     }
   }
 
@@ -170,7 +171,7 @@ export class RestaurantsRepository extends BaseRepository {
         Number.isInteger(offset) ? offset : 0
       );
     } catch (error) {
-      console.error('Error fetching restaurants:', error);
+      logger.error('Error fetching restaurants:', error);
       throw error;
     }
   }
@@ -204,7 +205,7 @@ export class RestaurantsRepository extends BaseRepository {
         ]
       );
     } catch (error) {
-      console.error('Error creating restaurant:', error);
+      logger.error('Error creating restaurant:', error);
       throw error;
     }
   }
@@ -257,7 +258,7 @@ export class RestaurantsRepository extends BaseRepository {
 
       return await this.db.oneOrNone<IRestaurant>(query, values);
     } catch (error) {
-      console.error(`Error updating restaurant with ID ${id}:`, error);
+      logger.error(`Error updating restaurant with ID ${id}:`, error);
       throw error;
     }
   }
@@ -290,7 +291,7 @@ export class RestaurantsRepository extends BaseRepository {
 
       return result > 1;
     } catch (error) {
-      console.error(`Error deleting restaurant with ID ${id}:`, error);
+      logger.error(`Error deleting restaurant with ID ${id}:`, error);
       throw error;
     }
   }
@@ -313,7 +314,7 @@ export class RestaurantsRepository extends BaseRepository {
         [limit]
       );
     } catch (error) {
-      console.error('Error fetching popular cuisines:', error);
+      logger.error('Error fetching popular cuisines:', error);
       throw error;
     }
   }
@@ -330,7 +331,7 @@ export class RestaurantsRepository extends BaseRepository {
         [limit]
       );
     } catch (error) {
-      console.error('Error fetching top rated restaurants:', error);
+      logger.error('Error fetching top rated restaurants:', error);
       throw error;
     }
   }
@@ -341,9 +342,9 @@ export class RestaurantsRepository extends BaseRepository {
   async close(): Promise<void> {
     try {
       await this.db.$pool.end();
-      console.log('Database connection closed');
+      logger.info('Database connection closed');
     } catch (error) {
-      console.error('Error closing database connection:', error);
+      logger.error('Error closing database connection:', error);
       throw error;
     }
   }
@@ -359,7 +360,7 @@ export class RestaurantsRepository extends BaseRepository {
         SET restaurant_id = EXCLUDED.restaurant_id
       `);
     } catch (error) {
-      console.error(`Error inserting daily feed:`, error);
+      logger.error(`Error inserting daily feed:`, error);
     }
   }
 
@@ -428,9 +429,9 @@ export class RestaurantsRepository extends BaseRepository {
           WHERE ru.restaurant_id = r.id AND ru.rating IS NOT NULL
         )
         `);
-      console.log('Users data aggregated successfully');
+      logger.info('Users data aggregated successfully');
     } catch (error) {
-      console.error('Error aggregating Users data:', error);
+      logger.error('Error aggregating Users data:', error);
       throw error;
     }
   }

@@ -47,7 +47,6 @@ export const authenticateToken = (
 
   try {
     const decoded = jwt.verify(token, secret) as jwt.JwtPayload;
-    console.log('Decoded JWT:', decoded);
     if (decoded && typeof decoded === 'object' && 'user_id' in decoded) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (req as any).userId = decoded.user_id;
