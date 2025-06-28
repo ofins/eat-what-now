@@ -141,9 +141,6 @@ const Feed = () => {
               <h3 className="text-xl font-bold text-gray-600">
                 {nextRestaurant.name}
               </h3>
-              <p className="text-gray-500 mt-2">
-                {nextRestaurant.cuisine_type}
-              </p>
             </div>
           </div>
         )}
@@ -165,9 +162,6 @@ const Feed = () => {
                   {currentRestaurant?.address}
                 </p>
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                    {currentRestaurant?.cuisine_type}
-                  </span>
                   <span className="text-yellow-500 text-lg">
                     {"★".repeat(Math.floor(currentRestaurant?.rating || 0))}
                   </span>
