@@ -1,24 +1,16 @@
-/* Auth Components Styling */
+/* Auth Components Design Styling */
 .auth-container {
-  height: 100vh;
-  overflow-y: auto;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  -webkit-overflow-scrolling: touch;
 }
 
 .auth-card {
   background: white;
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  padding: 2.5rem;
-  width: 100%;
-  max-width: 420px;
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .auth-card::before {
@@ -33,49 +25,28 @@
 
 .auth-header {
   text-align: center;
-  margin-bottom: 2rem;
 }
 
 .auth-title {
   color: #2c3e50;
-  font-size: 2rem;
   font-weight: 700;
-  margin: 0 0 0.5rem 0;
   letter-spacing: -0.025em;
 }
 
 .auth-subtitle {
   color: #7f8c8d;
-  font-size: 1rem;
-  margin: 0;
   line-height: 1.5;
-}
-
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
 }
 
 .form-label {
   color: #34495e;
   font-weight: 600;
-  font-size: 0.875rem;
   letter-spacing: 0.025em;
-  margin-bottom: 0.25rem;
 }
 
 .form-input {
-  padding: 1rem;
   border: 2px solid #e1e8ed;
   border-radius: 8px;
-  font-size: 1rem;
   transition: all 0.2s ease;
   background: #fafbfc;
   color: #2c3e50;
@@ -96,13 +67,10 @@
   background: linear-gradient(135deg, #ef2a39 0%, #e74c3c 100%);
   color: white;
   border: none;
-  padding: 1rem 1.5rem;
   border-radius: 8px;
-  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-top: 0.5rem;
   position: relative;
   overflow: hidden;
 }
@@ -152,41 +120,30 @@
 .auth-error {
   background: #fee;
   color: #e74c3c;
-  padding: 1rem;
   border-radius: 8px;
-  font-size: 0.875rem;
   border: 1px solid #fcc;
-  margin-top: 0.5rem;
 }
 
 .auth-success {
   background: #eff8f5;
   color: #27ae60;
-  padding: 1rem;
   border-radius: 8px;
-  font-size: 0.875rem;
   border: 1px solid #d5f4e6;
-  margin-top: 0.5rem;
 }
 
 .auth-footer {
   text-align: center;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
   border-top: 1px solid #ecf0f1;
 }
 
 .auth-link-text {
   color: #7f8c8d;
-  font-size: 0.875rem;
-  margin: 0;
 }
 
 .auth-link {
   color: #ef2a39;
   text-decoration: none;
   font-weight: 600;
-  margin-left: 0.25rem;
   transition: color 0.2s ease;
 }
 
@@ -195,26 +152,9 @@
   text-decoration: underline;
 }
 
-/* Responsive Design */
+/* Responsive Design - Mobile adjustments for design elements */
 @media (max-width: 480px) {
-  .auth-container {
-    padding: 1rem 0.5rem;
-  }
-
   .auth-card {
-    padding: 2rem 1.5rem;
     border-radius: 12px;
-  }
-
-  .auth-title {
-    font-size: 1.75rem;
-  }
-
-  .form-input {
-    padding: 0.875rem;
-  }
-
-  .auth-button {
-    padding: 0.875rem 1.25rem;
   }
 }
