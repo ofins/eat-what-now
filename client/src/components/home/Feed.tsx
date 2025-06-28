@@ -179,6 +179,9 @@ const Feed = () => {
                   Price:{" "}
                   {"$".repeat(Math.floor(currentRestaurant?.price_range || 1))}
                 </div>
+                <div className="w-full aspect-video overflow-hidden">
+                  <img width="100%" src={currentRestaurant?.img_url} />
+                </div>
               </div>
             </div>
           </div>
