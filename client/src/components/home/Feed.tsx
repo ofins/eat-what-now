@@ -158,10 +158,10 @@ const Feed = () => {
           <div className="w-full h-full bg-white rounded-2xl shadow-xl border-2 border-gray-100">
             <div className="h-full flex flex-col justify-between p-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                <h2 className="text-xl font-bold text-gray-800 mb-6">
                   {currentRestaurant?.name}
                 </h2>
-                <p className="text-gray-600 mb-3">
+                <p className="text-gray-600 mb-3 text-sm">
                   {currentRestaurant?.address}
                 </p>
                 <div className="flex items-center gap-2 mb-3">
