@@ -5,17 +5,18 @@ export interface IRestaurant {
   name: string;
   latitude: number;
   longitude: number;
-  image_url: string;
-  description: string;
   address: string;
-  cuisine_type: string;
   price_range: number;
   rating: number;
+  average_ratings: number;
+  total_upvotes: number;
+  total_downvotes: number;
+  total_favorites: number;
+  total_comments: number;
+  img_url?: string;
+  outbound_link?: string;
   created_at: Date;
   updated_at: Date;
-  open_hours?: string;
-  contact_info?: string;
-  img_url?: string;
 }
 
 export interface RestaurantFilterOptions extends PaginationTypes {
@@ -35,11 +36,12 @@ export interface CreateRestaurantData {
   address: string;
   cuisine_type: string;
   price_range: number;
-  rating: number;
   longitude: number;
   latitude: number;
   open_hours?: string;
   contact_info?: string;
+  rating?: number;
+  average_ratings?: number;
 }
 
 /**

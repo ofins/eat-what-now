@@ -33,7 +33,7 @@ router.put(
   (req: Request, res: Response) => {
     const { id } = req.params;
     restaurantRepository
-      .updateRestaurant(Number(id), req.body)
+      .updateRestaurant(Number(id), req.body.data)
       .then((data) => res.send(data))
       .catch((error) => {
         logger.error(`Error updating restaurant: ${error}`);

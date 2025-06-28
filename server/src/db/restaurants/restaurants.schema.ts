@@ -10,41 +10,36 @@ export const restaurantSchema = z.object({
     .number()
     .describe('Longitude coordinate of the restaurant location'),
   image_url: z.string().url(),
-  description: z.string().optional().describe('Description of the restaurant'),
   address: z.string().describe('Physical address of the restaurant'),
   website: z
     .string()
     .url()
     .optional()
     .describe('Website URL of the restaurant'),
-  cuisine_type: z
-    .string()
-    .describe('Type of cuisine offered by the restaurant'),
   price_range: z
     .number()
     .int()
     .min(1)
     .max(5)
     .describe('Price range of the restaurant, from 1 to 5'),
-  rating: z
+  average_ratings: z
     .number()
     .min(0)
     .max(5)
     .describe('Average rating of the restaurant, from 0 to 5'),
-  open_hours: z.string().optional().describe('Opening hours of the restaurant'),
   created_at: z.date().describe('Timestamp when the restaurant was created'),
   updated_at: z
     .date()
     .optional()
     .describe('Timestamp when the restaurant was last updated'),
   img_url: z.string().url().optional(),
+  outbound_link: z.string().url().optional(),
 });
 
 export const restaurantFilterOptionsSchema = z.object({
   longitude: z.number().optional(),
   latitude: z.number().optional(),
   radius: z.number().optional(), // in kilometers
-  cuisineType: z.string().optional(),
   priceRange: z.string().optional(),
   minRating: z.number().min(0).max(5).optional(),
   limit: z.coerce.number().int().min(1).max(100),
@@ -54,14 +49,14 @@ export const restaurantFilterOptionsSchema = z.object({
 export const createRestaurantSchema = z.object({
   name: z.string(),
   address: z.string(),
-  cuisine_type: z.string(),
+  rating: z.number().min(0).max(5).optional(),
   price_range: z.number().int().min(1).max(5),
-  rating: z.number().min(0).max(5),
   longitude: z.number(),
   latitude: z.number(),
-  open_hours: z.string().optional(),
-  contact_info: z.string().optional(),
   website: z.string().url().optional(),
+  img_url: z.string().url().optional(),
+  outbound_link: z.string().url().optional(),
+  average_ratings: z.number().min(0).max(5).optional(),
 });
 
 export const updateRestaurantSchema = z.object({

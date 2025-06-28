@@ -183,25 +183,25 @@ export class RestaurantsRepository extends BaseRepository {
    */
   async createRestaurant(data: CreateRestaurant): Promise<IRestaurant> {
     try {
-      this.validateRestaurantData(data);
+      this.validateRestaurantData(data as CreateRestaurantData);
 
       return await this.db.one<IRestaurant>(
         `INSERT INTO ${TABLE_NAME} (
-          name, address, cuisine_type, price_range, rating,
-          longitude, latitude, open_hours, contact_info
+          name, address, price_range, longitude, latitude, website, img_url, outbound_link, rating, average_ratings
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
         ) RETURNING *`,
         [
           data.name,
           data.address,
-          data.cuisine_type,
           data.price_range,
-          0,
           data.longitude,
           data.latitude,
-          data.open_hours || null,
-          data.contact_info || null,
+          data.website || null,
+          data.img_url || null,
+          data.outbound_link || null,
+          data.rating || 0,
+          data.average_ratings || 0,
         ]
       );
     } catch (error) {
@@ -297,29 +297,6 @@ export class RestaurantsRepository extends BaseRepository {
   }
 
   /**
-   * Get popular cuisines in the database
-   * @param limit Maximum number of cuisine types to return
-   * @returns Array of cuisine types with their counts
-   */
-  async getPopularCuisines(
-    limit = 10
-  ): Promise<{ cuisine_type: string; count: number }[]> {
-    try {
-      return await this.db.any(
-        `SELECT cuisine_type, COUNT(*) as count
-         FROM restaurants
-         GROUP BY cuisine_type
-         ORDER BY count DESC
-         LIMIT $1`,
-        [limit]
-      );
-    } catch (error) {
-      logger.error('Error fetching popular cuisines:', error);
-      throw error;
-    }
-  }
-
-  /**
    * Get top rated restaurants
    * @param limit Maximum number of restaurants to return
    * @returns Array of top rated restaurants
@@ -327,7 +304,7 @@ export class RestaurantsRepository extends BaseRepository {
   async getTopRatedRestaurants(limit = 10): Promise<IRestaurant[]> {
     try {
       return await this.db.any<IRestaurant>(
-        'SELECT * FROM restaurants ORDER BY rating DESC LIMIT $1',
+        'SELECT * FROM restaurants ORDER BY average_ratings DESC LIMIT $1',
         [limit]
       );
     } catch (error) {
@@ -378,16 +355,8 @@ export class RestaurantsRepository extends BaseRepository {
       throw new Error('Restaurant address is required');
     }
 
-    if (!data.cuisine_type || data.cuisine_type.trim().length === 0) {
-      throw new Error('Cuisine type is required');
-    }
-
     if (!data.price_range || data.price_range < 0 || data.price_range > 5) {
       throw new Error('Price range must be between 0 and 5');
-    }
-
-    if (data.rating < 0 || data.rating > 5) {
-      throw new Error('Rating must be between 0 and 5');
     }
 
     if (data.longitude < -180 || data.longitude > 180) {
