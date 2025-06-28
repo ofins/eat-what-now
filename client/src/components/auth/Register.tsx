@@ -19,7 +19,7 @@ const Register = () => {
 
   return (
     <div className="auth-container min-h-scree w-full flex items-start justify-center p-4 pb-20">
-      <div className="auth-card p-8 md:p-10 w-[90%] max-w-2xl min-w-[300px] mt-4 mb-8 h-[80vh]">
+      <div className="auth-card p-8 md:p-10 w-[90%] max-w-2xl min-w-[300px] mt-4 mb-8 h-fit">
         <div className="auth-header">
           <h2 className="auth-title text-2xl md:text-3xl mb-2">
             Create Account
@@ -121,7 +121,7 @@ const Register = () => {
           )}
         </form>
 
-        <div className="auth-footer mt-8 pt-6">
+        <div className="auth-footer mt-4 pt-4">
           <p className="auth-link-text text-sm m-0">
             Already have an account?
             <Link to="/login" className="auth-link ml-1">

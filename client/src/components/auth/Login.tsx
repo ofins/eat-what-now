@@ -26,7 +26,7 @@ const Login = () => {
 
   return (
     <div className="auth-container min-h-screen overflow-y-auto w-full flex items-start justify-center p-4 pb-20">
-      <div className="auth-card p-8 md:p-10 w-[90%] max-w-2xl min-w-[300px] mt-4 mb-8">
+      <div className="auth-card p-8 md:p-10 w-[90%] max-w-2xl min-w-[100%] mt-4 mb-8 h-fit">
         <div className="auth-header mb-8">
           <h2 className="auth-title text-2xl md:text-3xl mb-2">Welcome Back</h2>
           <p className="auth-subtitle text-base md:text-lg m-0">
