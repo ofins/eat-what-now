@@ -1,8 +1,13 @@
 ### 28th
 
+- Drop `cuisine_type`, `open_hours`, `contact_info` in `restaurants`
+- Add `outbound_link`
+- Update `restaurants` schema
+
 Issue encountered:
 
 - Unable to fetch data when developing with mobile devices on local network.
+  - change `BASE_URL` in client `.env` from `localhost` to IP
 
 ### 25th
 
