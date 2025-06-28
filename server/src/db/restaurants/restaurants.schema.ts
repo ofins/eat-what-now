@@ -37,6 +37,7 @@ export const restaurantSchema = z.object({
     .date()
     .optional()
     .describe('Timestamp when the restaurant was last updated'),
+  img_url: z.string().url().optional(),
 });
 
 export const restaurantFilterOptionsSchema = z.object({

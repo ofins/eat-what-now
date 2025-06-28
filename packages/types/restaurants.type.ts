@@ -15,6 +15,7 @@ export interface IRestaurant {
   updated_at: Date;
   open_hours?: string;
   contact_info?: string;
+  img_url?: string;
 }
 
 export interface RestaurantFilterOptions extends PaginationTypes {
