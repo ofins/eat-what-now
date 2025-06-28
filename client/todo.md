@@ -1,1 +1,2 @@
+- [ ] Add loading screen for initially fetching user location
 - [x] Create HOC for feed for users that are logged in and did not log in.
