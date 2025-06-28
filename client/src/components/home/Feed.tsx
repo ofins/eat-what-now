@@ -110,7 +110,7 @@ const Feed = () => {
       className="flex flex-col items-center h-screen min-h-[400px] px-4"
     >
       {/* Card Stack Container */}
-      <div className="relative w-80 h-[60%] max-w-sm mt-6">
+      <div className="relative w-80 h-[60%] max-w-sm mt-6 ">
         {/* Third card (background) */}
         {nextNextRestaurant && (
           <div

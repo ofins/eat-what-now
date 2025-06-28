@@ -13,9 +13,9 @@ const About = () => {
 
   if (isLoading) {
     return (
-      <div className="auth-container">
-        <div className="auth-card">
-          <div className="loading-spinner">Loading your profile...</div>
+      <div className="about-container">
+        <div className="about-card">
+          <div className="about-loading">Loading your profile...</div>
         </div>
       </div>
     );
@@ -23,58 +23,56 @@ const About = () => {
 
   if (error) {
     return (
-      <div className="auth-container">
-        <div className="auth-card">
-          <div className="auth-error">
-            Error loading profile: {error.message}
-          </div>
+      <div className="about-container">
+        <div className="about-card">
+          <div className="about-error">Unable to load profile data</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="auth-header">
-          <h2 className="auth-title">Your Profile</h2>
-          <p className="auth-subtitle">Manage your account information</p>
+    <div className="about-container">
+      <div className="about-card">
+        <div className="about-header">
+          <h2 className="about-title">Your Profile</h2>
+          <p className="about-subtitle">Manage your account information</p>
         </div>
 
-        <div className="profile-content">
-          <div className="profile-section">
-            <h3 className="profile-section-title">Personal Information</h3>
-            <div className="profile-info-grid">
-              <div className="profile-info-item">
-                <span className="profile-label">Full Name</span>
-                <span className="profile-value">
+        <div className="about-content">
+          <div className="about-section">
+            <h3 className="about-section-title">Personal Information</h3>
+            <div className="about-info-grid">
+              <div className="about-info-item">
+                <span className="about-label">Full Name</span>
+                <span className="about-value">
                   {data?.data.full_name || "Not provided"}
                 </span>
               </div>
-              <div className="profile-info-item">
-                <span className="profile-label">Email</span>
-                <span className="profile-value">
+              <div className="about-info-item">
+                <span className="about-label">Email</span>
+                <span className="about-value">
                   {data?.data.email || "Not provided"}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="profile-section">
-            <h3 className="profile-section-title">Account Status</h3>
-            <div className="profile-info-grid">
-              <div className="profile-info-item">
-                <span className="profile-label">Account Status</span>
+          <div className="about-section">
+            <h3 className="about-section-title">Account Status</h3>
+            <div className="about-info-grid">
+              <div className="about-info-item">
+                <span className="about-label">Account Status</span>
                 <span
-                  className={`profile-status ${data?.data.is_active ? "active" : "inactive"}`}
+                  className={`about-status ${data?.data.is_active ? "active" : "inactive"}`}
                 >
                   {data?.data.is_active ? "Active" : "Inactive"}
                 </span>
               </div>
-              <div className="profile-info-item">
-                <span className="profile-label">Email Verified</span>
+              <div className="about-info-item">
+                <span className="about-label">Email Verified</span>
                 <span
-                  className={`profile-status ${data?.data.is_verified ? "verified" : "unverified"}`}
+                  className={`about-status ${data?.data.is_verified ? "verified" : "unverified"}`}
                 >
                   {data?.data.is_verified ? "Verified" : "Unverified"}
                 </span>
