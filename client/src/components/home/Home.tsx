@@ -52,9 +52,9 @@ const Home = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   console.log("Location:", location);
 
   return (
-    <div id="Home" className="w-full h-full flex flex-col items-center  px-4">
-      <span className="font-[lobster] text-3xl py-3">EatWhatNow</span>
-      <div className="py-3">
+    <div id="Home" className="w-full flex flex-col items-center px-4">
+      {/* <span className="font-[lobster] text-3xl py-3">EatWhatNow</span> */}
+      <div className="py-3 mt-10">
         <Feed />
       </div>
     </div>

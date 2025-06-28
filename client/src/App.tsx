@@ -35,7 +35,7 @@ function App() {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <main className="h-screen flex justify-center items-center">
+        <main className="h-screen flex justify-center items-center overflow-hidden">
           <Routes>
             <Route index element={<Home />} />
             <Route
