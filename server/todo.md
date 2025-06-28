@@ -1,5 +1,8 @@
 # To-Do List
 
+- [ ] Setup Google Places API to allow fetch of detailed data through unique ID
+  - Free for 10K per month, setup rate-limit for this so app does not incur cost
+
 ## Bug Issues
 
 - [x] Unable to connect to Docker DB using dbeaver (6.4.2025)
@@ -14,6 +17,7 @@
 - [ ] Reviews management endpoints CRUD
 - [ ] Implement load balancing
 - [ ] Cache mechanism (Redis)
+- [ ] Setup API for adding restaurant through link
 - [x] Protect against common vulnerabilities (SQL Injections, XSS, CSRF)
 - [x] Setup Logger for API and DB
 - [x] Implement rate limiting to prevent abuse

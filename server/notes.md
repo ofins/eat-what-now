@@ -1,3 +1,9 @@
+### 28th
+
+Issue encountered:
+
+- Unable to fetch data when developing with mobile devices on local network.
+
 ### 25th
 
 - Setup basic logging system using `winston` and `morgan`

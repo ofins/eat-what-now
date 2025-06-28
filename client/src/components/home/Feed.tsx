@@ -1,8 +1,6 @@
 import type { IRestaurant } from "@ewn/types/restaurants.type";
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { updateRestaurantVote } from "../../api/restaurants-user";
-import type { UserProfileResponse } from "../About";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 type FeedResponse = {
   data: IRestaurant[];
@@ -19,18 +17,6 @@ const PAGE_LIMIT = 10;
 
 const Feed = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(
-    null
-  );
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const isLoggedIn = !!localStorage.getItem("token");
-  const { data: userData } = useQuery<UserProfileResponse>({
-    queryKey: ["users/profile"],
-    enabled: isLoggedIn,
-  });
 
   // Efficient infinite data fetching
   const {
@@ -60,8 +46,6 @@ const Feed = () => {
     initialPageParam: 0,
   });
 
-  const mutation = useMutation({ mutationFn: updateRestaurantVote });
-
   const restaurants = data?.pages.flatMap((page) => page.data) || [];
 
   // Prefetch next page when user is near the end
@@ -81,86 +65,18 @@ const Feed = () => {
     fetchNextPage,
   ]);
 
-  // Handle touch/mouse events for swiping
-  const handleStart = (clientX: number, clientY: number) => {
-    setDragStart({ x: clientX, y: clientY });
-    setIsDragging(true);
-  };
-
-  const handleMove = (clientX: number, clientY: number) => {
-    if (!dragStart || !isDragging) return;
-
-    const deltaX = clientX - dragStart.x;
-    const deltaY = clientY - dragStart.y;
-
-    // Allow both horizontal and slight vertical movement for natural feel
-    setDragOffset({ x: deltaX, y: deltaY * 0.1 }); // Reduce vertical movement
-  };
-
-  const handleEnd = () => {
-    if (!isDragging) return;
-
-    const threshold = 80; // Minimum swipe distance (reduced for easier swiping)
-
-    if (
-      Math.abs(dragOffset.x) > threshold &&
-      currentIndex < restaurants.length - 1
-    ) {
+  const handleNext = () => {
+    if (currentIndex < restaurants.length - 1) {
       setCurrentIndex((prev) => prev + 1);
-      if (dragOffset.x > 0) {
-        handleSwipeRight();
-      } else {
-        handleSwipeLeft();
-      }
+    } else if (hasNextPage) {
+      // If we're at the end but there are more pages, fetch and reset
+      fetchNextPage().then(() => {
+        setCurrentIndex((prev) => prev + 1);
+      });
+    } else {
+      // If we're at the very end, reset to beginning
+      setCurrentIndex(0);
     }
-
-    // Reset drag state
-    setDragStart(null);
-    setDragOffset({ x: 0, y: 0 });
-    setIsDragging(false);
-  };
-
-  // Mouse events
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    handleStart(e.clientX, e.clientY);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    handleMove(e.clientX, e.clientY);
-  };
-
-  const handleMouseUp = () => {
-    handleEnd();
-  };
-
-  // Touch events
-  const handleTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    handleStart(touch.clientX, touch.clientY);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    // e.preventDefault(); // Prevent scrolling, this is causing issues.
-    const touch = e.touches[0];
-    handleMove(touch.clientX, touch.clientY);
-  };
-
-  const handleTouchEnd = () => {
-    handleEnd();
-  };
-
-  const handleSwipeLeft = () => {
-    console.log("Swiped left");
-  };
-
-  const handleSwipeRight = () => {
-    console.log("Swiped right");
-    mutation.mutate({
-      upvoted: true,
-      user_id: userData?.data.id,
-      restaurant_id: restaurants[currentIndex].id,
-    });
   };
 
   console.log(restaurants[currentIndex]);
@@ -188,13 +104,9 @@ const Feed = () => {
   const nextRestaurant = restaurants[currentIndex + 1];
   const nextNextRestaurant = restaurants[currentIndex + 2];
 
-  // Calculate rotation and opacity based on drag
-  const rotation = dragOffset.x * 0.1; // Max 10 degrees rotation per 100px drag
-  const opacity = 1 - Math.abs(dragOffset.x) / 300; // Fade out as we swipe
-
   return (
     <div className="flex flex-col items-center h-screen min-h-[400px] px-4">
-      {/* Tinder-like Card Stack Container */}
+      {/* Card Stack Container */}
       <div className="relative w-80 h-96 max-w-sm">
         {/* Third card (background) */}
         {nextNextRestaurant && (
@@ -235,27 +147,10 @@ const Feed = () => {
 
         {/* Current card (top) */}
         <div
-          ref={cardRef}
-          className="absolute inset-0 cursor-grab active:cursor-grabbing"
+          className="absolute inset-0"
           style={{
-            transform: `
-              translateX(${dragOffset.x}px) 
-              translateY(${dragOffset.y}px) 
-              rotate(${rotation}deg)
-            `,
-            opacity: opacity,
-            transition: isDragging
-              ? "none"
-              : "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
             zIndex: 3,
           }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
         >
           <div className="w-full h-full bg-white rounded-2xl shadow-xl border-2 border-gray-100">
             <div className="h-full flex flex-col justify-between p-6">
@@ -282,30 +177,6 @@ const Feed = () => {
                   {"$".repeat(Math.floor(currentRestaurant?.price_range || 1))}
                 </div>
               </div>
-
-              {/* Swipe indicators */}
-              {isDragging && (
-                <div className="absolute top-4 left-4 right-4 flex justify-between pointer-events-none">
-                  <div
-                    className={`px-4 py-2 rounded-full font-bold text-white transition-opacity ${
-                      dragOffset.x > 50
-                        ? "opacity-100 bg-green-500"
-                        : "opacity-0"
-                    }`}
-                  >
-                    LIKE
-                  </div>
-                  <div
-                    className={`px-4 py-2 rounded-full font-bold text-white transition-opacity ${
-                      dragOffset.x < -50
-                        ? "opacity-100 bg-red-500"
-                        : "opacity-0"
-                    }`}
-                  >
-                    PASS
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -317,31 +188,15 @@ const Feed = () => {
         {hasNextPage && " (loading more...)"}
       </div>
 
-      {/* Swipe Instructions */}
-      {/* <div className="mt-8 text-center">
-        <div className="flex justify-center gap-4 mt-6">
-          <button
-            onClick={() =>
-              currentIndex < restaurants.length - 1 &&
-              setCurrentIndex((prev) => prev + 1)
-            }
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 shadow-sm"
-            disabled={currentIndex >= restaurants.length - 1 && !hasNextPage}
-          >
-            PASS
-          </button>
-          <button
-            onClick={() =>
-              currentIndex < restaurants.length - 1 &&
-              setCurrentIndex((prev) => prev + 1)
-            }
-            className="px-4 py-2 bg-[#EF2A39] text-white rounded-lg hover:bg-red-600 disabled:opacity-50 shadow-sm"
-            disabled={currentIndex >= restaurants.length - 1 && !hasNextPage}
-          >
-            LIKE
-          </button>
-        </div>
-      </div> */}
+      {/* Next Button */}
+      <div className="mt-8">
+        <button
+          onClick={handleNext}
+          className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium shadow-md transition-colors"
+        >
+          Next Restaurant
+        </button>
+      </div>
 
       {/* Loading indicator for next page */}
       {isFetchingNextPage && (
