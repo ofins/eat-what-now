@@ -341,6 +341,24 @@ export class RestaurantsRepository extends BaseRepository {
     }
   }
 
+  async updateUpvoteCount(restaurantId: number, count: number): Promise<void> {
+    try {
+      if (!Number.isInteger(restaurantId) || restaurantId <= 0) {
+        throw new Error('Invalid restaurant ID');
+      }
+      await this.db.none(
+        `UPDATE ${TABLE_NAME} SET total_upvotes = total_upvotes + $2 WHERE id = $1`,
+        [restaurantId, count]
+      );
+    } catch (error) {
+      logger.error(
+        `Error incrementing upvote count for restaurant ${restaurantId}:`,
+        error
+      );
+      throw error;
+    }
+  }
+
   /**
    * Validate restaurant data
    * @param data Restaurant data to validate

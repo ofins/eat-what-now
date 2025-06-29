@@ -44,6 +44,31 @@ export class RestaurantUserRepository extends BaseRepository {
     );
   }
 
+  async toggleUpvote(userId: string, restaurantId: number) {
+    const exists = await this.db.oneOrNone(
+      `SELECT * FROM ${TABLE_NAME} WHERE user_id = $1 AND restaurant_id = $2`,
+      [userId, restaurantId]
+    );
+
+    if (exists) {
+      return this.db.one(
+        `
+        UPDATE ${TABLE_NAME}
+        SET upvoted = NOT upvoted, updated_at = NOW()
+        WHERE user_id = $1 AND restaurant_id = $2
+        RETURNING *
+        `,
+        [userId, restaurantId]
+      );
+    } else {
+      return this.addRelationship({
+        user_id: userId,
+        restaurant_id: restaurantId,
+        upvoted: true,
+      });
+    }
+  }
+
   async getRestaurantsForUser(userId: number) {
     return this.db.any(`SELECT * FROM ${TABLE_NAME} WHERE user_id = $1`, [
       userId,

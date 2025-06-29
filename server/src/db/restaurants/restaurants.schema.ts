@@ -61,7 +61,19 @@ export const createRestaurantSchema = z.object({
 
 export const updateRestaurantSchema = z.object({
   id: z.number().int(),
-  data: createRestaurantSchema.partial(),
+  data: z.object({
+    name: z.string().optional(),
+    address: z.string().optional(),
+    rating: z.number().min(0).max(5).optional(),
+    price_range: z.number().int().min(1).max(5).optional(),
+    longitude: z.number().optional(),
+    latitude: z.number().optional(),
+    total_upvotes: z.number().int().optional(),
+    total_downvotes: z.number().int().optional(),
+    total_favorites: z.number().int().optional(),
+    total_comments: z.number().int().optional(),
+    average_ratings: z.number().min(0).max(5).optional(),
+  }),
 });
 
 export const createRestaurantUserSchema = z.object({

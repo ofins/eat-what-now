@@ -79,6 +79,32 @@ router.post(
   }
 );
 
+router.post(
+  '/user/upvote',
+  authenticateAPIKey,
+  async (req: Request, res: Response) => {
+    const { user_id, restaurant_id } = req.body;
+
+    try {
+      const updatedData = await restaurantUserRepository.toggleUpvote(
+        user_id,
+        restaurant_id
+      );
+
+      // Fast update the restaurant's upvote count
+      await restaurantRepository.updateUpvoteCount(
+        restaurant_id,
+        updatedData.upvoted ? 1 : -1
+      );
+
+      res.send(updatedData);
+    } catch (error) {
+      logger.error(`Error toggling upvote: ${error}`);
+      res.status(500).send({ error: `Internal Server Error` });
+    }
+  }
+);
+
 export default router;
 
 /**
@@ -184,6 +210,38 @@ export default router;
  *         description: Invalid input
  *       401:
  *         description: Unauthorized
+ *       500:
+ *         description: Internal Server Error
+ * /restaurants/user/upvote:
+ *   post:
+ *     summary: Toggle upvote for a restaurant by user
+ *     description: Toggles the upvote status for a restaurant by a user. Requires API key authentication.
+ *     tags:
+ *       - Restaurants
+ *     security:
+ *       - ApiKeyAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: string
+ *                 description: User ID
+ *               restaurant_id:
+ *                 type: integer
+ *                 description: Restaurant ID
+ *     responses:
+ *       200:
+ *         description: Upvote toggled successfully
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Restaurant not found
  *       500:
  *         description: Internal Server Error
  */
