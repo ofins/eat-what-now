@@ -1,6 +1,8 @@
 import type { IRestaurant } from "@ewn/types/restaurants.type";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { calculateDistance } from "../../utils/common";
+import type { ILocation } from "./Home";
 
 type FeedResponse = {
   data: IRestaurant[];
@@ -15,7 +17,11 @@ type FeedResponse = {
 
 const PAGE_LIMIT = 10;
 
-const Feed = () => {
+interface Props {
+  location: ILocation | null;
+}
+
+const Feed = ({ location }: Props) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Efficient infinite data fetching
@@ -79,8 +85,6 @@ const Feed = () => {
     }
   };
 
-  console.log(restaurants[currentIndex]);
-
   if (isLoading)
     return (
       <div className="flex items-center justify-center h-screen">
@@ -101,8 +105,8 @@ const Feed = () => {
     );
 
   const currentRestaurant = restaurants[currentIndex];
-  const nextRestaurant = restaurants[currentIndex + 1];
-  const nextNextRestaurant = restaurants[currentIndex + 2];
+  // const nextRestaurant = restaurants[currentIndex + 1];
+  // const nextNextRestaurant = restaurants[currentIndex + 2];
 
   return (
     <div
@@ -112,7 +116,7 @@ const Feed = () => {
       {/* Card Stack Container */}
       <div className="relative w-80 h-[60%] max-w-sm mt-6 ">
         {/* Third card (background) */}
-        {nextNextRestaurant && (
+        {/* {nextNextRestaurant && (
           <div
             className="absolute inset-0 bg-white rounded-2xl shadow-md"
             style={{
@@ -126,10 +130,10 @@ const Feed = () => {
               </h3>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Second card (middle) */}
-        {nextRestaurant && (
+        {/* {nextRestaurant && (
           <div
             className="absolute inset-0 bg-white rounded-2xl shadow-lg border"
             style={{
@@ -143,7 +147,7 @@ const Feed = () => {
               </h3>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Current card (top) */}
         <div
@@ -168,6 +172,15 @@ const Feed = () => {
                   <span className="text-sm text-gray-500 font-medium">
                     {currentRestaurant?.rating}
                   </span>
+                </div>
+                <div className="text-sm text-gray-600 mb-3 opacity-80">
+                  {calculateDistance(
+                    currentRestaurant?.latitude || 0,
+                    currentRestaurant?.longitude || 0,
+                    location?.latitude || 0,
+                    location?.longitude || 0
+                  ).toFixed(2)}{" "}
+                  km away
                 </div>
                 <div className="text-sm text-gray-600 font-medium">
                   Price:{" "}

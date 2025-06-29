@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Feed from "./Feed";
 
-interface ILocation {
+export interface ILocation {
   latitude: number | null;
   longitude: number | null;
 }
@@ -31,6 +31,7 @@ const Home = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
     );
   }, []);
 
+  // todo: event source
   // useEffect(() => {
   //   const eventSource = new EventSource("http://localhost:3000/events");
 
@@ -55,7 +56,7 @@ const Home = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
     <div id="Home" className="w-full flex flex-col items-center px-4">
       {/* <span className="font-[lobster] text-3xl py-3">EatWhatNow</span> */}
       <div className="py-3 mt-10">
-        <Feed />
+        <Feed location={location} />
       </div>
     </div>
   );
