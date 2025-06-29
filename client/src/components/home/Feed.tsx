@@ -156,38 +156,103 @@ const Feed = ({ location }: Props) => {
             zIndex: 3,
           }}
         >
-          <div className="w-full h-full bg-white rounded-2xl shadow-xl border-2 border-gray-100">
-            <div className="h-full flex flex-col justify-between p-6">
-              <div>
-                <h2 className="text-xl font-bold text-gray-800 mb-6">
-                  {currentRestaurant?.name}
-                </h2>
-                <p className="text-gray-600 mb-3 text-sm">
-                  {currentRestaurant?.address}
-                </p>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-yellow-500 text-lg">
-                    {"★".repeat(Math.floor(currentRestaurant?.rating || 0))}
-                  </span>
-                  <span className="text-sm text-gray-500 font-medium">
-                    {currentRestaurant?.rating}
-                  </span>
+          <div className="w-full h-full bg-white rounded-2xl shadow-xl border-2 border-gray-100 overflow-hidden">
+            <div className="h-full flex flex-col">
+              {/* Image Section - Fixed height */}
+              <div className="w-full h-32 flex-shrink-0 bg-gray-100 rounded-t-2xl overflow-hidden">
+                {currentRestaurant?.img_url ? (
+                  <img
+                    src={currentRestaurant.img_url}
+                    alt={currentRestaurant.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    No image available
+                  </div>
+                )}
+              </div>
+
+              {/* Content Section - Scrollable if needed */}
+              <div className="flex-1 flex flex-col p-4 min-h-0">
+                {/* Restaurant Name - Fixed height */}
+                <div className="flex-shrink-0 mb-3">
+                  <h2 className="text-lg font-bold text-gray-800 line-clamp-2 leading-tight">
+                    {currentRestaurant?.name}
+                  </h2>
                 </div>
-                <div className="text-sm text-gray-600 mb-3 opacity-80">
-                  {calculateDistance(
-                    currentRestaurant?.latitude || 0,
-                    currentRestaurant?.longitude || 0,
-                    location?.latitude || 0,
-                    location?.longitude || 0
-                  ).toFixed(2)}{" "}
-                  km away
+
+                {/* Address - Fixed height */}
+                <div className="flex-shrink-0 mb-3">
+                  <p className="text-gray-600 text-xs line-clamp-2 leading-relaxed">
+                    {currentRestaurant?.address}
+                  </p>
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
-                  Price:{" "}
-                  {"$".repeat(Math.floor(currentRestaurant?.price_range || 1))}
+
+                {/* Rating and Distance Row */}
+                <div className="flex-shrink-0 flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-1">
+                    <span className="text-yellow-500 text-sm">
+                      {"★".repeat(Math.floor(currentRestaurant?.rating || 0))}
+                      {"☆".repeat(
+                        5 - Math.floor(currentRestaurant?.rating || 0)
+                      )}
+                    </span>
+                    <span className="text-xs text-gray-500 font-medium ml-1">
+                      {Number(currentRestaurant?.rating).toFixed(1)}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded-full">
+                    {calculateDistance(
+                      currentRestaurant?.latitude || 0,
+                      currentRestaurant?.longitude || 0,
+                      location?.latitude || 0,
+                      location?.longitude || 0
+                    ).toFixed(1)}{" "}
+                    km
+                  </div>
                 </div>
-                <div className="w-full aspect-video overflow-hidden">
-                  <img width="100%" src={currentRestaurant?.img_url} />
+
+                {/* Price Range */}
+                <div className="flex-shrink-0 mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">Price:</span>
+                    <span className="text-green-600 font-medium text-sm">
+                      {"$".repeat(
+                        Math.floor(currentRestaurant?.price_range || 1)
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Stats Grid - Fixed height */}
+                <div className="flex-shrink-0 mt-auto pt-3 border-t border-gray-100">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex items-center gap-1">
+                      <span className="text-green-500 text-sm">👍</span>
+                      <span className="text-xs text-gray-600">
+                        {currentRestaurant?.total_upvotes || 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-red-500 text-sm">👎</span>
+                      <span className="text-xs text-gray-600">
+                        {currentRestaurant?.total_downvotes || 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-pink-500 text-sm">❤️</span>
+                      <span className="text-xs text-gray-600">
+                        {currentRestaurant?.total_favorites || 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-blue-500 text-sm">💬</span>
+                      <span className="text-xs text-gray-600">
+                        {currentRestaurant?.total_comments || 0}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
