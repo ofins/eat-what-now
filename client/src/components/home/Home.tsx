@@ -56,7 +56,7 @@ const Home = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
     <div id="Home" className="w-full flex flex-col items-center px-4">
       {/* <span className="font-[lobster] text-3xl py-3">EatWhatNow</span> */}
       <div className="py-3 mt-10">
-        <Feed location={location} />
+        <Feed location={location} isLoggedIn={isLoggedIn} />
       </div>
     </div>
   );

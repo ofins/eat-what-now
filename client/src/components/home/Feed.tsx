@@ -1,8 +1,10 @@
 import type { IRestaurant } from "@ewn/types/restaurants.type";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { calculateDistance } from "../../utils/common";
 import type { ILocation } from "./Home";
+import { updateRestaurantUserRelation } from "../../api/restaurants-user";
+import type { IUser } from "@ewn/types/users.type";
 
 type FeedResponse = {
   data: IRestaurant[];
@@ -19,9 +21,10 @@ const PAGE_LIMIT = 10;
 
 interface Props {
   location: ILocation | null;
+  isLoggedIn?: boolean;
 }
 
-const Feed = ({ location }: Props) => {
+const Feed = ({ location, isLoggedIn = false }: Props) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Efficient infinite data fetching
@@ -51,6 +54,13 @@ const Feed = ({ location }: Props) => {
     },
     initialPageParam: 0,
   });
+
+  const { data: userData } = useQuery<{ data: IUser }>({
+    queryKey: ["users/profile"], // Path matches API endpoint
+    enabled: isLoggedIn, // Only fetch if user is logged in
+  });
+
+  console.log("User Data:", userData);
 
   const restaurants = data?.pages.flatMap((page) => page.data) || [];
 
@@ -229,19 +239,52 @@ const Feed = ({ location }: Props) => {
                 <div className="flex-shrink-0 mt-auto pt-3 border-t border-gray-100">
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex items-center gap-1">
-                      <span className="text-green-500 text-sm">👍</span>
+                      <span
+                        className="text-green-500 text-sm"
+                        onClick={() => {
+                          updateRestaurantUserRelation({
+                            user_id: userData?.data.id || "",
+                            restaurant_id: currentRestaurant.id,
+                            upvoted: true,
+                          });
+                        }}
+                      >
+                        👍
+                      </span>
                       <span className="text-xs text-gray-600">
                         {currentRestaurant?.total_upvotes || 0}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="text-red-500 text-sm">👎</span>
+                      <span
+                        className="text-red-500 text-sm"
+                        onClick={() => {
+                          updateRestaurantUserRelation({
+                            user_id: userData?.data.id || "",
+                            restaurant_id: currentRestaurant.id,
+                            downvoted: true,
+                          });
+                        }}
+                      >
+                        👎
+                      </span>
                       <span className="text-xs text-gray-600">
                         {currentRestaurant?.total_downvotes || 0}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="text-pink-500 text-sm">❤️</span>
+                      <span
+                        className="text-pink-500 text-sm"
+                        onClick={() => {
+                          updateRestaurantUserRelation({
+                            user_id: userData?.data.id || "",
+                            restaurant_id: currentRestaurant.id,
+                            favorited: true,
+                          });
+                        }}
+                      >
+                        ❤️
+                      </span>
                       <span className="text-xs text-gray-600">
                         {currentRestaurant?.total_favorites || 0}
                       </span>
