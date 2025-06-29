@@ -37,3 +37,17 @@ export const updateRestaurantUserRelation = async ({
 
   return response;
 };
+
+export const toggleUpvote = async (user_id: string, restaurant_id: number) => {
+  const response = await httpClient.post(
+    `${import.meta.env.VITE_API_BASE_URL}/restaurants/user/upvote`,
+    {
+      user_id,
+      restaurant_id,
+    }
+  );
+
+  if (!response) throw new Error("Failed to toggle upvote");
+
+  return response;
+};

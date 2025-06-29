@@ -17,8 +17,9 @@
 - [ ] Reviews management endpoints CRUD
 - [ ] Implement load balancing
 - [ ] Cache mechanism (Redis)
-- [ ] Setup API for adding restaurant through link
+- [x] Setup API for adding restaurant through link
 - [ ] Ability to write comments for restaurants
+- [ ] Implement transaction mechanism
 - [x] Protect against common vulnerabilities (SQL Injections, XSS, CSRF)
 - [x] Setup Logger for API and DB
 - [x] Implement rate limiting to prevent abuse

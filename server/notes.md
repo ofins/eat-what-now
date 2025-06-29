@@ -1,3 +1,12 @@
+### 29th
+
+- Add `/restaurant/user/upvote` API for exclusively toggling upvotes
+- Apply fast update on `total_upvote` count when user toggles upvotes by updating `restaurant-user` table and increment/decrement `restaurant` table's `total_upvote`
+
+Things I learned:
+
+- How to apply fast update for features such as `like/dislike` counts
+
 ### 28th
 
 - Drop `cuisine_type`, `open_hours`, `contact_info` in `restaurants`

@@ -3,7 +3,10 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { calculateDistance } from "../../utils/common";
 import type { ILocation } from "./Home";
-import { updateRestaurantUserRelation } from "../../api/restaurants-user";
+import {
+  toggleUpvote,
+  updateRestaurantUserRelation,
+} from "../../api/restaurants-user";
 import type { IUser } from "@ewn/types/users.type";
 
 type FeedResponse = {
@@ -38,6 +41,7 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    refetch,
   } = useInfiniteQuery<FeedResponse>({
     queryKey: ["feed"],
     queryFn: async ({ pageParam = 0 }) => {
@@ -63,17 +67,25 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
     enabled: isLoggedIn, // Only fetch if user is logged in
   });
 
-  console.log("User Data:", userData);
-
-  const handleStatClick = (statType: string, action: () => void) => {
+  const handleStatClick = async (
+    statType: string,
+    action: () => Promise<void>
+  ) => {
     if (!isLoggedIn || !userData?.data.id) return;
 
     // Show pulse animation
     const key = `${currentRestaurant.id}-${statType}`;
     setClickedStats((prev) => ({ ...prev, [key]: true }));
 
-    // Execute the action
-    action();
+    try {
+      // Execute the action and wait for it to complete
+      await action();
+
+      // Refetch feed data to update stats
+      await refetch();
+    } catch (error) {
+      console.error(`Error performing ${statType}:`, error);
+    }
 
     // Remove animation after delay
     setTimeout(() => {
@@ -265,12 +277,16 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                             : ""
                         } ${isLoggedIn ? "cursor-pointer" : "cursor-default opacity-50"}`}
                         onClick={() =>
-                          handleStatClick("upvote", () => {
-                            updateRestaurantUserRelation({
-                              user_id: userData?.data.id || "",
-                              restaurant_id: currentRestaurant.id,
-                              upvoted: true,
-                            });
+                          handleStatClick("upvote", async () => {
+                            // updateRestaurantUserRelation({
+                            //   user_id: userData?.data.id || "",
+                            //   restaurant_id: currentRestaurant.id,
+                            //   upvoted: true,
+                            // });
+                            await toggleUpvote(
+                              userData?.data.id || "",
+                              currentRestaurant.id
+                            );
                           })
                         }
                       >
@@ -280,7 +296,7 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                         {currentRestaurant?.total_upvotes || 0}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    {/* <div className="flex items-center gap-1">
                       <span
                         className={`text-red-500 text-sm cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95 ${
                           clickedStats[`${currentRestaurant.id}-downvote`]
@@ -288,8 +304,8 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                             : ""
                         } ${isLoggedIn ? "cursor-pointer" : "cursor-default opacity-50"}`}
                         onClick={() =>
-                          handleStatClick("downvote", () => {
-                            updateRestaurantUserRelation({
+                          handleStatClick("downvote", async () => {
+                            await updateRestaurantUserRelation({
                               user_id: userData?.data.id || "",
                               restaurant_id: currentRestaurant.id,
                               downvoted: true,
@@ -302,7 +318,7 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                       <span className="text-xs text-gray-600">
                         {currentRestaurant?.total_downvotes || 0}
                       </span>
-                    </div>
+                    </div> */}
                     <div className="flex items-center gap-1">
                       <span
                         className={`text-pink-500 text-sm cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95 ${
@@ -311,8 +327,8 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                             : ""
                         } ${isLoggedIn ? "cursor-pointer" : "cursor-default opacity-50"}`}
                         onClick={() =>
-                          handleStatClick("favorite", () => {
-                            updateRestaurantUserRelation({
+                          handleStatClick("favorite", async () => {
+                            await updateRestaurantUserRelation({
                               user_id: userData?.data.id || "",
                               restaurant_id: currentRestaurant.id,
                               favorited: true,
