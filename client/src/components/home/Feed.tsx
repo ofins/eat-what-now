@@ -26,6 +26,9 @@ interface Props {
 
 const Feed = ({ location, isLoggedIn = false }: Props) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [clickedStats, setClickedStats] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   // Efficient infinite data fetching
   const {
@@ -61,6 +64,22 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
   });
 
   console.log("User Data:", userData);
+
+  const handleStatClick = (statType: string, action: () => void) => {
+    if (!isLoggedIn || !userData?.data.id) return;
+
+    // Show pulse animation
+    const key = `${currentRestaurant.id}-${statType}`;
+    setClickedStats((prev) => ({ ...prev, [key]: true }));
+
+    // Execute the action
+    action();
+
+    // Remove animation after delay
+    setTimeout(() => {
+      setClickedStats((prev) => ({ ...prev, [key]: false }));
+    }, 300);
+  };
 
   const restaurants = data?.pages.flatMap((page) => page.data) || [];
 
@@ -240,14 +259,20 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex items-center gap-1">
                       <span
-                        className="text-green-500 text-sm"
-                        onClick={() => {
-                          updateRestaurantUserRelation({
-                            user_id: userData?.data.id || "",
-                            restaurant_id: currentRestaurant.id,
-                            upvoted: true,
-                          });
-                        }}
+                        className={`text-green-500 text-sm cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95 ${
+                          clickedStats[`${currentRestaurant.id}-upvote`]
+                            ? "animate-pulse scale-125"
+                            : ""
+                        } ${isLoggedIn ? "cursor-pointer" : "cursor-default opacity-50"}`}
+                        onClick={() =>
+                          handleStatClick("upvote", () => {
+                            updateRestaurantUserRelation({
+                              user_id: userData?.data.id || "",
+                              restaurant_id: currentRestaurant.id,
+                              upvoted: true,
+                            });
+                          })
+                        }
                       >
                         👍
                       </span>
@@ -257,14 +282,20 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                     </div>
                     <div className="flex items-center gap-1">
                       <span
-                        className="text-red-500 text-sm"
-                        onClick={() => {
-                          updateRestaurantUserRelation({
-                            user_id: userData?.data.id || "",
-                            restaurant_id: currentRestaurant.id,
-                            downvoted: true,
-                          });
-                        }}
+                        className={`text-red-500 text-sm cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95 ${
+                          clickedStats[`${currentRestaurant.id}-downvote`]
+                            ? "animate-pulse scale-125"
+                            : ""
+                        } ${isLoggedIn ? "cursor-pointer" : "cursor-default opacity-50"}`}
+                        onClick={() =>
+                          handleStatClick("downvote", () => {
+                            updateRestaurantUserRelation({
+                              user_id: userData?.data.id || "",
+                              restaurant_id: currentRestaurant.id,
+                              downvoted: true,
+                            });
+                          })
+                        }
                       >
                         👎
                       </span>
@@ -274,14 +305,20 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                     </div>
                     <div className="flex items-center gap-1">
                       <span
-                        className="text-pink-500 text-sm"
-                        onClick={() => {
-                          updateRestaurantUserRelation({
-                            user_id: userData?.data.id || "",
-                            restaurant_id: currentRestaurant.id,
-                            favorited: true,
-                          });
-                        }}
+                        className={`text-pink-500 text-sm cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95 ${
+                          clickedStats[`${currentRestaurant.id}-favorite`]
+                            ? "animate-pulse scale-125"
+                            : ""
+                        } ${isLoggedIn ? "cursor-pointer" : "cursor-default opacity-50"}`}
+                        onClick={() =>
+                          handleStatClick("favorite", () => {
+                            updateRestaurantUserRelation({
+                              user_id: userData?.data.id || "",
+                              restaurant_id: currentRestaurant.id,
+                              favorited: true,
+                            });
+                          })
+                        }
                       >
                         ❤️
                       </span>
@@ -296,6 +333,13 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                       </span>
                     </div>
                   </div>
+
+                  {/* Login prompt for non-authenticated users */}
+                  {!isLoggedIn && (
+                    <div className="mt-2 text-xs text-gray-400 text-center">
+                      Login to interact with restaurants
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
