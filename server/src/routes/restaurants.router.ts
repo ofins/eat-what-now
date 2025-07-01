@@ -8,6 +8,7 @@ import {
 import logger from 'src/log/logger';
 import { authenticateAPIKey } from 'src/middleware/auth';
 import { restaurantRepository, restaurantUserRepository } from 'src/server';
+import { searchGooglePlacesByText } from 'src/utils/google';
 
 const router = express.Router();
 
@@ -100,6 +101,22 @@ router.post(
       res.send(updatedData);
     } catch (error) {
       logger.error(`Error toggling upvote: ${error}`);
+      res.status(500).send({ error: `Internal Server Error` });
+    }
+  }
+);
+
+router.post(
+  '/google/search-by-text',
+  authenticateAPIKey,
+  async (req: Request, res: Response) => {
+    const { text, location } = req.body;
+
+    try {
+      const results = await searchGooglePlacesByText(text, location);
+      res.send(results);
+    } catch (error) {
+      logger.error(`Error searching restaurants by text: ${error}`);
       res.status(500).send({ error: `Internal Server Error` });
     }
   }
@@ -244,4 +261,114 @@ export default router;
  *         description: Restaurant not found
  *       500:
  *         description: Internal Server Error
+ *
+ * /restaurants/google/search-by-text:
+ *   post:
+ *     summary: Search restaurants by text using Google Places API
+ *     description: Searches for restaurants by text query and location using Google Places API. Returns restaurant data including name, address, price level, photos, and routing information.
+ *     tags:
+ *       - Restaurants
+ *     security:
+ *       - ApiKeyAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - text
+ *               - location
+ *             properties:
+ *               text:
+ *                 type: string
+ *                 description: Search query text (e.g., restaurant name, cuisine type)
+ *                 example: "starbucks"
+ *               location:
+ *                 type: object
+ *                 required:
+ *                   - latitude
+ *                   - longitude
+ *                 properties:
+ *                   latitude:
+ *                     type: number
+ *                     format: double
+ *                     description: Latitude coordinate for search origin
+ *                     example: 25.0396385
+ *                   longitude:
+ *                     type: number
+ *                     format: double
+ *                     description: Longitude coordinate for search origin
+ *                     example: 121.5310953
+ *     responses:
+ *       200:
+ *         description: Search results returned successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 places:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: Google Place ID
+ *                       displayName:
+ *                         type: object
+ *                         properties:
+ *                           text:
+ *                             type: string
+ *                             description: Restaurant name
+ *                           languageCode:
+ *                             type: string
+ *                             description: Language code
+ *                       formattedAddress:
+ *                         type: string
+ *                         description: Full formatted address
+ *                       priceLevel:
+ *                         type: string
+ *                         enum: [PRICE_LEVEL_FREE, PRICE_LEVEL_INEXPENSIVE, PRICE_LEVEL_MODERATE, PRICE_LEVEL_EXPENSIVE, PRICE_LEVEL_VERY_EXPENSIVE]
+ *                         description: Price range indicator
+ *                       photos:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             name:
+ *                               type: string
+ *                               description: Photo reference name
+ *                             widthPx:
+ *                               type: integer
+ *                               description: Photo width in pixels
+ *                             heightPx:
+ *                               type: integer
+ *                               description: Photo height in pixels
+ *                 routingSummaries:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       legs:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             duration:
+ *                               type: string
+ *                               description: Travel duration (e.g., "300s")
+ *                             distanceMeters:
+ *                               type: integer
+ *                               description: Distance in meters
+ *                       directionsUri:
+ *                         type: string
+ *                         description: Google Maps directions URL
+ *       400:
+ *         description: Invalid input - missing required fields or invalid coordinates
+ *       401:
+ *         description: Unauthorized - invalid or missing API key
+ *       500:
+ *         description: Internal Server Error - Google Places API error or server issue
  */
