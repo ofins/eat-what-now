@@ -1,6 +1,6 @@
 # To-Do List
 
-- [ ] Setup Google Places API to allow fetch of detailed data through unique ID
+- [x] Setup Google Places API to allow fetch of detailed data through unique ID
   - Free for 10K per month, setup rate-limit for this so app does not incur cost
 - [ ] Chatting system
   - If user is within vicinity of a restaurant, he will have access to its chat room
@@ -43,8 +43,8 @@
 - [ ] Explore basic failure mechanism to integrate in DB
 - [ ] Ensure database has proper normalization technique
 - [ ] Setup caching system - Redis
-- [ ] Optimize PostGIS queries for location-based searches
 - [ ] Create database backup script
+- [ ] Optimize PostGIS queries for location-based searches
 - [x] Setup a form of migration
 - [x] Setup `restaurants-users` table
 - [x] Setup `users` and `restaurants` table

@@ -1,37 +1,31 @@
 import React, { useState } from "react";
-import SearchResultList from "./google/SearchResultList";
-import data from "./google/data.json";
-
-interface Place {
-  id: string;
-  formattedAddress: string;
-  priceLevel: string;
-  displayName: {
-    text: string;
-    languageCode: string;
-  };
-  photos: Array<{
-    name: string;
-    widthPx: number;
-    heightPx: number;
-  }>;
-}
+import SearchResultList, { type SearchResult } from "./google/SearchResultList";
+import { searchRestaurantsByText } from "../api/restaurants";
+import type { RestaurantGoogleDetails } from "@ewn/types/restaurants.type";
 
 const Search = () => {
+  const [data, setData] = useState<SearchResult>({
+    places: [],
+    routingSummaries: [],
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
-
     setIsSearching(true);
-    // TODO: Implement actual Google Places API search
-    console.log("Searching for:", searchQuery);
 
-    // Simulate API call delay
-    setTimeout(() => {
+    try {
+      const results = await searchRestaurantsByText(searchQuery, {
+        latitude: 25.0396385,
+        longitude: 121.5310953,
+      });
+      setData(results);
+    } catch (error) {
+      console.error("Error searching restaurants:", error);
+    } finally {
       setIsSearching(false);
-    }, 1000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -40,7 +34,7 @@ const Search = () => {
     }
   };
 
-  const handleAddToDatabase = async (place: Place) => {
+  const handleAddToDatabase = async (place: RestaurantGoogleDetails) => {
     console.log("Adding restaurant to database:", place);
     // TODO: Implement actual API call to add restaurant to database
 
@@ -149,10 +143,6 @@ const Search = () => {
             loading={isSearching}
             onSelectPlace={(place) => {
               console.log("Selected place:", place);
-              // Here you would typically:
-              // 1. Navigate to the restaurant details
-              // 2. Close the search modal
-              // 3. Show the restaurant in the main feed
             }}
             onAddToDatabase={handleAddToDatabase}
           />

@@ -66,3 +66,40 @@ export interface RestaurantsRepositoryConfig {
   maxSearchRadius: number; // Maximum search radius in kilometers
   defaultLimit: number;
 }
+
+export interface PlacesAPIResponse {
+  places: RestaurantGoogleDetails[];
+  routingSummaries: RoutingSummary[];
+}
+
+export interface RoutingSummary {
+  legs: Array<{
+    duration: string;
+    distanceMeters: number;
+  }>;
+  directionsUri: string;
+}
+
+export interface RestaurantGoogleDetails {
+  id: string;
+  formattedAddress: string;
+  priceLevel: string;
+  displayName: {
+    text: string;
+    languageCode: string;
+  };
+  photos: Photo[];
+}
+
+export interface Photo {
+  name: string;
+  widthPx: number;
+  heightPx: number;
+  authorAttributions: Array<{
+    displayName: string;
+    uri: string;
+    photoUri: string;
+  }>;
+  flagContentUri: string;
+  googleMapsUri: string;
+}

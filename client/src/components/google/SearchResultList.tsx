@@ -1,47 +1,20 @@
 import React, { useState } from "react";
 import AddRestaurantModal from "./AddRestaurantModal";
+import type {
+  RestaurantGoogleDetails,
+  Photo,
+  RoutingSummary,
+} from "@ewn/types/restaurants.type";
 
-interface Photo {
-  name: string;
-  widthPx: number;
-  heightPx: number;
-  authorAttributions: Array<{
-    displayName: string;
-    uri: string;
-    photoUri: string;
-  }>;
-  flagContentUri: string;
-  googleMapsUri: string;
-}
-
-interface Place {
-  id: string;
-  formattedAddress: string;
-  priceLevel: string;
-  displayName: {
-    text: string;
-    languageCode: string;
-  };
-  photos: Photo[];
-}
-
-interface RoutingSummary {
-  legs: Array<{
-    duration: string;
-    distanceMeters: number;
-  }>;
-  directionsUri: string;
-}
-
-interface SearchResult {
-  places: Place[];
+export interface SearchResult {
+  places: RestaurantGoogleDetails[];
   routingSummaries: RoutingSummary[];
 }
 
 interface SearchResultListProps {
   searchResults: SearchResult;
-  onSelectPlace: (place: Place) => void;
-  onAddToDatabase?: (place: Place) => Promise<void>;
+  onSelectPlace: (place: RestaurantGoogleDetails) => void;
+  onAddToDatabase?: (place: RestaurantGoogleDetails) => Promise<void>;
   loading?: boolean;
 }
 
@@ -52,7 +25,9 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
   loading = false,
 }) => {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
-  const [modalPlace, setModalPlace] = useState<Place | null>(null);
+  const [modalPlace, setModalPlace] = useState<RestaurantGoogleDetails | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const getPriceLevelDisplay = (priceLevel: string) => {
     switch (priceLevel) {
@@ -98,13 +73,16 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
     setExpandedItem(expandedItem === placeId ? null : placeId);
   };
 
-  const handleAddToDatabase = (place: Place, e: React.MouseEvent) => {
+  const handleAddToDatabase = (
+    place: RestaurantGoogleDetails,
+    e: React.MouseEvent
+  ) => {
     e.stopPropagation();
     setModalPlace(place);
     setIsModalOpen(true);
   };
 
-  const handleModalConfirm = async (place: Place) => {
+  const handleModalConfirm = async (place: RestaurantGoogleDetails) => {
     if (onAddToDatabase) {
       await onAddToDatabase(place);
     }

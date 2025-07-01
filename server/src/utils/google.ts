@@ -52,6 +52,5 @@ export const searchGooglePlacesByText = async (
   }
 
   const data = await response.json();
-  console.log('Google Places API Response:', JSON.stringify(data, null, 2));
   return data;
 };

@@ -1,3 +1,8 @@
+### July 1st
+
+- Setup `Places API` from Google with ability to search for restaurants by text
+- User an easily add restaurants of their choice to database
+
 ### 29th
 
 - Add `/restaurant/user/upvote` API for exclusively toggling upvotes
