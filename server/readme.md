@@ -18,8 +18,10 @@ Struggling to find a place to eat tonight? Try EatWhatNow, the app that makes di
 - **User Authentication**: JWT-based login and registration
 - **Restaurant CRUD**: Create, read, update, delete restaurants
 - **User CRUD**: Manage users
-- **Feed API**: Location-based, filterable restaurant feed
+- **Feed API**: Location-based, filterable restaurant feed with geospatial queries
+- **PostGIS Integration**: Spatial database for geographic data and location-based searches
 - **Restaurant-User Join Table**: Track upvotes, downvotes, favorites, ratings, comments, and visits
+- **Google Places API**: Search and import restaurants from Google Places
 - **Swagger API Docs**: `/docs` endpoint
 - **PostgreSQL**: Data storage with migrations/seed using `Knex.js`
 - **CRON Jobs**: Aggregates restaurant stats hourly
@@ -27,8 +29,10 @@ Struggling to find a place to eat tonight? Try EatWhatNow, the app that makes di
 ## Tech Stack
 
 - Node.js, Express, TypeScript
-- PostgreSQL (with pg-promise)
+- PostgreSQL with PostGIS extension for geospatial data
+- pg-promise for database operations
 - JWT for authentication
+- Google Places API for restaurant search and import
 - Swagger for API documentation
 - bcrypt for password hashing
 
@@ -47,6 +51,7 @@ Copy `.env.example` to `.env` and fill in the required values:
 PORT=3000
 SIGNATURE=your_api_key
 JWT_SECRET=your_jwt_secret
+GOOGLE_API_KEY=your_google_places_api_key
 ```
 
 ### Local Development - Getting started
@@ -79,6 +84,7 @@ npm run server
 - `POST /restaurants` — Create a restaurant
 - `PUT /restaurants/:id` — Update a restaurant
 - `DELETE /restaurants/:id` — Delete a restaurant
+- `POST /restaurants/google/search-by-text` — Search restaurants using Google Places API
 
 ### Feed
 
@@ -87,6 +93,7 @@ npm run server
 ### Restaurant-User Actions
 
 - `POST /restaurants/user` — Upvote, downvote, favorite, rate, comment, or mark as visited
+- `POST /restaurants/user/upvote` — Toggle upvote for a restaurant
 
 ## Authentication
 
@@ -96,8 +103,27 @@ npm run server
 ## Database
 
 - Tables: `users`, `restaurants`, `restaurant_user`, `restaurants_daily_feed`
+- PostGIS extension enabled for geospatial functionality
+- Restaurants include geometry column (`geom`) for location-based queries
+- Spatial indexing with GIST for efficient geographic searches
 - Seed data is loaded on first run
 - Aggregated stats (upvotes, downvotes, etc.) are updated hourly via CRON
+
+## PostGIS Features
+
+This backend leverages PostgreSQL's PostGIS extension for advanced geospatial capabilities:
+
+### 🌍 **Spatial Data Storage**
+
+- Restaurant locations stored as `GEOMETRY(Point, 4326)` using WGS84 coordinate system
+- Automatic geometry column updates via database triggers
+- Coordinate validation for latitude (-90 to 90) and longitude (-180 to 180)
+
+### 📍 **Location-Based Queries**
+
+- Distance calculations using `ST_Distance` and `ST_DWithin`
+- Radius-based restaurant searches (e.g., "restaurants within 5km")
+- Efficient spatial indexing with GIST for fast geographic queries
 
 ## API Data Formats
 

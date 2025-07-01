@@ -14,6 +14,7 @@ export const REQUIRED_ENV_VARS = [
   'DB_DATABASE',
   'DB_USER',
   'DB_PASSWORD',
+  'GOOGLE_API_KEY',
 ];
 
 export function validateEnv() {

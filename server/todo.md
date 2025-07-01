@@ -44,7 +44,7 @@
 - [ ] Ensure database has proper normalization technique
 - [ ] Setup caching system - Redis
 - [ ] Create database backup script
-- [ ] Optimize PostGIS queries for location-based searches
+- [x] Optimize PostGIS queries for location-based searches
 - [x] Setup a form of migration
 - [x] Setup `restaurants-users` table
 - [x] Setup `users` and `restaurants` table
