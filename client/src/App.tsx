@@ -9,6 +9,7 @@ import AuthLayout from "./layouts/AuthLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import Search from "./components/Search";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +44,15 @@ function App() {
               element={
                 <ProtectedRoute>
                   <About />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="search"
+              element={
+                <ProtectedRoute>
+                  <Search />
                 </ProtectedRoute>
               }
             />

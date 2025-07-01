@@ -2,6 +2,9 @@
 
 - [ ] Setup Google Places API to allow fetch of detailed data through unique ID
   - Free for 10K per month, setup rate-limit for this so app does not incur cost
+- [ ] Chatting system
+  - If user is within vicinity of a restaurant, he will have access to its chat room
+  - Need to crete additional tables: `rooms`, `room-member`, `messages`
 
 ## Bug Issues
 
@@ -20,6 +23,7 @@
 - [x] Setup API for adding restaurant through link
 - [ ] Ability to write comments for restaurants
 - [ ] Implement transaction mechanism
+- [ ] Setup OAuth Login
 - [x] Protect against common vulnerabilities (SQL Injections, XSS, CSRF)
 - [x] Setup Logger for API and DB
 - [x] Implement rate limiting to prevent abuse

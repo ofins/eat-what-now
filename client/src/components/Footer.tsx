@@ -11,9 +11,14 @@ const Footer = () => {
           <img src="/home.svg" />
         </Link>
         {isLoggedIn ? (
-          <Link to="/about">
-            <img src="/profile.svg" />
-          </Link>
+          <>
+            <Link to="/about">
+              <img src="/profile.svg" />
+            </Link>
+            <Link to="/search">
+              <img src="/search.svg" />
+            </Link>
+          </>
         ) : null}
       </div>
       <div className="flex-1 flex justify-end gap-15">
