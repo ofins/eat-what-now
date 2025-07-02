@@ -24,6 +24,7 @@
 - [ ] Ability to write comments for restaurants
 - [ ] Implement transaction mechanism
 - [ ] Setup OAuth Login
+- [ ] Add `added_by` column for `restaurant` table
 - [x] Protect against common vulnerabilities (SQL Injections, XSS, CSRF)
 - [x] Setup Logger for API and DB
 - [x] Implement rate limiting to prevent abuse

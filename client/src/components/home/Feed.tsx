@@ -47,7 +47,7 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
     queryKey: ["feed"],
     queryFn: async ({ pageParam = 0 }) => {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/feed?offset=${pageParam}&limit=${PAGE_LIMIT}`
+        `${import.meta.env.VITE_API_BASE_URL}/feed?offset=${pageParam}&limit=${PAGE_LIMIT}&longitude=${location?.longitude}&latitude=${location?.latitude}`
       );
       if (!response.ok) throw new Error("Failed to fetch feed");
       return response.json();
@@ -61,6 +61,7 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
       return pages.length * PAGE_LIMIT;
     },
     initialPageParam: 0,
+    enabled: !!location, // Only fetch if location is provided
   });
 
   const { data: userData } = useQuery<{ data: IUser }>({

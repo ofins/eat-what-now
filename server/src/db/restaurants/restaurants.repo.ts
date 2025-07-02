@@ -87,12 +87,37 @@ export class RestaurantsRepository extends BaseRepository {
         radius = DEFAULT_RADIUS_KM,
         cuisineType,
         priceRange,
-        minRating = 0,
+        minRating,
         limit = this.config.defaultLimit,
-        offset = 0,
+        offset,
       } = options;
 
-      if (minRating < 0 || minRating > 5) {
+      // Validate numeric inputs
+      if (
+        longitude !== undefined &&
+        (isNaN(longitude) || longitude < -180 || longitude > 180)
+      ) {
+        throw new Error(
+          'Longitude must be a valid number between -180 and 180'
+        );
+      }
+
+      if (
+        latitude !== undefined &&
+        (isNaN(latitude) || latitude < -90 || latitude > 90)
+      ) {
+        throw new Error('Latitude must be a valid number between -90 and 90');
+      }
+
+      if (isNaN(radius) || radius <= 0) {
+        throw new Error('Radius must be a valid positive number');
+      }
+      if (
+        minRating === undefined ||
+        isNaN(minRating) ||
+        minRating < 0 ||
+        minRating > 5
+      ) {
         throw new Error('Rating must be between 0 and 5.');
       }
 
@@ -112,21 +137,19 @@ export class RestaurantsRepository extends BaseRepository {
       const params: unknown[] = [];
       let paramIndex = 1;
 
-      // If location is provided, search by proximity
+      // If location is provided, search by using spatial queries
       if (longitude !== undefined && latitude !== undefined) {
-        // Use Haversine formula to calculate distance
+        logger.info(
+          `Adding spatial query with longitude: ${longitude}, latitude: ${latitude}, radius: ${radius}`
+        );
         query += `
-        AND (
-          6371 * acos(
-            cos(radians($${paramIndex++})) *
-            cos(radians(latitude)) *
-            cos(radians(longitude) - radians($${paramIndex++})) +
-            sin(radians($${paramIndex++})) *
-            sin(radians(latitude))
-          )
-        ) <= $${paramIndex++}
+        AND ST_DWithin(
+          r.geom::geography,
+          ST_Point($${paramIndex++}, $${paramIndex++})::geography,
+          $${paramIndex++} * 1000
+        )
       `;
-        params.push(latitude, longitude, latitude, radius);
+        params.push(longitude, latitude, radius);
       }
 
       if (cuisineType) {
@@ -155,6 +178,11 @@ export class RestaurantsRepository extends BaseRepository {
         query += ` OFFSET $${paramIndex++}`;
         params.push(offset);
       }
+
+      logger.info(`Executing query with params:`, {
+        query: query.trim(),
+        params,
+      });
 
       const data = await this.db.any<IRestaurant>(query, params);
       const total = await this.db.one(

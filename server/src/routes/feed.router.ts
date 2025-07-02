@@ -12,12 +12,12 @@ router.get(
     const {
       longitude,
       latitude,
-      radius,
+      radius = 5,
       cuisineType,
       priceRange,
-      minRating,
-      limit,
-      offset,
+      minRating = 0,
+      limit = 10,
+      offset = 0,
     } = req.query;
 
     restaurantRepository

@@ -3,11 +3,15 @@ import z from 'zod';
 
 export const restaurantSchema = z.object({
   name: z.string().describe('Name of the restaurant'),
-  latitude: z
+  latitude: z.coerce
     .number()
+    .min(-90)
+    .max(90)
     .describe('Latitude coordinate of the restaurant location'),
-  longitude: z
+  longitude: z.coerce
     .number()
+    .min(-180)
+    .max(180)
     .describe('Longitude coordinate of the restaurant location'),
   image_url: z.string().url(),
   address: z.string().describe('Physical address of the restaurant'),
@@ -37,9 +41,17 @@ export const restaurantSchema = z.object({
 });
 
 export const restaurantFilterOptionsSchema = z.object({
-  longitude: z.number().optional(),
-  latitude: z.number().optional(),
-  radius: z.number().optional(), // in kilometers
+  latitude: z.coerce
+    .number()
+    .min(-90)
+    .max(90)
+    .describe('Latitude coordinate of the restaurant location'),
+  longitude: z.coerce
+    .number()
+    .min(-180)
+    .max(180)
+    .describe('Longitude coordinate of the restaurant location'),
+  radius: z.coerce.number().positive().optional(), // in kilometers
   priceRange: z.string().optional(),
   minRating: z.number().min(0).max(5).optional(),
   limit: z.coerce.number().int().min(1).max(100),
