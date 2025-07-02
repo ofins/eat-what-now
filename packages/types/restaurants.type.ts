@@ -2,6 +2,7 @@ import type { PaginationTypes } from "./index";
 
 export interface IRestaurant {
   id: number;
+  google_id: string;
   name: string;
   latitude: number;
   longitude: number;
@@ -17,6 +18,7 @@ export interface IRestaurant {
   outbound_link?: string;
   created_at: Date;
   updated_at: Date;
+  contributor_username?: string; // Username of the contributor who added the restaurant
 }
 
 export interface RestaurantFilterOptions extends PaginationTypes {
@@ -32,16 +34,16 @@ export interface RestaurantFilterOptions extends PaginationTypes {
  * Restaurant creation data
  */
 export interface CreateRestaurantData {
+  google_id: string;
   name: string;
   address: string;
-  cuisine_type: string;
   price_range: number;
   longitude: number;
   latitude: number;
-  open_hours?: string;
-  contact_info?: string;
-  rating?: number;
-  average_ratings?: number;
+  website?: string;
+  outbound_link?: string;
+  img_url?: string;
+  contributor_username?: string;
 }
 
 /**
@@ -89,6 +91,12 @@ export interface RestaurantGoogleDetails {
     languageCode: string;
   };
   photos: Photo[];
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  websiteUri: string;
+  googleMapsUri: string;
 }
 
 export interface Photo {

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Modal from "../shared/Modal";
+import type { RestaurantGoogleDetails } from "@ewn/types/restaurants.type";
 
 interface Photo {
   name: string;
@@ -14,22 +15,11 @@ interface Photo {
   googleMapsUri: string;
 }
 
-interface Place {
-  id: string;
-  formattedAddress: string;
-  priceLevel: string;
-  displayName: {
-    text: string;
-    languageCode: string;
-  };
-  photos: Photo[];
-}
-
 interface AddRestaurantModalProps {
   isOpen: boolean;
   onClose: () => void;
-  place: Place | null;
-  onConfirm: (place: Place) => Promise<void>;
+  place: RestaurantGoogleDetails | null;
+  onConfirm: (place: RestaurantGoogleDetails) => Promise<void>;
 }
 
 const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({

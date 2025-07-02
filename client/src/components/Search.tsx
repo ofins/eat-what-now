@@ -1,7 +1,21 @@
 import React, { useState } from "react";
 import SearchResultList, { type SearchResult } from "./google/SearchResultList";
-import { searchRestaurantsByText } from "../api/restaurants";
+import { createRestaurant, searchRestaurantsByText } from "../api/restaurants";
 import type { RestaurantGoogleDetails } from "@ewn/types/restaurants.type";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import type { IUser } from "@ewn/types/users.type";
+
+const googlePriceLevelToNum = (priceLevel: string | undefined): number => {
+  if (!priceLevel) return 1; // Default to 0 if no price level is provided
+  const priceMap: Record<string, number> = {
+    PRICE_LEVEL_FREE: 1,
+    PRICE_LEVEL_INEXPENSIVE: 1,
+    PRICE_LEVEL_MODERATE: 2,
+    PRICE_LEVEL_EXPENSIVE: 3,
+    PRICE_LEVEL_VERY_EXPENSIVE: 4,
+  };
+  return priceMap[priceLevel] ?? 0; // Return 0 if the price level is unknown
+};
 
 const Search = () => {
   const [data, setData] = useState<SearchResult>({
@@ -10,6 +24,14 @@ const Search = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: createRestaurant,
+    onSuccess: (data) => {
+      console.log("Restaurant added successfully:", data);
+      // Optionally, you can refresh the search results or show a success message
+    },
+  });
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -34,12 +56,24 @@ const Search = () => {
     }
   };
 
+  const { data: userData } = useQuery<{ data: IUser }>({
+    queryKey: ["users/profile"], // Path matches API endpoint
+  });
+
   const handleAddToDatabase = async (place: RestaurantGoogleDetails) => {
     console.log("Adding restaurant to database:", place);
     // TODO: Implement actual API call to add restaurant to database
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    mutation.mutate({
+      google_id: place.id,
+      name: place.displayName.text,
+      address: place.formattedAddress,
+      price_range: googlePriceLevelToNum(place.priceLevel),
+      longitude: place.location.longitude,
+      latitude: place.location.latitude,
+      website: place.websiteUri,
+      outbound_link: place.googleMapsUri,
+      contributor_username: userData?.data.username,
+    });
 
     // Show success message (you could add a toast notification here)
     alert(`${place.displayName.text} has been added to the database!`);
