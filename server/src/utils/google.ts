@@ -32,7 +32,7 @@ export const searchGooglePlacesByText = async (
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': apiKey,
       'X-Goog-FieldMask':
-        'places.displayName,places.formattedAddress,places.priceLevel,routingSummaries,places.id,places.photos',
+        'places.displayName,places.formattedAddress,places.priceLevel,routingSummaries,places.id,places.photos,places.googleMapsUri,places.websiteUri,places.location',
     },
     body: JSON.stringify(requestBody),
   });

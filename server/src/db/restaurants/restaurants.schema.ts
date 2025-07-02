@@ -69,6 +69,8 @@ export const createRestaurantSchema = z.object({
   img_url: z.string().url().optional(),
   outbound_link: z.string().url().optional(),
   average_ratings: z.number().min(0).max(5).optional(),
+  contributor_username: z.string().optional(),
+  google_id: z.string().describe('Google Places ID of the restaurant'),
 });
 
 export const updateRestaurantSchema = z.object({

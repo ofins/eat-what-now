@@ -215,9 +215,10 @@ export class RestaurantsRepository extends BaseRepository {
 
       return await this.db.one<IRestaurant>(
         `INSERT INTO ${TABLE_NAME} (
-          name, address, price_range, longitude, latitude, website, img_url, outbound_link, rating, average_ratings
+          name, address, price_range, longitude, latitude, website, img_url, outbound_link, rating, average_ratings,
+          contributor_username, google_id
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
         ) RETURNING *`,
         [
           data.name,
@@ -230,6 +231,8 @@ export class RestaurantsRepository extends BaseRepository {
           data.outbound_link || null,
           data.rating || 0,
           data.average_ratings || 0,
+          data.contributor_username || null,
+          data.google_id || null, // Ensure google_id is included
         ]
       );
     } catch (error) {
