@@ -4,7 +4,7 @@ dotenv.config();
 
 export const DEFAULT_RADIUS_KM = 5;
 export const DEFAULT_LIMIT = 20;
-export const MAX_SEARCH_RADIUS = 25;
+export const MAX_SEARCH_RADIUS = 501;
 
 export const REQUIRED_ENV_VARS = [
   'PORT',

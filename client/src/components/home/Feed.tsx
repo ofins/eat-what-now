@@ -47,7 +47,7 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
     queryKey: ["feed"],
     queryFn: async ({ pageParam = 0 }) => {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/feed?offset=${pageParam}&limit=${PAGE_LIMIT}&longitude=${location?.longitude}&latitude=${location?.latitude}`
+        `${import.meta.env.VITE_API_BASE_URL}/feed?offset=${pageParam}&limit=${PAGE_LIMIT}&longitude=${location?.longitude}&latitude=${location?.latitude}&radius=500`
       );
       if (!response.ok) throw new Error("Failed to fetch feed");
       return response.json();
@@ -171,8 +171,8 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
       <div
         className={`relative transition-all duration-500 ease-in-out mt-6 ${
           isExpanded
-            ? "w-[95vw] h-[85vh] max-w-[500px]"
-            : "w-80 h-[60%] max-w-sm"
+            ? "w-[95vw] h-[83vh] max-w-[500px]"
+            : "w-80 h-[70%] max-w-sm"
         }`}
       >
         {/* Third card (background) */}
@@ -312,23 +312,54 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                   </div>
                 </div>
 
-                {/* Price Range */}
+                {/* Price Range and Outbound Link */}
                 <div className="flex-shrink-0 mb-3">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-gray-500 ${isExpanded ? "text-sm" : "text-xs"}`}
-                    >
-                      Price:
-                    </span>
-                    <span
-                      className={`text-green-600 font-medium ${
-                        isExpanded ? "text-base" : "text-sm"
-                      }`}
-                    >
-                      {"$".repeat(
-                        Math.floor(currentRestaurant?.price_range || 1)
-                      )}
-                    </span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-gray-500 ${isExpanded ? "text-sm" : "text-xs"}`}
+                      >
+                        Price:
+                      </span>
+                      <span
+                        className={`text-green-600 font-medium ${
+                          isExpanded ? "text-base" : "text-sm"
+                        }`}
+                      >
+                        {"$".repeat(
+                          Math.floor(currentRestaurant?.price_range || 1)
+                        )}
+                      </span>
+                    </div>
+
+                    {/* Outbound Link Button */}
+                    {currentRestaurant?.outbound_link && (
+                      <a
+                        href={currentRestaurant.outbound_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center gap-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm ${
+                          isExpanded
+                            ? "px-4 py-2 text-sm font-medium"
+                            : "px-3 py-1.5 text-xs font-medium"
+                        }`}
+                      >
+                        <span>Visit</span>
+                        <svg
+                          className={`${isExpanded ? "w-4 h-4" : "w-3 h-3"}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                          />
+                        </svg>
+                      </a>
+                    )}
                   </div>
                 </div>
 
@@ -426,6 +457,52 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                   )}
                 </div>
 
+                {/* Contributed By Section */}
+                {currentRestaurant?.contributor_username && (
+                  <div className="flex-shrink-0 mb-4">
+                    <div
+                      className={`flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100 ${
+                        isExpanded ? "" : "mx-1"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 flex-1">
+                        <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">
+                            {currentRestaurant.contributor_username
+                              ?.charAt(0)
+                              .toUpperCase() || "U"}
+                          </span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span
+                            className={`text-gray-600 ${isExpanded ? "text-xs" : "text-xs"}`}
+                          >
+                            Contributed by
+                          </span>
+                          <span
+                            className={`font-medium text-gray-800 ${isExpanded ? "text-sm" : "text-xs"}`}
+                          >
+                            @{currentRestaurant.contributor_username}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-purple-500">
+                        <svg
+                          className={`${isExpanded ? "w-5 h-5" : "w-4 h-4"}`}
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Comments Section - Only visible when expanded */}
                 {isExpanded && (
                   <div className="flex-shrink-0">
@@ -495,21 +572,17 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
         </div>
       </div>
 
-      {/* Card Counter */}
-      <div className="mt-6 text-sm text-gray-600 font-medium">
-        {currentIndex + 1} of {restaurants.length}
-        {hasNextPage && " (loading more...)"}
-      </div>
-
       {/* Next Button */}
-      <div className="mt-8">
-        <button
-          onClick={handleNext}
-          className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium shadow-md transition-colors cursor-pointer"
-        >
-          Next Restaurant
-        </button>
-      </div>
+      {!isExpanded && (
+        <div className="mt-6">
+          <button
+            onClick={handleNext}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium shadow-md transition-colors cursor-pointer"
+          >
+            Next Restaurant
+          </button>
+        </div>
+      )}
 
       {/* Loading indicator for next page */}
       {isFetchingNextPage && (
