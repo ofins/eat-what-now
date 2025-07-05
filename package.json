@@ -12,6 +12,7 @@
     "build:server": "npm run build --workspace=server",
     "build:client": "npm run build --workspace=client",
     "start:server": "npm run start --workspace=server",
+    "migrate:up": "npm run migrate:up --workspace=server",
     "compose:up": "docker-compose up --build",
     "compose:down": "docker-compose down"
   },
