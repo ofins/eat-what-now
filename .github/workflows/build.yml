@@ -1,7 +1,7 @@
 name: ewn CI/CD
 
 on:
-  push:
+  pull request:
     branches:
       - main
     paths:

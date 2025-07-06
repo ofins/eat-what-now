@@ -6,6 +6,14 @@
 Issue encountered:
 
 - Unable to read `EC2_SSH_KEY` in Github action
+- After setting client and server, client page does not load. Curl HTTP works, but not HTTPS.
+  - reinstalling SSL certificate fixed the issue.
+
+Things I learned:
+
+- Configuring basic Nginx setup which allowed me to route endpoints to different applications in my Monorepo setup
+- Setting up EC2
+- Setting up PostgreSQL DB using AWS RDS
 
 ### July 1st
 
