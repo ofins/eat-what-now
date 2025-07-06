@@ -60,9 +60,10 @@
 - [ ] Host server on AWS
 - [ ] Setup CDN for static assets
 - [ ] Test PROD env
-- [ ] Setup site via AWS ECS with Docker
 - [ ] Purchase domain
 - [ ] Setup CI/CD pipeline in Github Actions
+- [x] Setup Database via AWS RDS
+- [ ] Setup server via AWS EC2 with Docker
 
 ## Documentation
 

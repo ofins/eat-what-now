@@ -9,7 +9,10 @@ export interface ILocation {
 
 const Home = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   // const [message, setMessage] = useState<string[]>([]);
-  const [location, setLocation] = useState<ILocation | null>(null);
+  const [location, setLocation] = useState<ILocation | null>({
+    longitude: 121.5258039, // Default location (Taipei)
+    latitude: 25.095147,
+  });
   console.log({ isLoggedIn });
 
   useEffect(() => {
