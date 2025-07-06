@@ -89,15 +89,13 @@ jobs:
       - name: Lint server
         run: npm run lint --workspace=server
 
-      # - name: Deploy to EC2 via SSH
-      #   uses: appleboy/ssh-action@v1.0.3
-      #   with:
-      #     host: ${{ secrets.EC2_HOST}}
-      #     username: ${{ secrets.EC2_USERNAME}}
-      #     key: ${{ secrets.EC2_SSH_KEY}}
-      #     script: |
-      #       cd /path
-      #       git pull origin main
-      #       npm install
-      #       npm run build --workspace=server
-      #       pm2 restart all
+      - name: Deploy to EC2 via SSH
+        if: github.ref == 'refs/heads/main'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST}}
+          username: ${{ secrets.EC2_USERNAME}}
+          key: ${{ secrets.EC2_SSH_KEY}}
+          script: |
+            cd /var/www/eat-what-now/server
+            ./deploy.sh
