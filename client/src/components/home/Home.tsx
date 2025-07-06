@@ -14,7 +14,6 @@ const Home = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
     latitude: 25.095147,
   });
   console.log({ isLoggedIn });
-  // test
   useEffect(() => {
     if (!navigator.geolocation) {
       console.error("Geolocation is not supported by this browser.");
