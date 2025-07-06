@@ -36,6 +36,10 @@ app.use(express.json());
 app.use(morganMiddleware);
 app.use(limiter);
 
+app.get('/health', (_req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 app.use('/feed', feedRouter);
 app.use('/users', usersRouter);
 app.use('/restaurants', restaurantsRouter);

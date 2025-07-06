@@ -40,6 +40,6 @@ echo "✅ Full-stack deployment completed successfully!"
 
 # Show status
 pm2 status
-echo "🌍 Frontend: https://your-domain.com"
-echo "🔧 API: https://your-domain.com/api"
-echo "📚 Docs: https://your-domain.com/docs"
+echo "🌍 Frontend: https://eatwhatnow.net"
+echo "🔧 API: https://eatwhatnow.net/api"
+echo "📚 Docs: https://eatwhatnow.net/docs"
