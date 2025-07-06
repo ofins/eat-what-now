@@ -53,11 +53,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build client
-        run: npm run build --workspace=client
-
       - name: Lint client
         run: npm run lint --workspace=client
+
+      - name: Build client
+        run: npm run build --workspace=client
 
   server:
     needs: detect-changes

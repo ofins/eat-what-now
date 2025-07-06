@@ -1,3 +1,12 @@
+### 6th
+
+- Setup server via AWS EC2
+- Setup PostgreSQL Database via AWS RDS
+
+Issue encountered:
+
+- Unable to read `EC2_SSH_KEY` in Github action
+
 ### July 1st
 
 - Setup `Places API` from Google with ability to search for restaurants by text
