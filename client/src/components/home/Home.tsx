@@ -9,14 +9,11 @@ export interface ILocation {
 
 const Home = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   // const [message, setMessage] = useState<string[]>([]);
-  const [location, setLocation] = useState<ILocation | null>({
-    longitude: 121.5258039, // Default location (Taipei)
-    latitude: 25.095147,
-  });
+  const [location, setLocation] = useState<ILocation | null>(null);
   console.log({ isLoggedIn });
   useEffect(() => {
     if (!navigator.geolocation) {
-      console.error("Geolocation is not supported by this browser.");
+      console.error("Geolocation is not suppo rted by this browser.");
       return;
     }
 
