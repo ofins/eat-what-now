@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { validateRestaurantFilterOptionsSchema } from 'src/db/restaurants/restaurants.schema';
 import logger from 'src/log/logger';
-import client from 'src/redis';
+import { getCachedData, setCachedData } from 'src/redis';
 import { restaurantRepository } from 'src/server';
 
 const router = express.Router();
@@ -22,14 +22,12 @@ router.get(
     } = req.query;
 
     // check if Redis has the data
-    const redisKey = `restaurants:${longitude}:${latitude}:${radius}:${cuisineType}:${priceRange}:${minRating}:${limit}:${offset}`;
+    const cacheKey = `restaurants:${longitude}:${latitude}:${radius}:${minRating}:${limit}:${offset}`;
 
     try {
-      const cachedData = await client.get(redisKey);
-
+      const cachedData = await getCachedData(cacheKey);
       if (cachedData) {
-        logger.info(`Cache hit for key: ${redisKey}`);
-        res.send(JSON.parse(cachedData));
+        res.send(cachedData);
         return;
       }
 
@@ -46,12 +44,9 @@ router.get(
           limit: parseFloat(limit as string),
           offset: parseFloat(offset as string),
         })
-        .then((data) => {
+        .then(async (data) => {
           // Store the result in Redis cache
-          client.set(redisKey, JSON.stringify(data), {
-            EX: 3600, // Cache for 1 hour
-          });
-          logger.info(`Cache set for key: ${redisKey}`);
+          await setCachedData(cacheKey, data, 3600);
           return data;
         })
         .then((data) => {

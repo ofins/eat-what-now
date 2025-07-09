@@ -1,4 +1,8 @@
 // Centralized configuration and environment variable validation
+
+import knex from 'knex';
+import { development } from '../knexfile';
+
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -25,3 +29,6 @@ export function validateEnv() {
     );
   }
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const db = knex(development as any);

@@ -3,6 +3,7 @@ import {
   RedisClientType,
 } from '/Users/jack.w/Documents/tutorials/eat-what-now/node_modules/redis';
 import dotenv from 'dotenv';
+import logger from './log/logger';
 
 dotenv.config();
 
@@ -24,5 +25,35 @@ client.on('error', (err: string) => {
     console.error('Failed to connect to Redis:', err);
   }
 })();
+
+// Cache utility function
+export const getCachedData = async (key: string) => {
+  try {
+    const cachedData = await client.get(key);
+    if (cachedData) {
+      logger.info(`Cache hit for key: ${key}`);
+      return JSON.parse(cachedData);
+    }
+    return null;
+  } catch (error) {
+    logger.error(`Redis get error for key ${key}:`, error);
+    return null;
+  }
+};
+
+export const setCachedData = async (
+  key: string,
+  data: unknown,
+  ttl: number = 3600
+) => {
+  try {
+    await client.set(key, JSON.stringify(data), {
+      EX: ttl, // Time to live in seconds
+    });
+    logger.info(`Cache set for key: ${key} with TTL: ${ttl}s`);
+  } catch (error) {
+    logger.error(`Redis set error for key ${key}:`, error);
+  }
+};
 
 export default client;
