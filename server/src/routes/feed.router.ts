@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { validateRestaurantFilterOptionsSchema } from 'src/db/restaurants/restaurants.schema';
 import logger from 'src/log/logger';
+import client from 'src/redis';
 import { restaurantRepository } from 'src/server';
 
 const router = express.Router();
@@ -8,7 +9,7 @@ const router = express.Router();
 router.get(
   '/',
   validateRestaurantFilterOptionsSchema,
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     const {
       longitude,
       latitude,
@@ -20,24 +21,49 @@ router.get(
       offset = 0,
     } = req.query;
 
-    restaurantRepository
-      .getRestaurants({
-        longitude: parseFloat(longitude as string),
-        latitude: parseFloat(latitude as string),
-        radius: parseFloat(radius as string), // Default 5km radius
-        cuisineType: typeof cuisineType === 'string' ? cuisineType : undefined,
-        priceRange: priceRange === 'string' ? priceRange : undefined,
-        minRating: parseFloat(minRating as string),
-        limit: parseFloat(limit as string),
-        offset: parseFloat(offset as string),
-      })
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((error) => {
-        logger.error(`Error fetching restaurants:${error}`);
-        res.status(500).send({ error: 'Internal Server Error' });
-      });
+    // check if Redis has the data
+    const redisKey = `restaurants:${longitude}:${latitude}:${radius}:${cuisineType}:${priceRange}:${minRating}:${limit}:${offset}`;
+
+    try {
+      const cachedData = await client.get(redisKey);
+
+      if (cachedData) {
+        logger.info(`Cache hit for key: ${redisKey}`);
+        res.send(JSON.parse(cachedData));
+        return;
+      }
+
+      // if cache miss, fetch from database
+      restaurantRepository
+        .getRestaurants({
+          longitude: parseFloat(longitude as string),
+          latitude: parseFloat(latitude as string),
+          radius: parseFloat(radius as string), // Default 5km radius
+          cuisineType:
+            typeof cuisineType === 'string' ? cuisineType : undefined,
+          priceRange: priceRange === 'string' ? priceRange : undefined,
+          minRating: parseFloat(minRating as string),
+          limit: parseFloat(limit as string),
+          offset: parseFloat(offset as string),
+        })
+        .then((data) => {
+          // Store the result in Redis cache
+          client.set(redisKey, JSON.stringify(data), {
+            EX: 3600, // Cache for 1 hour
+          });
+          logger.info(`Cache set for key: ${redisKey}`);
+          return data;
+        })
+        .then((data) => {
+          res.send(data);
+        })
+        .catch((error) => {
+          logger.error(`Error fetching restaurants:${error}`);
+          res.status(500).send({ error: 'Internal Server Error' });
+        });
+    } catch (error) {
+      logger.error(`Something went wrong: ${error}`);
+    }
   }
 );
 

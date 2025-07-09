@@ -17,6 +17,7 @@ import logger from './log/logger';
 import morganMiddleware from './middleware/morgan';
 import limiter from './middleware/rate-limiter';
 import helmet from 'helmet';
+import 'src/redis';
 
 // Validate environment variables at startup
 validateEnv();
