@@ -12,7 +12,18 @@ import BaseRepository from '../base.repo';
 import logger from 'src/log/logger';
 
 const TABLE_NAME = 'users';
-export class UsersRepository extends BaseRepository {
+
+interface UsersRepositoryInterface {
+  getUserById(id: string): Promise<IUser | null>;
+  getUserByEmail(email: string): Promise<IUser | null>;
+  getUserByUsername(username: string): Promise<IUser | null>;
+  getUsers(options: UserFilterOptions): Promise<PaginatedResponse<IUser>>;
+  createUser(data: CreateUserDBSchema): Promise<IUser>;
+}
+export class UsersRepository
+  extends BaseRepository
+  implements UsersRepositoryInterface
+{
   protected db: IDatabase<unknown, IClient>;
 
   constructor() {
@@ -34,6 +45,7 @@ export class UsersRepository extends BaseRepository {
       );
     } catch (error) {
       logger.error(`Error fetching user by ID ${id}:`, error);
+      return null;
     }
   }
 
@@ -45,6 +57,7 @@ export class UsersRepository extends BaseRepository {
       );
     } catch (error) {
       logger.error(`Error fetching user by email ${email}:`, error);
+      return null;
     }
   }
 
@@ -56,6 +69,7 @@ export class UsersRepository extends BaseRepository {
       );
     } catch (error) {
       logger.error(`Error fetching user by username ${username}:`, error);
+      return null;
     }
   }
 

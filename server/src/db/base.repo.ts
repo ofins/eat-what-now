@@ -5,7 +5,13 @@ import logger from 'src/log/logger';
 export interface BaseRepositoryConfig {
   connectionString: string;
 }
-export default abstract class BaseRepository {
+
+interface BaseRepositoryInterface {
+  initializeDatabase(): Promise<void>;
+}
+export default abstract class BaseRepository
+  implements BaseRepositoryInterface
+{
   protected db: IDatabase<unknown, IClient>;
   protected TABLE_NAME: string;
 

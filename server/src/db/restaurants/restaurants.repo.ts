@@ -23,7 +23,27 @@ dotenv.config();
 
 const TABLE_NAME = 'restaurants';
 
-export class RestaurantsRepository extends BaseRepository {
+interface RestaurantsRepositoryInterface {
+  getRestaurantById(id: number): Promise<IRestaurant | null>;
+  getRestaurants(
+    options?: RestaurantFilterOptions
+  ): Promise<PaginatedResponse<IRestaurant>>;
+  createRestaurant(data: CreateRestaurant): Promise<IRestaurant>;
+  updateRestaurant(
+    id: number,
+    data: UpdateRestaurant
+  ): Promise<IRestaurant | null>;
+  deleteRestaurant(id: number): Promise<boolean>;
+  getTopRatedRestaurants(limit?: number): Promise<IRestaurant[]>;
+  close(): Promise<void>;
+  shuffleRestaurantDailyFeed(): Promise<void>;
+  updateUpvoteCount(restaurantId: number, count: number): Promise<void>;
+}
+
+export class RestaurantsRepository
+  extends BaseRepository
+  implements RestaurantsRepositoryInterface
+{
   private config: RestaurantsRepositoryConfig;
   protected db: IDatabase<unknown, IClient>;
 
@@ -53,7 +73,7 @@ export class RestaurantsRepository extends BaseRepository {
     });
   }
 
-  async getRestaurantById(id: number) {
+  async getRestaurantById(id: number): Promise<IRestaurant | null> {
     try {
       if (!Number.isInteger(id) || id <= 0) {
         throw new Error('Invalid restaurant ID');
@@ -65,6 +85,7 @@ export class RestaurantsRepository extends BaseRepository {
       );
     } catch (error) {
       logger.error(`Error fetching restaurant by ID ${id}:`, error);
+      return null;
     }
   }
 

@@ -5,7 +5,27 @@ import db from 'src/db/db';
 
 const TABLE_NAME = 'restaurant_user';
 
-export class RestaurantUserRepository extends BaseRepository {
+interface RestaurantRepositoryInterface {
+  addRelationship(data: CreateRestaurantUser): Promise<IRestaurantUser>;
+  toggleUpvote(userId: string, restaurantId: number): Promise<IRestaurantUser>;
+  getRestaurantsForUser(userId: number): Promise<IRestaurantUser[]>;
+  getUsersForRestaurant(restaurantId: number): Promise<IRestaurantUser[]>;
+  getRestaurantDetails(restaurantId: number): Promise<{
+    restaurant_id: number;
+    totalUpvotes: number;
+    totalDownvotes: number;
+    totalFavorites: number;
+    averageRating: number | null;
+    comments: Array<{ user_id: string; comment: string }>;
+    userCount: number;
+    users: IRestaurantUser[];
+  }>;
+}
+
+export class RestaurantUserRepository
+  extends BaseRepository
+  implements RestaurantRepositoryInterface
+{
   constructor() {
     super(db, TABLE_NAME);
     this.db = db;
