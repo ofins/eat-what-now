@@ -1,44 +1,18 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { validateRestaurantFilterOptionsSchema } from 'src/db/restaurants/restaurants.schema';
-import logger from 'src/log/logger';
-import { restaurantRepository } from 'src/server';
+import { container } from 'src/di/di.container';
+import { InjectionTokens } from 'src/di/injections-token.enum';
 
 const router = express.Router();
+
+const restaurantsController = container.resolve(
+  InjectionTokens.restaurantsController
+);
 
 router.get(
   '/',
   validateRestaurantFilterOptionsSchema,
-  (req: Request, res: Response) => {
-    const {
-      longitude,
-      latitude,
-      radius = 5,
-      cuisineType,
-      priceRange,
-      minRating = 0,
-      limit = 10,
-      offset = 0,
-    } = req.query;
-
-    restaurantRepository
-      .getRestaurants({
-        longitude: parseFloat(longitude as string),
-        latitude: parseFloat(latitude as string),
-        radius: parseFloat(radius as string), // Default 5km radius
-        cuisineType: typeof cuisineType === 'string' ? cuisineType : undefined,
-        priceRange: priceRange === 'string' ? priceRange : undefined,
-        minRating: parseFloat(minRating as string),
-        limit: parseFloat(limit as string),
-        offset: parseFloat(offset as string),
-      })
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((error) => {
-        logger.error(`Error fetching restaurants:${error}`);
-        res.status(500).send({ error: 'Internal Server Error' });
-      });
-  }
+  restaurantsController.getRestaurants.bind(restaurantsController)
 );
 
 export default router;

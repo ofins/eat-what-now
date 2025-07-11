@@ -47,14 +47,12 @@ export class RestaurantsRepository
   private config: RestaurantsRepositoryConfig;
   protected db: IDatabase<unknown, IClient>;
 
-  constructor(
-    config = {
+  constructor(config?: RestaurantsRepositoryConfig) {
+    super(db, TABLE_NAME);
+    this.config = config || {
       maxSearchRadius: MAX_SEARCH_RADIUS,
       defaultLimit: DEFAULT_LIMIT,
-    }
-  ) {
-    super(db, TABLE_NAME);
-    this.config = config;
+    };
     this.db = db;
 
     this.aggregateUserData();

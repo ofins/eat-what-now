@@ -1,6 +1,7 @@
+import dotenv from 'dotenv';
 import pgPromise from 'pg-promise';
 
-// ? why does env work without dotenv?
+dotenv.config();
 
 const pgp = pgPromise();
 const db = pgp({

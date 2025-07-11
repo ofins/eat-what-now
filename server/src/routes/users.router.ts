@@ -1,52 +1,25 @@
-import express, { Request, Response } from 'express';
-import logger from 'src/log/logger';
+import express from 'express';
+import { container } from 'src/di/di.container';
+import { InjectionTokens } from 'src/di/injections-token.enum';
 import { authenticateAPIKey, authenticateToken } from 'src/middleware/auth';
-import { usersRepository } from 'src/server';
 
 const router = express.Router();
 
-// * Internal
-router.get('/', authenticateAPIKey, (req: Request, res: Response) => {
-  const { limit, offset } = req.query;
+const usersController = container.resolve(InjectionTokens.usersController);
 
-  usersRepository
-    .getUsers({
-      limit: parseFloat(limit as string),
-      offset: parseFloat(offset as string),
-    })
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((error) => {
-      logger.error(`Error fetching users:${error}`);
-      res.status(500).send({ error: 'Internal Server Error' });
-    });
-});
+// * Internal
+router.get(
+  '/',
+  authenticateAPIKey,
+  usersController.getUsers.bind(usersController)
+);
 
 // * Public
-router.get('/profile', authenticateToken, (req: Request, res: Response) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userId = (req as any).userId;
-
-  if (!userId) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
-  }
-
-  usersRepository
-    .getUserById(userId)
-    .then((user) => {
-      if (!user) {
-        res.status(404).json({ error: 'User not found' });
-        return;
-      }
-      res.json({ data: user });
-    })
-    .catch((error) => {
-      logger.error('Error fetching user profile:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
+router.get(
+  '/profile',
+  authenticateToken,
+  usersController.getUserProfile.bind(usersController)
+);
 
 export default router;
 

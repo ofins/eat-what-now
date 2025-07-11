@@ -1,125 +1,56 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import {
-  CreateRestaurantUser,
   validateCreateRestaurantSchema,
   validateCreateRestaurantUserSchema,
   validateUpdateRestaurantSchema,
 } from 'src/db/restaurants/restaurants.schema';
-import logger from 'src/log/logger';
+import { container } from 'src/di/di.container';
+import { InjectionTokens } from 'src/di/injections-token.enum';
 import { authenticateAPIKey } from 'src/middleware/auth';
-import { restaurantRepository, restaurantUserRepository } from 'src/server';
-import { searchGooglePlacesByText } from 'src/utils/google';
 
 const router = express.Router();
+
+const restaurantsController = container.resolve(
+  InjectionTokens.restaurantsController
+);
 
 router.post(
   '/',
   authenticateAPIKey,
   validateCreateRestaurantSchema,
-  (req: Request, res: Response) => {
-    restaurantRepository
-      .createRestaurant(req.body)
-      .then((data) => res.send(data))
-      .catch((error) => {
-        logger.error(`Error creating restaurant: ${error}`);
-        res.status(500).send({ error: `Internal Server Error` });
-      });
-  }
+  restaurantsController.createRestaurant.bind(restaurantsController)
 );
 
 router.put(
   '/:id',
   authenticateAPIKey,
   validateUpdateRestaurantSchema,
-  (req: Request, res: Response) => {
-    const { id } = req.params;
-    restaurantRepository
-      .updateRestaurant(Number(id), req.body.data)
-      .then((data) => res.send(data))
-      .catch((error) => {
-        logger.error(`Error updating restaurant: ${error}`);
-        res.status(500).send({ error: `Internal Server Error` });
-      });
-  }
+  restaurantsController.updateRestaurant.bind(restaurantsController)
 );
 
-router.delete('/:id', authenticateAPIKey, (req: Request, res: Response) => {
-  const { id } = req.params;
-  restaurantRepository
-    .deleteRestaurant(Number(id))
-    .then((data) => res.send(data))
-    .catch((error) => {
-      logger.error(`Error deleting restaurant: ${error}`);
-      res.status(500).send({ error: `Internal Server Error` });
-    });
-});
+router.delete(
+  '/:id',
+  authenticateAPIKey,
+  restaurantsController.deleteRestaurant.bind(restaurantsController)
+);
 
 router.post(
   '/user',
   authenticateAPIKey,
   validateCreateRestaurantUserSchema,
-  (req: Request, res: Response) => {
-    const data: CreateRestaurantUser = {
-      user_id: req.body.user_id,
-      restaurant_id: req.body.restaurant_id,
-      upvoted: req.body.upvoted,
-      downvoted: req.body.downvoted,
-      favorited: req.body.favorited,
-      rating: req.body.rating,
-      comment: req.body.comment,
-      visited_at: req.body.visited_at,
-    };
-
-    restaurantUserRepository
-      .addRelationship(data)
-      .then((data) => res.send(data))
-      .catch((error) => {
-        logger.error(`Error adding relationship: ${error}`);
-        res.status(500).send({ error: `Internal Server Error` });
-      });
-  }
+  restaurantsController.addRestaurantUser.bind(restaurantsController)
 );
 
 router.post(
   '/user/upvote',
   authenticateAPIKey,
-  async (req: Request, res: Response) => {
-    const { user_id, restaurant_id } = req.body;
-
-    try {
-      const updatedData = await restaurantUserRepository.toggleUpvote(
-        user_id,
-        restaurant_id
-      );
-
-      // Fast update the restaurant's upvote count
-      await restaurantRepository.updateUpvoteCount(
-        restaurant_id,
-        updatedData.upvoted ? 1 : -1
-      );
-
-      res.send(updatedData);
-    } catch (error) {
-      logger.error(`Error toggling upvote: ${error}`);
-      res.status(500).send({ error: `Internal Server Error` });
-    }
-  }
+  restaurantsController.upvoteRestaurant.bind(restaurantsController)
 );
 
 router.post(
   '/google/search-by-text',
   authenticateAPIKey,
-  async (req: Request, res: Response) => {
-    const { text, location } = req.body;
-
-    try {
-      const results = await searchGooglePlacesByText(text, location);
-      res.send(results);
-    } catch (error) {
-      logger.error(`Error searching restaurants by text: ${error}`);
-      res.status(500).send({ error: `Internal Server Error` });
-    }
-  }
+  restaurantsController.searchGooglePlacesByText.bind(restaurantsController)
 );
 
 export default router;

@@ -14,18 +14,22 @@ export default abstract class BaseRepository
 {
   protected db: IDatabase<unknown, IClient>;
   protected TABLE_NAME: string;
+  private _initialized: boolean = false;
 
   constructor(db: IDatabase<unknown, IClient>, TABLE_NAME: string) {
     this.db = db;
     this.TABLE_NAME = TABLE_NAME;
     this.initializeDatabase()
       .then(() => this.verifyDatabaseStructure())
+      .then(() => (this._initialized = true))
       .catch((error) => {
         console.error('Error during database initialization:', error);
       });
   }
 
   public async initializeDatabase(): Promise<void> {
+    if (this._initialized) return;
+
     try {
       const data = await this.db.one('SELECT NOW() AS current_time');
       logger.info(

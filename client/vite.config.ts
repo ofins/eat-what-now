@@ -14,7 +14,7 @@ export default defineConfig({
     //  tsconfigPaths()
   ],
   server: {
-    open: true,
+    open: false,
     host: "0.0.0.0",
   },
   resolve: {

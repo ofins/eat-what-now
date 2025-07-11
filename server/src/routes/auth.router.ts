@@ -1,98 +1,25 @@
-import bcrypt from 'bcrypt';
-import express, { Request, Response } from 'express';
+import express from 'express';
 import {
   validateCreateUser,
   validateUserLogin,
 } from 'src/db/users/users.schema';
-import logger from 'src/log/logger';
-import { signToken } from 'src/middleware/auth';
-import { usersRepository } from 'src/server';
+import { container } from 'src/di/di.container';
+import { InjectionTokens } from 'src/di/injections-token.enum';
 
 const router = express.Router();
 
-router.post('/login', validateUserLogin, (req: Request, res: Response) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    res.status(400).json({ error: 'Email and password are required.' });
-    return;
-  }
-
-  usersRepository
-    .getUserByEmail(email)
-    .then((user) => {
-      if (!user) {
-        res.status(401).json({ error: 'Invalid credentials' });
-        return;
-      }
-
-      return bcrypt.compare(password, user.password_hash).then((valid) => {
-        if (!valid) {
-          res.status(401).json({ error: 'Invalid credentials' });
-          return;
-        }
-        const token = signToken({ user_id: user.id });
-        res.json({
-          data: {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            full_name: user.full_name,
-            is_active: user.is_active,
-            is_verified: user.is_verified,
-            created_at: user.created_at,
-            updated_at: user.updated_at,
-          },
-          token,
-        });
-      });
-    })
-    .catch((error) => {
-      logger.error('Login error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
+const usersController = container.resolve(InjectionTokens.usersController);
+// console.log(usersController, 'usersController');
+router.post(
+  '/login',
+  validateUserLogin,
+  usersController.login.bind(usersController)
+);
 
 router.post(
   '/register',
   validateCreateUser,
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { email, username, password, full_name } = req.body;
-
-      if (!email || !username || !password) {
-        res.status(400).json({ error: 'Missing info' });
-        return;
-      }
-
-      const [existingUserByEmail, existingUserByUsername] = await Promise.all([
-        usersRepository.getUserByEmail(email),
-        usersRepository.getUserByUsername(username),
-      ]);
-
-      if (existingUserByEmail) {
-        res.status(409).json({ error: 'Email already registered' });
-        return;
-      }
-      if (existingUserByUsername) {
-        res.status(409).json({ error: 'Username already taken' });
-        return;
-      }
-
-      const passwordHash = await bcrypt.hash(password, 10);
-      await usersRepository.createUser({
-        email,
-        username,
-        password_hash: passwordHash,
-        full_name,
-      });
-
-      res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-      logger.error('Registration error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  }
+  usersController.registerUser.bind(usersController)
 );
 
 export default router;

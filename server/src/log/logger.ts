@@ -1,6 +1,14 @@
 import winston from 'winston';
 const { combine, timestamp, printf, colorize, align, errors } = winston.format;
 
+export interface Logger {
+  info: (message: string, ...args: never[]) => void;
+  warn: (message: string, ...args: never[]) => void;
+  error: (message: string, ...args: never[]) => void;
+  debug: (message: string, ...args: never[]) => void;
+  verbose: (message: string, ...args: never[]) => void;
+}
+
 const logger = winston.createLogger({
   level: 'info',
   format: combine(
