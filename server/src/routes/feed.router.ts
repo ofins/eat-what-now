@@ -1,7 +1,7 @@
 import express from 'express';
 import { validateRestaurantFilterOptionsSchema } from 'src/db/restaurants/restaurants.schema';
 import { container } from 'src/di/di.container';
-import { InjectionTokens } from 'src/di/injections-token.enum';
+import { InjectionTokens } from 'src/di/enum/injections-token.enum';
 
 const router = express.Router();
 

@@ -6,12 +6,12 @@ import {
 } from '@ewn/types/restaurants.type';
 import dotenv from 'dotenv';
 import cron from 'node-cron';
+import { DbService } from 'src/db/db';
 import {
   DEFAULT_LIMIT,
   DEFAULT_RADIUS_KM,
   MAX_SEARCH_RADIUS,
-} from 'src/config/constants';
-import { DbService } from 'src/db/db';
+} from 'src/global/constants';
 import logger from 'src/log/logger';
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
 import { CreateRestaurant, UpdateRestaurant } from './restaurants.schema';
@@ -32,7 +32,6 @@ interface RestaurantsRepositoryInterface {
   ): Promise<IRestaurant | null>;
   deleteRestaurant(id: number): Promise<boolean>;
   getTopRatedRestaurants(limit?: number): Promise<IRestaurant[]>;
-  close(): Promise<void>;
   shuffleRestaurantDailyFeed(): Promise<void>;
   updateUpvoteCount(restaurantId: number, count: number): Promise<void>;
 }
@@ -355,19 +354,6 @@ export class RestaurantsRepository implements RestaurantsRepositoryInterface {
         );
     } catch (error) {
       logger.error('Error fetching top rated restaurants:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Close the database connection
-   */
-  async close(): Promise<void> {
-    try {
-      await this.dbService.getConnection().$pool.end();
-      logger.info('Database connection closed');
-    } catch (error) {
-      logger.error('Error closing database connection:', error);
       throw error;
     }
   }

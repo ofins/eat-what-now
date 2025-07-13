@@ -5,7 +5,7 @@ import {
   validateUpdateRestaurantSchema,
 } from 'src/db/restaurants/restaurants.schema';
 import { container } from 'src/di/di.container';
-import { InjectionTokens } from 'src/di/injections-token.enum';
+import { InjectionTokens } from 'src/di/enum/injections-token.enum';
 import { authenticateAPIKey } from 'src/middleware/auth';
 
 const router = express.Router();

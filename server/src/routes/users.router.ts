@@ -1,6 +1,6 @@
 import express from 'express';
 import { container } from 'src/di/di.container';
-import { InjectionTokens } from 'src/di/injections-token.enum';
+import { InjectionTokens } from 'src/di/enum/injections-token.enum';
 import { authenticateAPIKey, authenticateToken } from 'src/middleware/auth';
 
 const router = express.Router();

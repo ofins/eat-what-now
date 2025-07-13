@@ -16,10 +16,10 @@ export const development = {
   },
   migrations: {
     tableName: 'knex_migrations',
-    directory: './migrations',
+    directory: './src/db/migrations',
   },
   seeds: {
-    directory: './migrations/seeds',
+    directory: './src/db/migrations/seeds',
   },
 };
 export const staging = {
