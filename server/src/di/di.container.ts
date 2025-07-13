@@ -7,7 +7,7 @@ import { UsersController } from 'src/db/users/users.controller';
 import { UsersRepository } from 'src/db/users/users.repo';
 import logger from 'src/log/logger';
 import { InjectionTokens } from './injections-token.enum';
-import ConfigService from 'src/config';
+import ConfigService from 'src/config/config.service';
 
 export const container = awilix.createContainer({
   injectionMode: awilix.InjectionMode.CLASSIC, // Use CLASSIC mode for constructor injection,

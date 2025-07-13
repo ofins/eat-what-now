@@ -1,18 +1,17 @@
-import 'reflect-metadata';
 import dotenv from 'dotenv';
-dotenv.config(); // ✅ Load env vars first
+import 'reflect-metadata';
+dotenv.config();
 
 import cors from 'cors';
 import express, { Response } from 'express';
-import { validateEnv } from './config';
-import { serveMarkdownFile } from './utils/file';
+import helmet from 'helmet';
+import { container } from './di/di.container';
+import { InjectionTokens } from './di/injections-token.enum';
 import logger from './log/logger';
 import morganMiddleware from './middleware/morgan';
 import limiter from './middleware/rate-limiter';
-import helmet from 'helmet';
 import { swaggerUiHandler, swaggerUiSetup } from './swagger';
-import { container } from './di/di.container';
-import { InjectionTokens } from './di/injections-token.enum';
+import { serveMarkdownFile } from './utils/file';
 
 export async function startServer() {
   try {
@@ -21,8 +20,6 @@ export async function startServer() {
 
     const dbService = container.resolve(InjectionTokens.dbService);
     await dbService.connect();
-
-    validateEnv();
 
     const authRouter = (await import('./routes/auth.router')).default;
     const feedRouter = (await import('./routes/feed.router')).default;

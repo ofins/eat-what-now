@@ -1,6 +1,6 @@
 import pgPromise from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
-import ConfigService from 'src/config';
+import ConfigService from 'src/config/config.service';
 import { Logger } from 'src/log/logger';
 
 interface DbServiceInterface {

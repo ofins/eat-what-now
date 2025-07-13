@@ -10,11 +10,11 @@ import {
   DEFAULT_LIMIT,
   DEFAULT_RADIUS_KM,
   MAX_SEARCH_RADIUS,
-} from 'src/config';
-import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
-import { CreateRestaurant, UpdateRestaurant } from './restaurants.schema';
+} from 'src/config/constants';
 import { DbService } from 'src/db/db';
 import logger from 'src/log/logger';
+import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
+import { CreateRestaurant, UpdateRestaurant } from './restaurants.schema';
 
 dotenv.config();
 
