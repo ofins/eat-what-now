@@ -1,7 +1,7 @@
 export const apps = [
   {
     name: 'ewn-backend',
-    script: './dist/src/server.js',
+    script: './dist/src/index.js',
     cwd: '/var/www/eat-what-now/server',
     instances: 1,
     autorestart: true,

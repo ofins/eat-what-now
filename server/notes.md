@@ -219,7 +219,7 @@ Things I learned:
 ### May 9th
 
 - create `ewn-backend` project and git
-- setup basic `server.js` using node
+- setup basic `index.js` using node
 
 Things I learned:
 

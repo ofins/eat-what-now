@@ -3,13 +3,10 @@ import {
   IUser,
   UserFilterOptions,
 } from '@ewn/types/users.type';
-import { IDatabase } from 'pg-promise';
-import { IClient } from 'pg-promise/typescript/pg-subset';
-import db from 'src/db/db';
 import { isUUID } from 'src/utils/misc';
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
-import BaseRepository from '../base.repo';
 import logger from 'src/log/logger';
+import { DbService } from '../db';
 
 const TABLE_NAME = 'users';
 
@@ -20,16 +17,8 @@ interface UsersRepositoryInterface {
   getUsers(options: UserFilterOptions): Promise<PaginatedResponse<IUser>>;
   createUser(data: CreateUserDBSchema): Promise<IUser>;
 }
-export class UsersRepository
-  extends BaseRepository
-  implements UsersRepositoryInterface
-{
-  protected db: IDatabase<unknown, IClient>;
-
-  constructor() {
-    super(db, TABLE_NAME);
-    this.db = db;
-  }
+export class UsersRepository implements UsersRepositoryInterface {
+  constructor(private readonly dbService: DbService) {}
 
   async getUserById(id: string) {
     try {
@@ -37,7 +26,7 @@ export class UsersRepository
         throw new Error('Invalid user ID');
       }
 
-      return await this.db.oneOrNone<IUser>(
+      return await this.dbService.getConnection().oneOrNone<IUser>(
         `SELECT id, email, username, full_name, 
           avatar_url, is_active, is_verified, 
           created_at, updated_at FROM ${TABLE_NAME} WHERE id = $1`,
@@ -51,10 +40,11 @@ export class UsersRepository
 
   async getUserByEmail(email: string) {
     try {
-      return await this.db.oneOrNone<IUser>(
-        `SELECT * FROM ${TABLE_NAME} WHERE email = $1`,
-        [email]
-      );
+      return await this.dbService
+        .getConnection()
+        .oneOrNone<IUser>(`SELECT * FROM ${TABLE_NAME} WHERE email = $1`, [
+          email,
+        ]);
     } catch (error) {
       logger.error(`Error fetching user by email ${email}:`, error);
       return null;
@@ -63,10 +53,11 @@ export class UsersRepository
 
   async getUserByUsername(username: string) {
     try {
-      return await this.db.oneOrNone<IUser>(
-        `SELECT * FROM ${TABLE_NAME} WHERE username = $1`,
-        [username]
-      );
+      return await this.dbService
+        .getConnection()
+        .oneOrNone<IUser>(`SELECT * FROM ${TABLE_NAME} WHERE username = $1`, [
+          username,
+        ]);
     } catch (error) {
       logger.error(`Error fetching user by username ${username}:`, error);
       return null;
@@ -102,12 +93,12 @@ export class UsersRepository
         params.push(offset);
       }
 
-      const data = await this.db.any<IUser>(query, params);
-      const total = await this.db.one(
-        'SELECT COUNT(*) FROM users',
-        [],
-        (row) => +row.count
-      );
+      const data = await this.dbService
+        .getConnection()
+        .any<IUser>(query, params);
+      const total = await this.dbService
+        .getConnection()
+        .one('SELECT COUNT(*) FROM users', [], (row) => +row.count);
 
       return paginateResponse<IUser>(
         data,
@@ -124,7 +115,7 @@ export class UsersRepository
   async createUser(data: CreateUserDBSchema) {
     try {
       const now = new Date();
-      return await this.db.one<IUser>(
+      return await this.dbService.getConnection().one<IUser>(
         `INSERT INTO ${TABLE_NAME} (
           email, username, password_hash, full_name, avatar_url,
           is_active, is_verified, created_at, updated_at

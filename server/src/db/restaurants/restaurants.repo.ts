@@ -12,11 +12,8 @@ import {
   MAX_SEARCH_RADIUS,
 } from 'src/config';
 import { PaginatedResponse, paginateResponse } from 'src/utils/pagination';
-import BaseRepository from '../base.repo';
 import { CreateRestaurant, UpdateRestaurant } from './restaurants.schema';
-import db from 'src/db/db';
-import { IDatabase } from 'pg-promise';
-import { IClient } from 'pg-promise/typescript/pg-subset';
+import { DbService } from 'src/db/db';
 import logger from 'src/log/logger';
 
 dotenv.config();
@@ -40,20 +37,14 @@ interface RestaurantsRepositoryInterface {
   updateUpvoteCount(restaurantId: number, count: number): Promise<void>;
 }
 
-export class RestaurantsRepository
-  extends BaseRepository
-  implements RestaurantsRepositoryInterface
-{
+export class RestaurantsRepository implements RestaurantsRepositoryInterface {
   private config: RestaurantsRepositoryConfig;
-  protected db: IDatabase<unknown, IClient>;
 
-  constructor(config?: RestaurantsRepositoryConfig) {
-    super(db, TABLE_NAME);
-    this.config = config || {
+  constructor(private readonly dbService: DbService) {
+    this.config = {
       maxSearchRadius: MAX_SEARCH_RADIUS,
       defaultLimit: DEFAULT_LIMIT,
     };
-    this.db = db;
 
     this.aggregateUserData();
     cron.schedule('0 * * * *', async () => {
@@ -77,10 +68,11 @@ export class RestaurantsRepository
         throw new Error('Invalid restaurant ID');
       }
 
-      return await this.db.oneOrNone<IRestaurant>(
-        `SELECT * FROM ${TABLE_NAME} WHERE id = $1`,
-        [id]
-      );
+      return await this.dbService
+        .getConnection()
+        .oneOrNone<IRestaurant>(`SELECT * FROM ${TABLE_NAME} WHERE id = $1`, [
+          id,
+        ]);
     } catch (error) {
       logger.error(`Error fetching restaurant by ID ${id}:`, error);
       return null;
@@ -203,12 +195,12 @@ export class RestaurantsRepository
         params,
       });
 
-      const data = await this.db.any<IRestaurant>(query, params);
-      const total = await this.db.one(
-        'SELECT COUNT(*) FROM restaurants',
-        [],
-        (row) => +row.count
-      );
+      const data = await this.dbService
+        .getConnection()
+        .any<IRestaurant>(query, params);
+      const total = await this.dbService
+        .getConnection()
+        .one('SELECT COUNT(*) FROM restaurants', [], (row) => +row.count);
 
       return paginateResponse<IRestaurant>(
         data,
@@ -232,7 +224,7 @@ export class RestaurantsRepository
     try {
       this.validateRestaurantData(data as CreateRestaurantData);
 
-      return await this.db.one<IRestaurant>(
+      return await this.dbService.getConnection().one<IRestaurant>(
         `INSERT INTO ${TABLE_NAME} (
           name, address, price_range, longitude, latitude, website, img_url, outbound_link, rating, average_ratings,
           contributor_username, google_id
@@ -306,7 +298,9 @@ export class RestaurantsRepository
         RETURNING *
       `;
 
-      return await this.db.oneOrNone<IRestaurant>(query, values);
+      return await this.dbService
+        .getConnection()
+        .oneOrNone<IRestaurant>(query, values);
     } catch (error) {
       logger.error(`Error updating restaurant with ID ${id}:`, error);
       throw error;
@@ -323,7 +317,7 @@ export class RestaurantsRepository
       if (!Number.isInteger(id) || id <= 0) {
         throw new Error('Invalid restaurant ID');
       }
-      const result = await this.db.tx(async (t) => {
+      const result = await this.dbService.getConnection().tx(async (t) => {
         const dailyFeedDelete = await t.result(
           `DELETE FROM restaurants_daily_feed WHERE restaurant_id = $1`,
           [id],
@@ -353,10 +347,12 @@ export class RestaurantsRepository
    */
   async getTopRatedRestaurants(limit = 10): Promise<IRestaurant[]> {
     try {
-      return await this.db.any<IRestaurant>(
-        'SELECT * FROM restaurants ORDER BY average_ratings DESC LIMIT $1',
-        [limit]
-      );
+      return await this.dbService
+        .getConnection()
+        .any<IRestaurant>(
+          'SELECT * FROM restaurants ORDER BY average_ratings DESC LIMIT $1',
+          [limit]
+        );
     } catch (error) {
       logger.error('Error fetching top rated restaurants:', error);
       throw error;
@@ -368,7 +364,7 @@ export class RestaurantsRepository
    */
   async close(): Promise<void> {
     try {
-      await this.db.$pool.end();
+      await this.dbService.getConnection().$pool.end();
       logger.info('Database connection closed');
     } catch (error) {
       logger.error('Error closing database connection:', error);
@@ -378,8 +374,10 @@ export class RestaurantsRepository
 
   async shuffleRestaurantDailyFeed(): Promise<void> {
     try {
-      await this.db.none(`DELETE FROM restaurants_daily_feed;`);
-      await this.db.none(`
+      await this.dbService
+        .getConnection()
+        .none(`DELETE FROM restaurants_daily_feed;`);
+      await this.dbService.getConnection().none(`
         INSERT INTO restaurants_daily_feed (date, position, restaurant_id)
         SELECT current_date, row_number() OVER (ORDER BY RANDOM()), id
         FROM restaurants
@@ -396,10 +394,12 @@ export class RestaurantsRepository
       if (!Number.isInteger(restaurantId) || restaurantId <= 0) {
         throw new Error('Invalid restaurant ID');
       }
-      await this.db.none(
-        `UPDATE ${TABLE_NAME} SET total_upvotes = total_upvotes + $2 WHERE id = $1`,
-        [restaurantId, count]
-      );
+      await this.dbService
+        .getConnection()
+        .none(
+          `UPDATE ${TABLE_NAME} SET total_upvotes = total_upvotes + $2 WHERE id = $1`,
+          [restaurantId, count]
+        );
     } catch (error) {
       logger.error(
         `Error incrementing upvote count for restaurant ${restaurantId}:`,
@@ -438,7 +438,7 @@ export class RestaurantsRepository
 
   private async aggregateUserData(): Promise<void> {
     try {
-      await this.db.none(`
+      await this.dbService.getConnection().none(`
         UPDATE ${TABLE_NAME} r
         SET total_upvotes = (
           SELECT COUNT(*)

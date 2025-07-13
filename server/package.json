@@ -1,8 +1,8 @@
 {
   "scripts": {
-    "start": "node dist/src/server.js",
+    "start": "node dist/src/index.js",
     "build": "tsc && tsc-alias",
-    "dev": "ts-node-dev --respawn --transpile-only --require tsconfig-paths/register src/server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only --require tsconfig-paths/register src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tsc --noEmit && eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
@@ -17,7 +17,7 @@
   },
   "name": "ewn-backend",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "index.js",
   "author": "",
   "license": "ISC",
   "description": "",

@@ -1,5 +1,5 @@
 import * as awilix from 'awilix';
-import db from 'src/db/db';
+import { DbService } from 'src/db/db';
 import { RestaurantUserRepository } from 'src/db/restaurant-user/restaurant-user.repo';
 import { RestaurantsController } from 'src/db/restaurants/restaurants.controller';
 import { RestaurantsRepository } from 'src/db/restaurants/restaurants.repo';
@@ -7,7 +7,7 @@ import { UsersController } from 'src/db/users/users.controller';
 import { UsersRepository } from 'src/db/users/users.repo';
 import logger from 'src/log/logger';
 import { InjectionTokens } from './injections-token.enum';
-import { MAX_SEARCH_RADIUS, DEFAULT_LIMIT } from 'src/config';
+import ConfigService from 'src/config';
 
 export const container = awilix.createContainer({
   injectionMode: awilix.InjectionMode.CLASSIC, // Use CLASSIC mode for constructor injection,
@@ -16,11 +16,8 @@ export const container = awilix.createContainer({
 
 export function initContainer() {
   container.register({
-    [InjectionTokens.config]: awilix.asValue({
-      maxSearchRadius: MAX_SEARCH_RADIUS,
-      defaultLimit: DEFAULT_LIMIT,
-    }),
-    [InjectionTokens.db]: awilix.asValue(db),
+    [InjectionTokens.configService]: awilix.asClass(ConfigService).singleton(),
+    [InjectionTokens.dbService]: awilix.asClass(DbService).singleton(),
     [InjectionTokens.restaurantsRepository]: awilix.asClass(
       RestaurantsRepository
     ),
