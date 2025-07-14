@@ -9,7 +9,7 @@ import { InjectionTokens } from 'src/di/enum/injections-token.enum';
 const router = express.Router();
 
 const usersController = container.resolve(InjectionTokens.usersController);
-// console.log(usersController, 'usersController');
+
 router.post(
   '/login',
   validateUserLogin,
