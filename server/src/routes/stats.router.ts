@@ -296,139 +296,16 @@ router.delete('/clear-cache', async (req, res) => {
   }
 });
 
-router.get('/inner-join', () => {});
-
-export default router;
-
 /**
  * @swagger
- * /stats/mismatch:
+ * /stats/test-hash:
  *   get:
- *     summary: Find restaurants without users or users without restaurants
- *     description: Performs a full outer join to identify orphaned records between restaurants and users based on contributor_username
+ *     summary: Test Redis hash storage functionality
+ *     description: Creates a test Redis hash with random key and stores sample user data
  *     tags: [Stats]
  *     responses:
  *       200:
- *         description: Successfully retrieved mismatch data
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       restaurant_id:
- *                         type: integer
- *                         example: 123
- *                       name:
- *                         type: string
- *                         example: "Pizza Palace"
- *                       username:
- *                         type: string
- *                         nullable: true
- *                         example: "john_doe"
- *                 count:
- *                   type: integer
- *                   example: 5
- *       500:
- *         description: Internal server error
- *
- * /stats/users-empty:
- *   get:
- *     summary: Get users not assigned to any restaurant
- *     description: Returns a list of users who are not assigned to any restaurant using left join
- *     tags: [Stats]
- *     responses:
- *       200:
- *         description: Successfully retrieved unassigned users
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         example: 1
- *                       username:
- *                         type: string
- *                         example: "jane_doe"
- *                       email:
- *                         type: string
- *                         example: "jane@example.com"
- *                       created_at:
- *                         type: string
- *                         format: date-time
- *                         example: "2023-01-01T00:00:00.000Z"
- *                 count:
- *                   type: integer
- *                   example: 3
- *       500:
- *         description: Internal server error
- *
- * /stats/users-assigned:
- *   get:
- *     summary: Get users with their assigned restaurants
- *     description: Returns users with an aggregated list of restaurant IDs they are assigned to
- *     tags: [Stats]
- *     responses:
- *       200:
- *         description: Successfully retrieved users with restaurant assignments
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         example: 1
- *                       username:
- *                         type: string
- *                         example: "john_doe"
- *                       email:
- *                         type: string
- *                         example: "john@example.com"
- *                       restaurants:
- *                         type: array
- *                         items:
- *                           type: integer
- *                         example: [1, 2, 3]
- *                         description: Array of restaurant IDs assigned to this user
- *                 count:
- *                   type: integer
- *                   example: 10
- *       500:
- *         description: Internal server error
- *
- * /stats/clear-cache:
- *   delete:
- *     summary: Clear all stats cache
- *     description: Clears all cached statistics data
- *     tags: [Stats]
- *     responses:
- *       200:
- *         description: Cache cleared successfully
+ *         description: Hash created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -439,23 +316,21 @@ export default router;
  *                   example: true
  *                 message:
  *                   type: string
- *                   example: "Stats cache cleared successfully"
- *                 cleared_keys:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example: ["stats:mismatch", "stats:users-empty", "stats:users-assigned"]
+ *                   example: "Test hash created successfully"
+ *                 cacheKey:
+ *                   type: string
+ *                   example: "test:123"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: "Alice"
+ *                     age:
+ *                       type: string
+ *                       example: "30"
  *       500:
  *         description: Internal server error
- *
- * /stats/inner-join:
- *   get:
- *     summary: Perform inner join operation (placeholder)
- *     description: Placeholder endpoint for inner join statistics
- *     tags: [Stats]
- *     responses:
- *       501:
- *         description: Not implemented
  *         content:
  *           application/json:
  *             schema:
@@ -464,34 +339,45 @@ export default router;
  *                 success:
  *                   type: boolean
  *                   example: false
- *                 message:
+ *                 error:
  *                   type: string
- *                   example: "Endpoint not implemented yet"
- *
- * components:
- *   schemas:
- *     StatsResponse:
- *       type: object
- *       properties:
- *         success:
- *           type: boolean
- *           description: Indicates if the request was successful
- *         data:
- *           type: array
- *           description: Array of result objects
- *         count:
- *           type: integer
- *           description: Number of records returned
- *     ErrorResponse:
- *       type: object
- *       properties:
- *         success:
- *           type: boolean
- *           example: false
- *         error:
- *           type: string
- *           description: Error message
- *   tags:
- *     - name: Stats
- *       description: Statistical operations and database joins for analyzing data relationships
+ *                   example: "Failed to create test hash"
  */
+router.get('/test-hash', async (req: Request, res: Response) => {
+  try {
+    const cacheKey = `test:${Math.floor(Math.random() * 1000)}`;
+    const testData = {
+      name: 'Alice',
+      age: '30',
+    };
+
+    await client.hSet(cacheKey, testData);
+    await client.expire(cacheKey, 3600);
+    const name = await client.hGet(cacheKey, 'name');
+    const age = await client.hGet(cacheKey, 'age');
+    const data = await client.hGetAll(cacheKey);
+    const ttl = await client.ttl(cacheKey);
+
+    logger.info(`Test hash created with key: ${cacheKey}`);
+
+    res.json({
+      success: true,
+      message: 'Test hash created successfully',
+      cacheKey: cacheKey,
+      data: {
+        name: name,
+        age: age,
+        ttl,
+        data,
+      },
+    });
+  } catch (error) {
+    logger.error('Error creating test hash:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create test hash',
+    });
+  }
+});
+
+export default router;

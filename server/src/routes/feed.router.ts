@@ -27,6 +27,7 @@ router.get(
     try {
       const cachedData = await getCachedData(cacheKey);
       if (cachedData) {
+        console.log('cached...');
         res.send(cachedData);
         return;
       }
@@ -46,6 +47,7 @@ router.get(
         })
         .then(async (data) => {
           // Store the result in Redis cache
+          console.log('fetching from db...');
           await setCachedData(cacheKey, data, 3600);
           return data;
         })

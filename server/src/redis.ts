@@ -18,6 +18,7 @@ client.on('error', (err: string) => {
 (async () => {
   try {
     await client.connect();
+    await client.set('hello', 'world');
     const val = await client.get('hello');
     console.log('Value from Redis:', val);
     console.log('Connected to Redis');
@@ -50,6 +51,7 @@ export const setCachedData = async (
     await client.set(key, JSON.stringify(data), {
       EX: ttl, // Time to live in seconds
     });
+
     logger.info(`Cache set for key: ${key} with TTL: ${ttl}s`);
   } catch (error) {
     logger.error(`Redis set error for key ${key}:`, error);
