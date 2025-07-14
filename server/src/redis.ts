@@ -59,3 +59,17 @@ export const setCachedData = async (
 };
 
 export default client;
+
+// * Cache update scenarios
+// profile updates, account status changes, bulk data updates
+// For minimal manual updates, implement strategies like invalidating cache on db updates
+
+// * Common Data types and scenarios
+// - Strings: User preferences, session data, session IDs, JSON
+// - Hashes (collection of key-value pairs): User profiles, product details
+// - Lists: Recent searches, notifications
+// - Sets: Unique tags, categories
+// - Sorted Sets: Leaderboards, ranking systems
+
+// * Less Common
+// RedisJSON for complex JSON structures

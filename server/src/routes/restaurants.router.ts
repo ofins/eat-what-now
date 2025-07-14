@@ -7,6 +7,7 @@ import {
 } from 'src/db/restaurants/restaurants.schema';
 import logger from 'src/log/logger';
 import { authenticateAPIKey } from 'src/middleware/auth';
+import client from 'src/redis';
 import { restaurantRepository, restaurantUserRepository } from 'src/server';
 import { searchGooglePlacesByText } from 'src/utils/google';
 
@@ -36,6 +37,14 @@ router.put(
     restaurantRepository
       .updateRestaurant(Number(id), req.body.data)
       .then((data) => res.send(data))
+      .then(() => {
+        // invalidate cache on update
+        client.del([
+          'stats:mismatch',
+          'stats:users-empty',
+          'stats:users-assigned',
+        ]);
+      })
       .catch((error) => {
         logger.error(`Error updating restaurant: ${error}`);
         res.status(500).send({ error: `Internal Server Error` });
