@@ -1,3 +1,12 @@
+### 16th
+
+- setup db in docker with persist volume
+
+### 13th
+
+- integrate Awilix as DI
+- change db config by adding `DbService` class to handle and reduce instantiating multiple times
+
 ### 6th
 
 - Setup server via AWS EC2

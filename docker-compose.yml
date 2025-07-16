@@ -1,19 +1,6 @@
 # version: "3.8"
 
 services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    env_file:
-      - server/.env
-    depends_on:
-      - db
-    # volumes:
-    #   - .:/usr/src
-    #   - /usr/src/node_modules # avoid overwriting node_modules
-    # command: ["./wait-for-it.sh", "db:5432", "--", "npm", "run", "start"]
-
   db:
     image: postgis/postgis:16-3.4 # PostgreSQL 16 with PostGIS 3.4
     restart: always
@@ -22,9 +9,6 @@ services:
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: my_database
     ports:
-      - "5432:5432" # Changed external port to 5433 to avoid conflict
+      - "7001:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data # Persist database data
-
-volumes:
-  pgdata:
+      - ./.docker/db/data:/var/lib/postgresql/data

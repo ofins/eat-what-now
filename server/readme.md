@@ -57,8 +57,11 @@ GOOGLE_API_KEY=your_google_places_api_key
 ### Local Development - Getting started
 
 ```sh
+nvm use
+npm ci
+
 cp .env.example .env
-npm install
+
 npm run migrate:up
 npm run seed # optional
 npm run server
