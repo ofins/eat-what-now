@@ -21,4 +21,5 @@ jobs:
           timeout: 30s
           script: |
             cd /var/www/eat-what-now
+            chmod +x deploy.sh
             ./deploy.sh
