@@ -25,6 +25,7 @@
 - [ ] Setup OAuth Login
 - [ ] Feeds should start with restaurants closest to user and expand outward with no limits
 - [ ] Combine server Zod schema with frontend
+- [ ] When inputting restaurant to DB, this should be logged so it can be used as analytics in the future
 - [x] Setup API for adding restaurant through link
 - [x] Add `contributed_username` and `google_id` column for `restaurant` table
 - [x] Protect against common vulnerabilities (SQL Injections, XSS, CSRF)
