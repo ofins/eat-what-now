@@ -4,6 +4,7 @@ export enum InjectionTokens {
   restaurantUserRepository = 'restaurantUserRepository',
   restaurantsController = 'restaurantsController',
   usersRepository = 'usersRepository',
+  usersService = 'usersService',
   usersController = 'usersController',
   logger = 'logger',
   configService = 'configService',

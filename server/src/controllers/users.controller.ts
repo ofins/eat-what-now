@@ -1,12 +1,12 @@
-import { Request, Response } from 'express';
-import { UsersRepository } from './users.repo';
 import bcrypt from 'bcrypt';
-import { signToken } from 'src/middleware/auth';
+import { Request, Response } from 'express';
 import { Logger } from 'src/log/logger';
+import { signToken } from 'src/middleware/auth';
+import { UsersService } from '../services/users.service';
 
 export class UsersController {
   constructor(
-    private readonly usersRepository: UsersRepository,
+    private readonly usersService: UsersService,
     private readonly logger: Logger
   ) {
     this.getUsers = this.getUsers.bind(this);
@@ -19,7 +19,7 @@ export class UsersController {
     const { limit, offset } = req.query;
 
     try {
-      const data = await this.usersRepository.getUsers({
+      const data = await this.usersService.findAllUsers({
         limit: parseFloat(limit as string),
         offset: parseFloat(offset as string),
       });
@@ -40,7 +40,7 @@ export class UsersController {
     }
 
     try {
-      const user = await this.usersRepository.getUserById(userId);
+      const user = await this.usersService.findUserById(userId);
       if (!user) {
         res.status(404).json({ error: 'User not found' });
         return;
@@ -60,8 +60,8 @@ export class UsersController {
       return;
     }
 
-    this.usersRepository
-      .getUserByEmail(email)
+    this.usersService
+      .findUserByEmail(email)
       .then((user) => {
         if (!user) {
           res.status(401).json({ error: 'Invalid credentials' });
@@ -105,8 +105,8 @@ export class UsersController {
       }
 
       const [existingUserByEmail, existingUserByUsername] = await Promise.all([
-        this.usersRepository.getUserByEmail(email),
-        this.usersRepository.getUserByUsername(username),
+        this.usersService.findUserByEmail(email),
+        this.usersService.findUserByUsername(username),
       ]);
 
       if (existingUserByEmail) {
@@ -120,7 +120,7 @@ export class UsersController {
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      await this.usersRepository.createUser({
+      await this.usersService.createUser({
         email,
         username,
         password_hash: hashedPassword,

@@ -1,12 +1,13 @@
 import * as awilix from 'awilix';
 import ConfigService from 'src/config/config.service';
+import { UsersController } from 'src/controllers/users.controller';
 import { DbService } from 'src/db/db';
 import { RestaurantUserRepository } from 'src/db/restaurant-user/restaurant-user.repo';
 import { RestaurantsController } from 'src/db/restaurants/restaurants.controller';
 import { RestaurantsRepository } from 'src/db/restaurants/restaurants.repo';
-import { UsersController } from 'src/db/users/users.controller';
-import { UsersRepository } from 'src/db/users/users.repo';
 import logger from 'src/log/logger';
+import { UsersRepository } from 'src/repositories/users.repo';
+import { UsersService } from 'src/services/users.service';
 import { InjectionTokens } from './enum/injections-token.enum';
 
 export const container = awilix.createContainer({
@@ -33,6 +34,7 @@ export function initContainer() {
     [InjectionTokens.usersController]: awilix
       .asClass(UsersController)
       .singleton(),
+    [InjectionTokens.usersService]: awilix.asClass(UsersService).singleton(),
     [InjectionTokens.logger]: awilix.asValue(logger),
   });
 }

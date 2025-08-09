@@ -1,10 +1,10 @@
 import express from 'express';
+import { container } from 'src/di/di.container';
+import { InjectionTokens } from 'src/di/enum/injections-token.enum';
 import {
   validateCreateUser,
   validateUserLogin,
-} from 'src/db/users/users.schema';
-import { container } from 'src/di/di.container';
-import { InjectionTokens } from 'src/di/enum/injections-token.enum';
+} from 'src/schemas/users.schema';
 
 const router = express.Router();
 

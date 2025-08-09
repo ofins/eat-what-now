@@ -12,7 +12,7 @@ import {
   userFilterOptionsSchema,
   userLoginSchema,
   userSchema,
-} from './db/users/users.schema';
+} from './schemas/users.schema';
 
 // Users
 const userSchemaJson = zodToJsonSchema(userSchema);

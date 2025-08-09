@@ -23,16 +23,20 @@ export interface UserFilterOptions extends PaginationTypes {
   updated_at?: Date;
 }
 
-export interface CreateUser {
-  email: string;
-  username: string;
-  password: string;
-  full_name?: string;
-}
+export type CreateUser = Omit<IUser, "id">;
 
-export interface CreateUserDBSchema {
+export interface CreateUserDto {
   email: string;
   username: string;
   password_hash: string;
   full_name?: string;
+}
+
+export interface UpdateUserDto {
+  email?: string;
+  username?: string;
+  full_name?: string;
+  avatar_url?: string;
+  is_active?: boolean;
+  is_verified?: boolean;
 }
