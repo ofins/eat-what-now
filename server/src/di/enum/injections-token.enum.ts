@@ -1,11 +1,15 @@
 export enum InjectionTokens {
   dbService = 'dbService',
   restaurantsRepository = 'restaurantsRepository',
-  restaurantUserRepository = 'restaurantUserRepository',
+  restaurantsService = 'restaurantsService',
   restaurantsController = 'restaurantsController',
+  restaurantUserRepository = 'restaurantUserRepository',
+  restaurantUserController = 'restaurantUserController',
+  restaurantUserService = 'restaurantUserService',
   usersRepository = 'usersRepository',
   usersService = 'usersService',
   usersController = 'usersController',
   logger = 'logger',
   configService = 'configService',
+  googleController = 'googleController',
 }

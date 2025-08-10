@@ -1,18 +1,19 @@
 import express from 'express';
-import {
-  validateCreateRestaurantSchema,
-  validateCreateRestaurantUserSchema,
-  validateUpdateRestaurantSchema,
-} from 'src/db/restaurants/restaurants.schema';
 import { container } from 'src/di/di.container';
 import { InjectionTokens } from 'src/di/enum/injections-token.enum';
 import { authenticateAPIKey } from 'src/middleware/auth';
+import {
+  validateCreateRestaurantSchema,
+  validateUpdateRestaurantSchema,
+} from 'src/schemas/restaurants.schema';
 
 const router = express.Router();
 
 const restaurantsController = container.resolve(
   InjectionTokens.restaurantsController
 );
+
+const googleController = container.resolve(InjectionTokens.googleController);
 
 router.post(
   '/',
@@ -35,22 +36,9 @@ router.delete(
 );
 
 router.post(
-  '/user',
-  authenticateAPIKey,
-  validateCreateRestaurantUserSchema,
-  restaurantsController.addRestaurantUser.bind(restaurantsController)
-);
-
-router.post(
-  '/user/upvote',
-  authenticateAPIKey,
-  restaurantsController.upvoteRestaurant.bind(restaurantsController)
-);
-
-router.post(
   '/google/search-by-text',
   authenticateAPIKey,
-  restaurantsController.searchGooglePlacesByText.bind(restaurantsController)
+  googleController.searchGooglePlacesByText.bind(googleController)
 );
 
 export default router;
@@ -130,62 +118,6 @@ export default router;
  *     responses:
  *       200:
  *         description: Restaurant deleted successfully
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Restaurant not found
- *       500:
- *         description: Internal Server Error
- *
- * /restaurants/user:
- *   post:
- *     summary: Add or update user-restaurant relationship
- *     description: Adds or updates a relationship between a user and a restaurant (e.g., upvote, favorite, comment). Requires API key authentication.
- *     tags:
- *       - Restaurants
- *     security:
- *       - ApiKeyAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateRestaurantUserSchema'
- *     responses:
- *       200:
- *         description: Relationship added/updated successfully
- *       400:
- *         description: Invalid input
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Internal Server Error
- * /restaurants/user/upvote:
- *   post:
- *     summary: Toggle upvote for a restaurant by user
- *     description: Toggles the upvote status for a restaurant by a user. Requires API key authentication.
- *     tags:
- *       - Restaurants
- *     security:
- *       - ApiKeyAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               user_id:
- *                 type: string
- *                 description: User ID
- *               restaurant_id:
- *                 type: integer
- *                 description: Restaurant ID
- *     responses:
- *       200:
- *         description: Upvote toggled successfully
- *       400:
- *         description: Invalid input
  *       401:
  *         description: Unauthorized
  *       404:

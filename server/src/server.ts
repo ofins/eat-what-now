@@ -26,6 +26,9 @@ export async function startServer() {
     const restaurantsRouter = (await import('./routes/restaurants.router'))
       .default;
     const usersRouter = (await import('./routes/users.router')).default;
+    const restaurantUserRouter = (
+      await import('./routes/restaurant-user.router')
+    ).default;
 
     const app = express();
     const port = process.env.PORT || 3000;
@@ -44,6 +47,7 @@ export async function startServer() {
     app.use('/feed', feedRouter);
     app.use('/users', usersRouter);
     app.use('/restaurants', restaurantsRouter);
+    app.use('/restaurant-user', restaurantUserRouter);
     app.use('/auth', authRouter);
 
     app.get('/notes', async (_, res: Response) => {

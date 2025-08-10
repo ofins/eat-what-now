@@ -139,11 +139,13 @@ export class UsersRepository {
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string): Promise<boolean> {
     try {
-      await this.dbService
+      const result = await this.dbService
         .getConnection()
-        .none(`DELETE FROM ${TABLE_NAME} WHERE id = $1`, [id]);
+        .result(`DELETE FROM ${TABLE_NAME} WHERE id = $1`, [id]);
+
+      return result.rowCount > 0;
     } catch (error) {
       logger.error(`Error deleting user with id ${id}:`, error);
       throw error;

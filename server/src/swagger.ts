@@ -6,7 +6,7 @@ import {
   createRestaurantUserSchema,
   restaurantSchema,
   updateRestaurantSchema,
-} from './db/restaurants/restaurants.schema';
+} from './schemas/restaurants.schema';
 import {
   createUserSchema,
   userFilterOptionsSchema,

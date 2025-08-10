@@ -46,6 +46,51 @@ export interface CreateRestaurantData {
   contributor_username?: string;
 }
 
+export interface CreateRestaurantDto {
+  name: string;
+  address: string;
+  price_range: number;
+  longitude: number;
+  latitude: number;
+  website?: string;
+  outbound_link?: string;
+  img_url?: string;
+  contributor_username?: string;
+  google_id?: string;
+}
+
+export interface CreateRestaurant {
+  name: string;
+  address: string;
+  price_range: number;
+  longitude: number;
+  latitude: number;
+  website?: string;
+  outbound_link?: string;
+  img_url?: string;
+  contributor_username?: string;
+  google_id?: string;
+  rating?: number;
+  average_ratings?: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface UpdateRestaurantDto {
+  name?: string;
+  address?: string;
+  price_range?: number;
+  longitude?: number;
+  latitude?: number;
+  website?: string;
+  outbound_link?: string;
+  img_url?: string;
+  contributor_username?: string;
+  google_id?: string;
+  rating?: number;
+  average_ratings?: number;
+}
+
 /**
  * Restaurant update data
  */
