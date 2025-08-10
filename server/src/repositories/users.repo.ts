@@ -81,28 +81,15 @@ export class UsersRepository {
     }
   }
 
-  async findOneByEmail(email: string): Promise<IUser | null> {
+  async findOneByQuery(query: string, param: string): Promise<IUser | null> {
     try {
       return await this.dbService
         .getConnection()
-        .oneOrNone<IUser>(`SELECT * FROM ${TABLE_NAME} WHERE email = $1`, [
-          email,
+        .oneOrNone<IUser>(`SELECT * FROM ${TABLE_NAME} WHERE ${query} = $1`, [
+          param,
         ]);
     } catch (error) {
-      logger.error(`Error fetching user with email ${email}:`, error);
-      return null;
-    }
-  }
-
-  async findOneByUsername(username: string): Promise<IUser | null> {
-    try {
-      return await this.dbService
-        .getConnection()
-        .oneOrNone<IUser>(`SELECT * FROM ${TABLE_NAME} WHERE username = $1`, [
-          username,
-        ]);
-    } catch (error) {
-      logger.error(`Error fetching user with username ${username}:`, error);
+      logger.error(`Error fetching user with query ${query}:`, error);
       return null;
     }
   }

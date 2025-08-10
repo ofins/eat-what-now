@@ -24,11 +24,11 @@ export class UsersService {
   }
 
   async findUserByEmail(email: string): Promise<IUser | null> {
-    return this.usersRepository.findOneByEmail(email);
+    return this.usersRepository.findOneByQuery('email', email);
   }
 
   async findUserByUsername(username: string): Promise<IUser | null> {
-    return this.usersRepository.findOneByUsername(username);
+    return this.usersRepository.findOneByQuery('username', username);
   }
 
   async updateUser(

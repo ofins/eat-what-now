@@ -20,7 +20,7 @@ export const updateRestaurantUserRelation = async ({
   visited_at?: Date;
 }) => {
   const response = await httpClient.post(
-    `${import.meta.env.VITE_API_BASE_URL}/restaurants/user`,
+    `${import.meta.env.VITE_API_BASE_URL}/restaurant-user`,
     {
       user_id,
       restaurant_id,
@@ -40,7 +40,7 @@ export const updateRestaurantUserRelation = async ({
 
 export const toggleUpvote = async (user_id: string, restaurant_id: number) => {
   const response = await httpClient.post(
-    `${import.meta.env.VITE_API_BASE_URL}/restaurants/user/upvote`,
+    `${import.meta.env.VITE_API_BASE_URL}/restaurant-user/upvote`,
     {
       user_id,
       restaurant_id,

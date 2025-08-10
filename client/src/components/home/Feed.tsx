@@ -1,13 +1,13 @@
 import type { IRestaurant } from "@ewn/types/restaurants.type";
+import type { IUser } from "@ewn/types/users.type";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { calculateDistance } from "../../utils/common";
-import type { ILocation } from "./Home";
 import {
   toggleUpvote,
   updateRestaurantUserRelation,
 } from "../../api/restaurants-user";
-import type { IUser } from "@ewn/types/users.type";
+import { calculateDistance } from "../../utils/common";
+import type { ILocation } from "./Home";
 
 type FeedResponse = {
   data: IRestaurant[];

@@ -1,3 +1,8 @@
+### Aug 9th & 10th
+
+- Major refactor of controller/service/repository model
+- significant improvement for decoupling and conventions
+
 ### 16th
 
 - setup db in docker with persist volume

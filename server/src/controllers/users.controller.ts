@@ -25,7 +25,7 @@ export class UsersController {
       });
       res.send(data);
     } catch (error) {
-      console.error(`Error fetching users: ${error}`);
+      this.logger.error(`Error fetching users: ${error}`);
       res.status(500).send({ error: 'Internal Server Error' });
     }
   }
