@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import SearchResultList, { type SearchResult } from "./google/SearchResultList";
-import { createRestaurant, searchRestaurantsByText } from "../api/restaurants";
 import type { RestaurantGoogleDetails } from "@ewn/types/restaurants.type";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import type { IUser } from "@ewn/types/users.type";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react";
+import { createRestaurant, searchRestaurantsByText } from "../api/restaurants";
+import { useLocation } from "../hooks/useLocation";
+import SearchResultList, { type SearchResult } from "./google/SearchResultList";
 
 const googlePriceLevelToNum = (priceLevel: string | undefined): number => {
   if (!priceLevel) return 1; // Default to 0 if no price level is provided
@@ -18,33 +19,83 @@ const googlePriceLevelToNum = (priceLevel: string | undefined): number => {
 };
 
 const Search = () => {
+  const { location } = useLocation();
   const [data, setData] = useState<SearchResult>({
     places: [],
     routingSummaries: [],
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Check for location availability
+  useEffect(() => {
+    // If we've tried to get location but it's still null after a delay, show an error
+    const timer = setTimeout(() => {
+      if (!location && !isSearching) {
+        setError(
+          "Unable to get your location. Please enable location services in your browser settings."
+        );
+      } else if (location) {
+        // Clear location error if location becomes available
+        setError((prev) => (prev?.includes("location") ? null : prev));
+      }
+    }, 3000); // Wait 3 seconds before showing the error
+
+    return () => clearTimeout(timer);
+  }, [location, isSearching]);
 
   const mutation = useMutation({
     mutationFn: createRestaurant,
     onSuccess: (data) => {
       console.log("Restaurant added successfully:", data);
-      // Optionally, you can refresh the search results or show a success message
+      // Clear any previous errors
+      setError(null);
+    },
+    onError: (error) => {
+      console.error("Error adding restaurant:", error);
+      setError(
+        error instanceof Error
+          ? `Failed to add restaurant: ${error.message}`
+          : "An unexpected error occurred while adding the restaurant. Please try again."
+      );
     },
   });
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     setIsSearching(true);
+    setError(null); // Clear any previous errors
+
+    if (!location?.latitude || !location?.longitude) {
+      setError(
+        "Location is not available. Please allow location access and try again."
+      );
+      setIsSearching(false);
+      return;
+    }
 
     try {
       const results = await searchRestaurantsByText(searchQuery, {
-        latitude: 25.0396385,
-        longitude: 121.5310953,
+        latitude: location.latitude,
+        longitude: location.longitude,
       });
       setData(results);
+
+      // Show "no results" message as an error if needed
+      if (results.places.length === 0) {
+        setError(
+          `No restaurants found for "${searchQuery}". Try a different search term or location.`
+        );
+      }
     } catch (error) {
       console.error("Error searching restaurants:", error);
+      setError(
+        error instanceof Error
+          ? `Search failed: ${error.message}`
+          : "An unexpected error occurred while searching. Please try again later."
+      );
+      // Keep the previous search results if there's an error
     } finally {
       setIsSearching(false);
     }
@@ -62,21 +113,40 @@ const Search = () => {
 
   const handleAddToDatabase = async (place: RestaurantGoogleDetails) => {
     console.log("Adding restaurant to database:", place);
-    // TODO: Implement actual API call to add restaurant to database
-    mutation.mutate({
-      google_id: place.id,
-      name: place.displayName.text,
-      address: place.formattedAddress,
-      price_range: googlePriceLevelToNum(place.priceLevel),
-      longitude: place.location.longitude,
-      latitude: place.location.latitude,
-      website: place.websiteUri,
-      outbound_link: place.googleMapsUri,
-      contributor_username: userData?.data.username,
-    });
 
-    // Show success message (you could add a toast notification here)
-    alert(`${place.displayName.text} has been added to the database!`);
+    try {
+      // Clear any previous errors
+      setError(null);
+
+      if (!userData?.data.id) {
+        setError("You must be logged in to add restaurants.");
+        return;
+      }
+
+      await mutation.mutate({
+        google_id: place.id,
+        name: place.displayName.text,
+        address: place.formattedAddress,
+        price_range: googlePriceLevelToNum(place.priceLevel),
+        longitude: place.location.longitude,
+        latitude: place.location.latitude,
+        website: place.websiteUri,
+        outbound_link: place.googleMapsUri,
+        contributor_username: userData?.data.username,
+      });
+
+      // Show success message (only if no error occurred)
+      if (!mutation.isError) {
+        alert(`${place.displayName.text} has been added to the database!`);
+      }
+    } catch (error) {
+      console.error("Error adding restaurant:", error);
+      setError(
+        error instanceof Error
+          ? `Failed to add restaurant: ${error.message}`
+          : "An unexpected error occurred while adding the restaurant. Please try again."
+      );
+    }
   };
 
   return (
@@ -166,6 +236,51 @@ const Search = () => {
               )
             )}
           </div>
+
+          {/* Error Message Display */}
+          {error && (
+            <div className="mt-3 bg-red-50 border-l-4 border-red-500 p-3 rounded-md">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 mt-0.5">
+                  <svg
+                    className="h-5 w-5 text-red-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+                <div className="ml-auto pl-3">
+                  <div className="-mx-1.5 -my-1.5">
+                    <button
+                      onClick={() => setError(null)}
+                      className="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none"
+                    >
+                      <span className="sr-only">Dismiss</span>
+                      <svg
+                        className="h-4 w-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

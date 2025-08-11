@@ -51,6 +51,9 @@ export const searchGooglePlacesByText = async (
     );
   }
 
+  logger.info(
+    `Google Places API request successful: ${JSON.stringify(requestBody)}`
+  );
   const data = await response.json();
   return data;
 };

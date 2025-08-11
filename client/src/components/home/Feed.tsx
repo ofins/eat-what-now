@@ -8,8 +8,8 @@ import {
   toggleUpvote,
   updateComment,
 } from "../../api/restaurants-user";
+import { useLocation } from "../../hooks/useLocation";
 import { calculateDistance } from "../../utils/common";
-import type { ILocation } from "./Home";
 
 type FeedResponse = {
   data: IRestaurant[];
@@ -25,11 +25,12 @@ type FeedResponse = {
 const PAGE_LIMIT = 10;
 
 interface Props {
-  location: ILocation | null;
   isLoggedIn?: boolean;
 }
 
-const Feed = ({ location, isLoggedIn = false }: Props) => {
+const Feed = ({ isLoggedIn = false }: Props) => {
+  const { location } = useLocation();
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [clickedStats, setClickedStats] = useState<{ [key: string]: boolean }>(
     {}
