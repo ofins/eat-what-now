@@ -12,6 +12,7 @@ export const updateRelationSchema = z.object({
     .boolean()
     .optional()
     .describe('Whether the restaurant is favorited or not'),
+  commented: z.string().max(500).optional().describe('Comment text'),
 });
 
 export const validateRestaurantUserRelationSchema = (

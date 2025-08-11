@@ -35,4 +35,14 @@ export class RestaurantUserService {
       favorited,
     });
   }
+
+  async upsertComment(
+    restaurantId: string,
+    userId: string,
+    comment: string
+  ): Promise<IRestaurantUser> {
+    return await this.restaurantUserRepository.upsert(restaurantId, userId, {
+      comment,
+    });
+  }
 }

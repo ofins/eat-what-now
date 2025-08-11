@@ -1,8 +1,13 @@
 import type { IRestaurant } from "@ewn/types/restaurants.type";
 import type { IUser } from "@ewn/types/users.type";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { toggleFavorite, toggleUpvote } from "../../api/restaurants-user";
+import DOMPurify from "dompurify";
+import { useEffect, useState, type FormEvent } from "react";
+import {
+  toggleFavorite,
+  toggleUpvote,
+  updateComment,
+} from "../../api/restaurants-user";
 import { calculateDistance } from "../../utils/common";
 import type { ILocation } from "./Home";
 
@@ -30,6 +35,9 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
     {}
   );
   const [isExpanded, setIsExpanded] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [isCommenting, setIsCommenting] = useState(false);
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
 
   // Efficient infinite data fetching
   const {
@@ -139,6 +147,34 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
 
   const handleCollapse = () => {
     setIsExpanded(false);
+  };
+
+  const handleCommentSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!isLoggedIn || !userData?.data.id || !newComment.trim()) return;
+
+    try {
+      setCommentSubmitting(true);
+      // Sanitize the comment to prevent XSS attacks
+      const sanitizedComment = DOMPurify.sanitize(newComment.trim());
+
+      await updateComment(
+        userData.data.id,
+        currentRestaurant.id,
+        sanitizedComment
+      );
+
+      // Clear the comment field and exit commenting mode
+      setNewComment("");
+      setIsCommenting(false);
+
+      // Refetch feed data to update comments
+      await refetch();
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+    } finally {
+      setCommentSubmitting(false);
+    }
   };
 
   if (isLoading)
@@ -428,14 +464,27 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                     </div>
                     <div className="flex items-center gap-2">
                       <span
-                        className={`text-blue-500 ${isExpanded ? "text-base" : "text-sm"}`}
+                        className={`text-blue-500 ${
+                          isLoggedIn
+                            ? "cursor-pointer"
+                            : "cursor-default opacity-50"
+                        } ${isExpanded ? "text-base" : "text-sm"}`}
+                        onClick={() => {
+                          if (isLoggedIn) {
+                            setIsExpanded(true);
+                            setTimeout(() => {
+                              setIsCommenting(true);
+                            }, 300);
+                          }
+                        }}
                       >
                         💬
                       </span>
                       <span
                         className={`text-gray-600 ${isExpanded ? "text-sm" : "text-xs"}`}
                       >
-                        {currentRestaurant?.total_comments || 0}
+                        {(currentRestaurant?.total_comments || 0) +
+                          (currentRestaurant?.user_comment ? 1 : 0)}
                       </span>
                     </div>
                     {!isExpanded && (
@@ -515,58 +564,136 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                       <h3 className="text-lg font-semibold text-gray-800 mb-3">
                         Comments & Reviews
                       </h3>
-                      <div className="bg-gray-50 rounded-lg p-3 space-y-3 min-h-[200px]">
-                        {/* Placeholder comments - Replace with actual comment data */}
-                        <div className="bg-white rounded-lg p-3 shadow-sm">
-                          <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                              U
+
+                      {/* Comment Form */}
+                      {isLoggedIn ? (
+                        isCommenting ? (
+                          <form
+                            onSubmit={handleCommentSubmit}
+                            className="bg-white rounded-lg p-3 shadow-sm mb-4"
+                          >
+                            <div className="mb-2">
+                              <textarea
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                rows={3}
+                                placeholder="Share your thoughts about this restaurant..."
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                disabled={commentSubmitting}
+                                maxLength={500}
+                              />
                             </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium text-sm text-gray-800">
-                                  User Name
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                  2 days ago
-                                </span>
+                            <div className="flex justify-end gap-2">
+                              <button
+                                type="button"
+                                className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm font-medium transition-colors"
+                                onClick={() => {
+                                  setIsCommenting(false);
+                                  setNewComment("");
+                                }}
+                                disabled={commentSubmitting}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="submit"
+                                className="px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm font-medium transition-colors disabled:bg-blue-300"
+                                disabled={
+                                  !newComment.trim() || commentSubmitting
+                                }
+                              >
+                                {commentSubmitting
+                                  ? "Posting..."
+                                  : "Post Comment"}
+                              </button>
+                            </div>
+                          </form>
+                        ) : (
+                          <div className="bg-white rounded-lg p-3 shadow-sm mb-4">
+                            <button
+                              className="w-full px-3 py-2 text-left text-gray-500 border border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:text-blue-500 transition-colors"
+                              onClick={() => setIsCommenting(true)}
+                            >
+                              <span className="flex items-center gap-2">
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 4v16m8-8H4"
+                                  />
+                                </svg>
+                                Add your comment
+                              </span>
+                            </button>
+                          </div>
+                        )
+                      ) : (
+                        <div className="bg-blue-50 text-blue-800 p-3 rounded-lg mb-4 text-sm">
+                          Please log in to add comments
+                        </div>
+                      )}
+
+                      <div className="bg-gray-50 rounded-lg p-3 space-y-3 min-h-[150px]">
+                        {/* Show the current user's comment if it exists */}
+                        {currentRestaurant?.user_comment && (
+                          <div className="bg-white rounded-lg p-3 shadow-sm border-l-4 border-blue-500">
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                                {userData?.data.username
+                                  ?.charAt(0)
+                                  .toUpperCase() || "Y"}
                               </div>
-                              <p className="text-sm text-gray-600">
-                                Great food and excellent service! Highly
-                                recommend the pasta dishes.
-                              </p>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-sm text-gray-800">
+                                      {userData?.data.username || "You"}
+                                    </span>
+                                    <span className="text-xs text-gray-500">
+                                      (your comment)
+                                    </span>
+                                  </div>
+                                  <button
+                                    className="text-gray-400 hover:text-blue-500 text-xs"
+                                    onClick={() => {
+                                      if (
+                                        typeof currentRestaurant.user_comment ===
+                                        "string"
+                                      ) {
+                                        setNewComment(
+                                          currentRestaurant.user_comment
+                                        );
+                                      }
+                                      setIsCommenting(true);
+                                    }}
+                                  >
+                                    Edit
+                                  </button>
+                                </div>
+                                <p className="text-sm text-gray-600">
+                                  {currentRestaurant.user_comment}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        )}
 
-                        <div className="bg-white rounded-lg p-3 shadow-sm">
-                          <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                              J
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium text-sm text-gray-800">
-                                  Jane Doe
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                  1 week ago
-                                </span>
-                              </div>
-                              <p className="text-sm text-gray-600">
-                                Nice ambiance and friendly staff. The prices are
-                                reasonable too.
-                              </p>
-                            </div>
+                        {/* Placeholder for other comments - In a real app, you would fetch and display actual comments */}
+                        {currentRestaurant?.total_comments > 0 ? (
+                          <div className="text-center text-gray-600 text-sm py-4">
+                            Other comments would be displayed here
                           </div>
-                        </div>
-
-                        {/* Add more placeholder comments */}
-                        <div className="text-center text-gray-400 text-sm py-4">
-                          {currentRestaurant?.total_comments === 0
-                            ? "No comments available"
-                            : "More comments will be loaded here..."}
-                        </div>
+                        ) : (
+                          <div className="text-center text-gray-400 text-sm py-4">
+                            No comments yet. Be the first to comment!
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

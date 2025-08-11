@@ -75,3 +75,22 @@ export const toggleFavorite = async (
 
   return response;
 };
+
+export const updateComment = async (
+  user_id: string,
+  restaurant_id: number,
+  comment: string
+) => {
+  const response = await httpClient.post(
+    `${import.meta.env.VITE_API_BASE_URL}/restaurant-user/comment`,
+    {
+      userId: user_id,
+      restaurantId: restaurant_id,
+      comment,
+    }
+  );
+
+  if (!response) throw new Error("Failed to update comment");
+
+  return response;
+};

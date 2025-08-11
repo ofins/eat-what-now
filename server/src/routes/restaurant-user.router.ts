@@ -33,6 +33,13 @@ router.post(
   restaurantUserController.updateFavorite.bind(restaurantUserController)
 );
 
+router.post(
+  '/comment',
+  authenticateAPIKey,
+  validateRestaurantUserRelationSchema,
+  restaurantUserController.updateComment.bind(restaurantUserController)
+);
+
 export default router;
 
 /**
@@ -124,6 +131,42 @@ export default router;
  *     responses:
  *       200:
  *         description: Favorite toggled successfully
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Restaurant not found
+ *       500:
+ *         description: Internal Server Error
+ *
+ * /restaurant-user/comment:
+ *   post:
+ *     summary: Add or update comment for a restaurant by user
+ *     description: Adds or updates a comment for a restaurant by a user. Requires API key authentication.
+ *     tags:
+ *       - RestaurantUser
+ *     security:
+ *       - ApiKeyAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: User ID
+ *               restaurantId:
+ *                 type: integer
+ *                 description: Restaurant ID
+ *               comment:
+ *                 type: string
+ *                 description: Comment text
+ *     responses:
+ *       200:
+ *         description: Comment added/updated successfully
  *       400:
  *         description: Invalid input
  *       401:

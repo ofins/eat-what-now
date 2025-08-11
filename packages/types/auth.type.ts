@@ -1,4 +1,4 @@
-import { Request } from "express";
+import type { Request } from "express";
 import type { IUser } from "./users.type";
 
 export interface LoginResponse {
