@@ -1,5 +1,7 @@
 export type ConfigServiceType = {
   db: DbConfigType;
+  google: GoogleConfigType;
+  server: ServerConfigType;
 };
 
 export type DbConfigType = {
@@ -8,4 +10,14 @@ export type DbConfigType = {
   database: string;
   user: string;
   password: string;
+};
+
+export type GoogleConfigType = {
+  apiKey: string;
+};
+
+export type ServerConfigType = {
+  port: number;
+  signature: string;
+  jwtSecret: string;
 };

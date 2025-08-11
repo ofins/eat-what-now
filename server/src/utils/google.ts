@@ -18,12 +18,25 @@ export const searchGooglePlacesByText = async (
 
   const requestBody = {
     textQuery,
+    locationBias: {
+      circle: {
+        center: {
+          latitude,
+          longitude,
+        },
+        radius: 5000.0, // 5km radius - adjust as needed
+      },
+    },
     routingParameters: {
       origin: {
         latitude,
         longitude,
       },
     },
+    includedType: 'restaurant',
+    languageCode: 'zh-TW', // Force Traditional Chinese language results
+    regionCode: 'TW', // Optional: can be removed or changed based on your needs
+    maxResultCount: 20,
   };
 
   const response = await fetch(url, {

@@ -17,6 +17,14 @@ class ConfigService {
         user: process.env.DB_USER as string,
         password: process.env.DB_PASSWORD as string,
       },
+      google: {
+        apiKey: process.env.GOOGLE_API_KEY as string,
+      },
+      server: {
+        port: Number(process.env.PORT) || 3000,
+        signature: process.env.SIGNATURE as string,
+        jwtSecret: process.env.JWT_SECRET as string,
+      },
     };
   }
 }
