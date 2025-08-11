@@ -9,7 +9,7 @@
     "format": "prettier --write .",
     "compose:up": "docker compose up --build",
     "compose:down": "docker-compose down",
-    "migrate:make": "knex migrate:make --esm --migrations-directory ./migrations",
+    "migrate:make": "knex migrate:make --esm --migrations-directory ./src/db/migrations",
     "migrate:up": "knex migrate:latest",
     "migrate:down": "knex migrate:rollback",
     "seed": "knex seed:run",

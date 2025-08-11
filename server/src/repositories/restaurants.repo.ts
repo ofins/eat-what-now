@@ -2,6 +2,7 @@ import {
   CreateRestaurant,
   CreateRestaurantDto,
   IRestaurant,
+  RestaurantFilterOptions,
   RestaurantsRepositoryConfig,
   UpdateRestaurantDto,
 } from '@ewn/types/restaurants.type';
@@ -46,10 +47,10 @@ export class RestaurantsRepository {
     try {
       return await this.dbService.getConnection().one<IRestaurant>(
         `INSERT INTO ${TABLE_NAME} (
-          name, address, price_range, longitude, latitude, website, img_url, outbound_link, rating, average_ratings,
+          name, address, price_range, longitude, latitude, website, img_url, outbound_link, rating,
           contributor_username, google_id, created_at, updated_at
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
         ) RETURNING *`,
         [
           restaurant.name,
@@ -61,7 +62,6 @@ export class RestaurantsRepository {
           restaurant.img_url || null,
           restaurant.outbound_link || null,
           restaurant.rating || 0,
-          restaurant.average_ratings || 0,
           restaurant.contributor_username || null,
           restaurant.google_id || null,
           restaurant.created_at,
@@ -88,10 +88,7 @@ export class RestaurantsRepository {
     }
   }
 
-  async getRestaurantsByQuery(
-    query: string,
-    params: unknown[]
-  ): Promise<IRestaurant[]> {
+  async findByQuery(query: string, params: unknown[]): Promise<IRestaurant[]> {
     try {
       return await this.dbService
         .getConnection()
@@ -102,7 +99,99 @@ export class RestaurantsRepository {
     }
   }
 
-  async update(id: number, data: UpdateRestaurantDto) {
+  async findByUserId(
+    userId: string,
+    options: RestaurantFilterOptions
+  ): Promise<IRestaurant[]> {
+    let query = `
+    SELECT
+      r.*,
+      (ru.upvoted IS NOT NULL) as user_upvoted,
+      (ru.favorited IS NOT NULL) as user_favorited,
+      (ru.comment IS NOT NULL) as user_comment,
+      ru.comment as user_comment
+    FROM ${TABLE_NAME} r
+    LEFT JOIN restaurant_user ru ON r.id = ru.restaurant_id AND ru.user_id = $1
+    WHERE 1=1`;
+    const params: unknown[] = [userId];
+
+    if (options) {
+      // Apply any filtering or pagination based on the options
+      if (options.radius && options.longitude && options.latitude) {
+        query += ` AND ST_DWithin(
+        ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography, 
+        ST_SetSRID(ST_MakePoint($${params.length + 1}, $${params.length + 2}), 4326)::geography, 
+        $${params.length + 3}
+      )`;
+        params.push(options.longitude, options.latitude, options.radius * 1000); // Convert km to meters
+      }
+
+      if (options.priceRange) {
+        query += ` AND price_range = $${params.length + 1}`;
+        params.push(options.priceRange);
+      }
+
+      if (options.minRating) {
+        query += ` AND rating >= $${params.length + 1}`;
+        params.push(options.minRating);
+      }
+
+      if (options.limit) {
+        query += ` LIMIT $${params.length + 1}`;
+        params.push(options.limit);
+      }
+
+      if (options.offset) {
+        query += ` OFFSET $${params.length + 1}`;
+        params.push(options.offset);
+      }
+    }
+
+    return await this.findByQuery(query, params);
+  }
+
+  async findRestaurantsByQuery(
+    options: RestaurantFilterOptions
+  ): Promise<IRestaurant[]> {
+    let query = 'SELECT * FROM restaurants WHERE 1=1';
+    const params: unknown[] = [];
+
+    if (options.radius && options.longitude && options.latitude) {
+      query += ` AND ST_DWithin(
+        ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography, 
+        ST_SetSRID(ST_MakePoint($${params.length + 1}, $${params.length + 2}), 4326)::geography, 
+        $${params.length + 3}
+      )`;
+      params.push(options.longitude, options.latitude, options.radius * 1000); // Convert km to meters
+    }
+
+    if (options.priceRange) {
+      query += ` AND price_range = $${params.length + 1}`;
+      params.push(options.priceRange);
+    }
+
+    if (options.minRating) {
+      query += ` AND rating >= $${params.length + 1}`;
+      params.push(options.minRating);
+    }
+
+    if (options.limit) {
+      query += ` LIMIT $${params.length + 1}`;
+      params.push(options.limit);
+    }
+
+    if (options.offset) {
+      query += ` OFFSET $${params.length + 1}`;
+      params.push(options.offset);
+    }
+
+    return await this.findByQuery(query, params);
+  }
+
+  async update(
+    id: number,
+    data: UpdateRestaurantDto
+  ): Promise<IRestaurant | null> {
     try {
       const fields = Object.keys(data)
         .map((key, idx) => `${key} = $${idx + 3}`)
@@ -143,11 +232,6 @@ export class RestaurantsRepository {
           FROM restaurant_user ru
           WHERE ru.restaurant_id = r.id AND ru.upvoted = true
         ),
-        total_downvotes = (
-          SELECT COUNT(*)
-          FROM restaurant_user ru
-          WHERE ru.restaurant_id = r.id AND ru.downvoted = true
-        ),
         total_favorites = (
           SELECT COUNT(*)
           FROM restaurant_user ru
@@ -158,7 +242,7 @@ export class RestaurantsRepository {
           FROM restaurant_user ru 
           WHERE ru.restaurant_id = r.id AND comment IS NOT NULL AND ru.comment <> ''
         ),
-        average_ratings = (
+        rating = (
           SELECT COALESCE(AVG(ru.rating), 0)
           FROM restaurant_user ru
           WHERE ru.restaurant_id = r.id AND ru.rating IS NOT NULL

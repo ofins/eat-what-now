@@ -9,9 +9,7 @@ export interface IRestaurant {
   address: string;
   price_range: number;
   rating: number;
-  average_ratings: number;
   total_upvotes: number;
-  total_downvotes: number;
   total_favorites: number;
   total_comments: number;
   img_url?: string;
@@ -71,7 +69,6 @@ export interface CreateRestaurant {
   contributor_username?: string;
   google_id?: string;
   rating?: number;
-  average_ratings?: number;
   created_at: Date;
   updated_at: Date;
 }
@@ -88,7 +85,6 @@ export interface UpdateRestaurantDto {
   contributor_username?: string;
   google_id?: string;
   rating?: number;
-  average_ratings?: number;
 }
 
 /**

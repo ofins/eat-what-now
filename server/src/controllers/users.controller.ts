@@ -1,3 +1,4 @@
+import { AuthRequest } from '@ewn/types/auth.type';
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { Logger } from 'src/log/logger';
@@ -31,8 +32,7 @@ export class UsersController {
   }
 
   async getUserProfile(req: Request, res: Response) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userId = (req as any).userId;
+    const userId = (req as AuthRequest).userId;
 
     if (!userId) {
       res.status(401).json({ error: 'Unauthorized' });

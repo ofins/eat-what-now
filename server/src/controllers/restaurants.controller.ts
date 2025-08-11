@@ -1,7 +1,7 @@
+import { AuthRequest } from '@ewn/types/auth.type';
 import { Request, Response } from 'express';
 import { Logger } from 'src/log/logger';
 import { RestaurantsService } from 'src/services/restaurants.service';
-
 export class RestaurantsController {
   constructor(
     private readonly restaurantsService: RestaurantsService,
@@ -9,33 +9,35 @@ export class RestaurantsController {
   ) {}
 
   async getRestaurants(req: Request, res: Response) {
-    const {
-      longitude,
-      latitude,
-      radius = 5,
-      cuisineType,
-      priceRange,
-      minRating = 0,
-      limit = 10,
-      offset = 0,
-    } = req.query;
+    const userId = (req as AuthRequest).userId;
 
     this.restaurantsService
-      .getRestaurantsByQuery({
-        longitude: parseFloat(longitude as string),
-        latitude: parseFloat(latitude as string),
-        radius: parseFloat(radius as string), // Default 5km radius
-        cuisineType: typeof cuisineType === 'string' ? cuisineType : undefined,
-        priceRange: priceRange === 'string' ? priceRange : undefined,
-        minRating: parseFloat(minRating as string),
-        limit: parseFloat(limit as string),
-        offset: parseFloat(offset as string),
-      })
-      .then((data) => {
-        res.send(data);
-      })
+      .getRestaurantsByQueryOptionalUserId(userId, req.query)
+      .then((data) => res.send(data))
       .catch((error) => {
-        this.logger.error(`Error fetching restaurants:${error}`);
+        this.logger.error(
+          `Error fetching restaurants with user ID ${userId}: ${error}`
+        );
+        res.status(500).send({ error: 'Internal Server Error' });
+      });
+    return;
+  }
+
+  async getRestaurantsWithUserRelation(req: Request, res: Response) {
+    const userId = (req as AuthRequest).userId;
+
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    this.restaurantsService
+      .getRestaurantsByQueryOptionalUserId(userId, req.query)
+      .then((data) => res.send(data))
+      .catch((error) => {
+        this.logger.error(
+          `Error fetching restaurants with user ID ${userId}: ${error}`
+        );
         res.status(500).send({ error: 'Internal Server Error' });
       });
   }

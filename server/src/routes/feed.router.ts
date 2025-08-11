@@ -1,6 +1,7 @@
 import express from 'express';
 import { container } from 'src/di/di.container';
 import { InjectionTokens } from 'src/di/enum/injections-token.enum';
+import { checkOptionalToken } from 'src/middleware/auth';
 import { validateRestaurantFilterOptionsSchema } from 'src/schemas/restaurants.schema';
 
 const router = express.Router();
@@ -11,6 +12,7 @@ const restaurantsController = container.resolve(
 
 router.get(
   '/',
+  checkOptionalToken,
   validateRestaurantFilterOptionsSchema,
   restaurantsController.getRestaurants.bind(restaurantsController)
 );

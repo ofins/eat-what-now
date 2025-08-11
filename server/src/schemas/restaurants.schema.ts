@@ -26,7 +26,7 @@ export const restaurantSchema = z.object({
     .min(1)
     .max(5)
     .describe('Price range of the restaurant, from 1 to 5'),
-  average_ratings: z.coerce
+  rating: z.coerce
     .number()
     .min(0)
     .max(5)
@@ -70,7 +70,6 @@ export const createRestaurantSchema = z.object({
   website: z.string().url().optional(),
   img_url: z.string().url().optional(),
   outbound_link: z.string().url().optional(),
-  average_ratings: z.number().min(0).max(5).optional(),
   contributor_username: z.string().optional(),
   google_id: z.string().describe('Google Places ID of the restaurant'),
 });
@@ -83,10 +82,8 @@ export const updateRestaurantSchema = z.object({
   longitude: z.number().optional(),
   latitude: z.number().optional(),
   total_upvotes: z.number().int().optional(),
-  total_downvotes: z.number().int().optional(),
   total_favorites: z.number().int().optional(),
   total_comments: z.number().int().optional(),
-  average_ratings: z.number().min(0).max(5).optional(),
 });
 
 export const createRestaurantUserSchema = z.object({

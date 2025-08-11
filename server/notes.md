@@ -114,14 +114,14 @@ What I learned:
 
 ### 28th
 
-- Aggregate `total_upvotes` and `total_downvotes` in `restaurants` repo.
+- Aggregate `total_upvotes` in `restaurants` repo.
 - Setup CRON service to update such data every hour.
 - Setup `singleton` for services.
 - Feat `/login` with JWT
 
 Issue encountered:
 
-1. Setting `average_ratings` in my restaurants table to `NOT NULL` constraint. Then aggregating causing `null` to appear if ratings are 0.
+1. Setting `ratings` in my restaurants table to `NOT NULL` constraint. Then aggregating causing `null` to appear if ratings are 0.
    1. use `COALESCE` to provide fallback of 0.
 
 What I learned:
