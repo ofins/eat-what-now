@@ -2,10 +2,7 @@ import type { IRestaurant } from "@ewn/types/restaurants.type";
 import type { IUser } from "@ewn/types/users.type";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import {
-  toggleUpvote,
-  updateRestaurantUserRelation,
-} from "../../api/restaurants-user";
+import { toggleFavorite, toggleUpvote } from "../../api/restaurants-user";
 import { calculateDistance } from "../../utils/common";
 import type { ILocation } from "./Home";
 
@@ -412,11 +409,11 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                         }`}
                         onClick={() =>
                           handleStatClick("favorite", async () => {
-                            await updateRestaurantUserRelation({
-                              user_id: userData?.data.id || "",
-                              restaurant_id: currentRestaurant.id,
-                              favorited: true,
-                            });
+                            await toggleFavorite(
+                              userData?.data.id || "",
+                              currentRestaurant.id,
+                              !currentRestaurant.user_favorited
+                            );
                           })
                         }
                       >
@@ -425,7 +422,8 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                       <span
                         className={`text-gray-600 ${isExpanded ? "text-sm" : "text-xs"}`}
                       >
-                        {currentRestaurant?.total_favorites || 0}
+                        {(currentRestaurant?.total_favorites || 0) +
+                          (currentRestaurant?.user_favorited ? 1 : 0)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">

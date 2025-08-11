@@ -56,3 +56,22 @@ export const toggleUpvote = async (
 
   return response;
 };
+
+export const toggleFavorite = async (
+  user_id: string,
+  restaurant_id: number,
+  favorite: boolean
+) => {
+  const response = await httpClient.post(
+    `${import.meta.env.VITE_API_BASE_URL}/restaurant-user/favorite`,
+    {
+      userId: user_id,
+      restaurantId: restaurant_id,
+      favorited: favorite,
+    }
+  );
+
+  if (!response) throw new Error("Failed to toggle favorite");
+
+  return response;
+};

@@ -1,5 +1,5 @@
 import express from 'express';
-import { validateUpvoteSchema } from 'src/schemas/restaurant-user.schema';
+import { validateRestaurantUserRelationSchema } from 'src/schemas/restaurant-user.schema';
 import { validateCreateRestaurantUserSchema } from 'src/schemas/restaurants.schema';
 
 import { container } from 'src/di/di.container';
@@ -22,8 +22,15 @@ router.post(
 router.post(
   '/upvote',
   authenticateAPIKey,
-  validateUpvoteSchema,
-  restaurantUserController.setUpvote.bind(restaurantUserController)
+  validateRestaurantUserRelationSchema,
+  restaurantUserController.updateUpvote.bind(restaurantUserController)
+);
+
+router.post(
+  '/favorite',
+  authenticateAPIKey,
+  validateRestaurantUserRelationSchema,
+  restaurantUserController.updateFavorite.bind(restaurantUserController)
 );
 
 export default router;
@@ -81,6 +88,42 @@ export default router;
  *     responses:
  *       200:
  *         description: Upvote toggled successfully
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Restaurant not found
+ *       500:
+ *         description: Internal Server Error
+ *
+ * /restaurant-user/favorite:
+ *   post:
+ *     summary: Toggle favorite for a restaurant by user
+ *     description: Toggles the favorite status for a restaurant by a user. Requires API key authentication.
+ *     tags:
+ *       - RestaurantUser
+ *     security:
+ *       - ApiKeyAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: User ID
+ *               restaurantId:
+ *                 type: integer
+ *                 description: Restaurant ID
+ *               favorited:
+ *                 type: boolean
+ *                 description: Favorite status
+ *     responses:
+ *       200:
+ *         description: Favorite toggled successfully
  *       400:
  *         description: Invalid input
  *       401:

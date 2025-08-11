@@ -25,4 +25,14 @@ export class RestaurantUserService {
       upvoted,
     });
   }
+
+  async toggleFavorite(
+    restaurantId: string,
+    userId: string,
+    favorited: boolean
+  ): Promise<IRestaurantUser> {
+    return await this.restaurantUserRepository.upsert(restaurantId, userId, {
+      favorited,
+    });
+  }
 }

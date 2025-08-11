@@ -20,7 +20,7 @@ export class RestaurantUserController {
     }
   }
 
-  async setUpvote(req: Request, res: Response) {
+  async updateUpvote(req: Request, res: Response) {
     try {
       const { userId, restaurantId, upvoted } = req.body;
       const result = await this.restaurantUserService.toggleUpvote(
@@ -32,6 +32,21 @@ export class RestaurantUserController {
     } catch (error) {
       res.status(500).json({ error: 'Failed to upvote restaurant' });
       this.logger.error(`Error upvoting restaurant: ${error}`);
+    }
+  }
+
+  async updateFavorite(req: Request, res: Response) {
+    try {
+      const { userId, restaurantId, favorited } = req.body;
+      const result = await this.restaurantUserService.toggleFavorite(
+        restaurantId,
+        userId,
+        favorited
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to favorite restaurant' });
+      this.logger.error(`Error favoriting restaurant: ${error}`);
     }
   }
 }

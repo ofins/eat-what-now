@@ -1,19 +1,26 @@
 import { NextFunction, Request, Response } from 'express';
 import z from 'zod';
 
-export const upvoteSchema = z.object({
+export const updateRelationSchema = z.object({
   userId: z.string().uuid().describe('UUID of the user'),
   restaurantId: z.number().describe('ID of the restaurant'),
-  upvoted: z.boolean().describe('Whether the restaurant is upvoted or not'),
+  upvoted: z
+    .boolean()
+    .optional()
+    .describe('Whether the restaurant is upvoted or not'),
+  favorited: z
+    .boolean()
+    .optional()
+    .describe('Whether the restaurant is favorited or not'),
 });
 
-export const validateUpvoteSchema = (
+export const validateRestaurantUserRelationSchema = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    upvoteSchema.parse(req.body);
+    updateRelationSchema.parse(req.body);
     next();
   } catch (error) {
     if (error instanceof z.ZodError) {
