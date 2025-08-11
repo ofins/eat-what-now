@@ -47,7 +47,12 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
     queryKey: ["feed"],
     queryFn: async ({ pageParam = 0 }) => {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/feed?offset=${pageParam}&limit=${PAGE_LIMIT}&longitude=${location?.longitude}&latitude=${location?.latitude}&radius=500`
+        `${import.meta.env.VITE_API_BASE_URL}/feed?offset=${pageParam}&limit=${PAGE_LIMIT}&longitude=${location?.longitude}&latitude=${location?.latitude}&radius=500`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       if (!response.ok) throw new Error("Failed to fetch feed");
       return response.json();
@@ -381,7 +386,8 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                           handleStatClick("upvote", async () => {
                             await toggleUpvote(
                               userData?.data.id || "",
-                              currentRestaurant.id
+                              currentRestaurant.id,
+                              !currentRestaurant.user_upvoted
                             );
                           })
                         }
@@ -391,7 +397,8 @@ const Feed = ({ location, isLoggedIn = false }: Props) => {
                       <span
                         className={`text-gray-600 ${isExpanded ? "text-sm" : "text-xs"}`}
                       >
-                        {currentRestaurant?.total_upvotes || 0}
+                        {(currentRestaurant?.total_upvotes || 0) +
+                          (currentRestaurant?.user_upvoted ? 1 : 0)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">

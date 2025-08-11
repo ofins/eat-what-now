@@ -3,7 +3,7 @@ import z from 'zod';
 
 export const upvoteSchema = z.object({
   userId: z.string().uuid().describe('UUID of the user'),
-  restaurantId: z.string().describe('ID of the restaurant'),
+  restaurantId: z.number().describe('ID of the restaurant'),
   upvoted: z.boolean().describe('Whether the restaurant is upvoted or not'),
 });
 

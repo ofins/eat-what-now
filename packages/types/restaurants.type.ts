@@ -17,6 +17,9 @@ export interface IRestaurant {
   created_at: Date;
   updated_at: Date;
   contributor_username?: string; // Username of the contributor who added the restaurant
+  user_upvoted: boolean;
+  user_favorited: boolean;
+  user_comment: boolean | null;
 }
 
 export interface RestaurantFilterOptions extends PaginationTypes {

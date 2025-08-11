@@ -23,7 +23,6 @@ export class RestaurantUserService {
   ): Promise<IRestaurantUser> {
     return await this.restaurantUserRepository.upsert(restaurantId, userId, {
       upvoted,
-      downvoted: !upvoted,
     });
   }
 }

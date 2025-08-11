@@ -38,12 +38,17 @@ export const updateRestaurantUserRelation = async ({
   return response;
 };
 
-export const toggleUpvote = async (user_id: string, restaurant_id: number) => {
+export const toggleUpvote = async (
+  user_id: string,
+  restaurant_id: number,
+  upvote: boolean
+) => {
   const response = await httpClient.post(
     `${import.meta.env.VITE_API_BASE_URL}/restaurant-user/upvote`,
     {
-      user_id,
-      restaurant_id,
+      userId: user_id,
+      restaurantId: restaurant_id,
+      upvoted: upvote,
     }
   );
 

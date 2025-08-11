@@ -106,9 +106,8 @@ export class RestaurantsRepository {
     let query = `
     SELECT
       r.*,
-      (ru.upvoted IS NOT NULL) as user_upvoted,
-      (ru.favorited IS NOT NULL) as user_favorited,
-      (ru.comment IS NOT NULL) as user_comment,
+      ru.upvoted as user_upvoted,
+      ru.favorited as user_favorited,
       ru.comment as user_comment
     FROM ${TABLE_NAME} r
     LEFT JOIN restaurant_user ru ON r.id = ru.restaurant_id AND ru.user_id = $1

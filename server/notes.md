@@ -1,6 +1,10 @@
+### 11th
+
+- create `user_upvote`, `user_comment`, and `user_favorited` for client
+
 ### Aug 9th & 10th
 
-- Major refactor of controller/service/repository model
+- major refactor of controller/service/repository model
 - significant improvement for decoupling and conventions
 
 ### 16th
