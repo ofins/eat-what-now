@@ -134,11 +134,6 @@ const Search = () => {
         outbound_link: place.googleMapsUri,
         contributor_username: userData?.data.username,
       });
-
-      // Show success message (only if no error occurred)
-      if (!mutation.isError) {
-        alert(`${place.displayName.text} has been added to the database!`);
-      }
     } catch (error) {
       console.error("Error adding restaurant:", error);
       setError(

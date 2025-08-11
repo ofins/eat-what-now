@@ -1,6 +1,9 @@
 ### 11th
 
 - create `user_upvote`, `user_comment`, and `user_favorited` for client
+- fix issues with google places search being based on server location rather than given location params
+- remove return photos from google places API
+- update success modal for adding restaurant to DB
 
 ### Aug 9th & 10th
 

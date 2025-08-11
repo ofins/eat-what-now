@@ -272,25 +272,6 @@ const Feed = ({ isLoggedIn = false }: Props) => {
                 </div>
               )}
 
-              {/* Image Section - Responsive height */}
-              <div
-                className={`w-full flex-shrink-0 bg-gray-100 overflow-hidden ${
-                  isExpanded ? "h-48 rounded-none" : "h-32 rounded-t-2xl"
-                }`}
-              >
-                {currentRestaurant?.img_url ? (
-                  <img
-                    src={currentRestaurant.img_url}
-                    alt={currentRestaurant.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    No image available
-                  </div>
-                )}
-              </div>
-
               {/* Content Section - Scrollable if needed */}
               <div
                 className={`flex-1 flex flex-col p-4 min-h-0 ${isExpanded ? "pb-6" : ""}`}
@@ -409,12 +390,16 @@ const Feed = ({ isLoggedIn = false }: Props) => {
                   >
                     <div className="flex items-center gap-2">
                       <span
-                        className={`text-green-500 cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95 ${
+                        className={`transition-all duration-200 hover:scale-110 active:scale-95 ${
                           clickedStats[`${currentRestaurant.id}-upvote`]
                             ? "animate-pulse scale-125"
                             : ""
                         } ${isLoggedIn ? "cursor-pointer" : "cursor-default opacity-50"} ${
                           isExpanded ? "text-base" : "text-sm"
+                        } ${
+                          currentRestaurant.user_upvoted
+                            ? "text-green-600"
+                            : "text-gray-500"
                         }`}
                         onClick={() =>
                           handleStatClick("upvote", async () => {
@@ -429,7 +414,11 @@ const Feed = ({ isLoggedIn = false }: Props) => {
                         👍
                       </span>
                       <span
-                        className={`text-gray-600 ${isExpanded ? "text-sm" : "text-xs"}`}
+                        className={`${isExpanded ? "text-sm" : "text-xs"} ${
+                          currentRestaurant.user_upvoted
+                            ? "text-green-600 font-medium"
+                            : "text-gray-600"
+                        }`}
                       >
                         {(currentRestaurant?.total_upvotes || 0) +
                           (currentRestaurant?.user_upvoted ? 1 : 0)}
@@ -437,12 +426,16 @@ const Feed = ({ isLoggedIn = false }: Props) => {
                     </div>
                     <div className="flex items-center gap-2">
                       <span
-                        className={`text-pink-500 cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95 ${
+                        className={`transition-all duration-200 hover:scale-110 active:scale-95 ${
                           clickedStats[`${currentRestaurant.id}-favorite`]
                             ? "animate-pulse scale-125"
                             : ""
                         } ${isLoggedIn ? "cursor-pointer" : "cursor-default opacity-50"} ${
                           isExpanded ? "text-base" : "text-sm"
+                        } ${
+                          currentRestaurant.user_favorited
+                            ? "text-pink-600"
+                            : "text-gray-500"
                         }`}
                         onClick={() =>
                           handleStatClick("favorite", async () => {
@@ -457,7 +450,11 @@ const Feed = ({ isLoggedIn = false }: Props) => {
                         ❤️
                       </span>
                       <span
-                        className={`text-gray-600 ${isExpanded ? "text-sm" : "text-xs"}`}
+                        className={`${isExpanded ? "text-sm" : "text-xs"} ${
+                          currentRestaurant.user_favorited
+                            ? "text-pink-600 font-medium"
+                            : "text-gray-600"
+                        }`}
                       >
                         {(currentRestaurant?.total_favorites || 0) +
                           (currentRestaurant?.user_favorited ? 1 : 0)}
@@ -465,11 +462,15 @@ const Feed = ({ isLoggedIn = false }: Props) => {
                     </div>
                     <div className="flex items-center gap-2">
                       <span
-                        className={`text-blue-500 ${
+                        className={`transition-all duration-200 hover:scale-110 ${
                           isLoggedIn
                             ? "cursor-pointer"
                             : "cursor-default opacity-50"
-                        } ${isExpanded ? "text-base" : "text-sm"}`}
+                        } ${isExpanded ? "text-base" : "text-sm"} ${
+                          currentRestaurant.user_comment
+                            ? "text-blue-600"
+                            : "text-gray-500"
+                        }`}
                         onClick={() => {
                           if (isLoggedIn) {
                             setIsExpanded(true);
@@ -482,7 +483,11 @@ const Feed = ({ isLoggedIn = false }: Props) => {
                         💬
                       </span>
                       <span
-                        className={`text-gray-600 ${isExpanded ? "text-sm" : "text-xs"}`}
+                        className={`${isExpanded ? "text-sm" : "text-xs"} ${
+                          currentRestaurant.user_comment
+                            ? "text-blue-600 font-medium"
+                            : "text-gray-600"
+                        }`}
                       >
                         {(currentRestaurant?.total_comments || 0) +
                           (currentRestaurant?.user_comment ? 1 : 0)}

@@ -1,10 +1,9 @@
-import React, { useState } from "react";
-import AddRestaurantModal from "./AddRestaurantModal";
 import type {
   RestaurantGoogleDetails,
-  Photo,
   RoutingSummary,
 } from "@ewn/types/restaurants.type";
+import React, { useState } from "react";
+import AddRestaurantModal from "./AddRestaurantModal";
 
 export interface SearchResult {
   places: RestaurantGoogleDetails[];
@@ -60,12 +59,6 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
     }
     const minutes = Math.round(seconds / 60);
     return `${minutes}m`;
-  };
-
-  const getPhotoUrl = (photo: Photo, maxWidth = 400) => {
-    // Extract photo reference from the name field
-    const photoRef = photo.name.split("/photos/")[1];
-    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoRef}&key=${import.meta.env.VITE_GOOGLE_API_KEY}`;
   };
 
   const handleToggleExpand = (placeId: string, e: React.MouseEvent) => {
@@ -167,22 +160,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                   <div className="flex gap-2">
                     {/* Restaurant Image */}
                     <div className="w-10 h-10 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
-                      {place.photos && place.photos.length > 0 ? (
-                        <img
-                          src={getPhotoUrl(place.photos[0], 80)}
-                          alt={place.displayName.text}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                            e.currentTarget.nextElementSibling?.classList.remove(
-                              "hidden"
-                            );
-                          }}
-                        />
-                      ) : null}
-                      <div
-                        className={`w-full h-full flex items-center justify-center text-gray-400 text-sm ${place.photos && place.photos.length > 0 ? "hidden" : ""}`}
-                      >
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
                         🍽️
                       </div>
                     </div>
@@ -245,17 +223,6 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                 {isExpanded && (
                   <div className="border-t border-gray-100 p-3 bg-gray-50">
                     <div className="space-y-3">
-                      {/* Larger Image */}
-                      {place.photos && place.photos.length > 0 && (
-                        <div className="w-full h-32 bg-gray-200 rounded-lg overflow-hidden">
-                          <img
-                            src={getPhotoUrl(place.photos[0], 300)}
-                            alt={place.displayName.text}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      )}
-
                       {/* Full Address */}
                       <div>
                         <h5 className="text-xs font-medium text-gray-700 mb-1">
