@@ -90,7 +90,6 @@ export const createRestaurantUserSchema = z.object({
   user_id: z.string().uuid(),
   restaurant_id: z.number().int(),
   upvoted: z.boolean().optional(),
-  downvoted: z.boolean().optional(),
   favorited: z.boolean().optional(),
   rating: z.number().min(0).max(5).optional(),
   comment: z.string().optional(),

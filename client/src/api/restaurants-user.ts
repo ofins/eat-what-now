@@ -4,7 +4,6 @@ export const updateRestaurantUserRelation = async ({
   user_id,
   restaurant_id,
   upvoted,
-  downvoted,
   favorited,
   rating,
   comment,
@@ -13,7 +12,6 @@ export const updateRestaurantUserRelation = async ({
   user_id: string;
   restaurant_id: number;
   upvoted?: boolean;
-  downvoted?: boolean;
   favorited?: boolean;
   rating?: number;
   comment?: string;
@@ -25,7 +23,6 @@ export const updateRestaurantUserRelation = async ({
       user_id,
       restaurant_id,
       upvoted,
-      downvoted,
       favorited,
       rating,
       comment,

@@ -3,7 +3,6 @@ export interface IRestaurantUser {
   user_id: string;
   restaurant_id: number;
   upvoted: boolean;
-  downvoted: boolean;
   favorited: boolean;
   rating: number | null;
   comment: string | null;
@@ -16,7 +15,6 @@ export interface CreateRestaurantUserData {
   user_id: string;
   restaurant_id: number;
   upvoted?: boolean;
-  downvoted?: boolean;
   favorited?: boolean;
   rating?: number;
   comment?: string;
@@ -27,7 +25,6 @@ export interface CreateRestaurantUserDto {
   user_id: string;
   restaurant_id: number;
   upvoted?: boolean;
-  downvoted?: boolean;
   favorited?: boolean;
   rating?: number;
   comment?: string;
@@ -38,7 +35,6 @@ export interface UpdateRestaurantUserData {
   user_id?: string;
   restaurant_id?: string;
   upvoted?: boolean;
-  downvoted?: boolean;
   favorited?: boolean;
   rating?: number;
   comment?: string;

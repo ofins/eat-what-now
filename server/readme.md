@@ -20,7 +20,7 @@ Struggling to find a place to eat tonight? Try EatWhatNow, the app that makes di
 - **User CRUD**: Manage users
 - **Feed API**: Location-based, filterable restaurant feed with geospatial queries
 - **PostGIS Integration**: Spatial database for geographic data and location-based searches
-- **Restaurant-User Join Table**: Track upvotes, downvotes, favorites, ratings, comments, and visits
+- **Restaurant-User Join Table**: Track upvotes, favorites, ratings, comments, and visits
 - **Google Places API**: Search and import restaurants from Google Places
 - **Swagger API Docs**: `/docs` endpoint
 - **PostgreSQL**: Data storage with migrations/seed using `Knex.js`
@@ -95,7 +95,7 @@ npm run server
 
 ### Restaurant-User Actions
 
-- `POST /restaurants/user` — Upvote, downvote, favorite, rate, comment, or mark as visited
+- `POST /restaurants/user` — Upvote, favorite, rate, comment, or mark as visited
 - `POST /restaurants/user/upvote` — Toggle upvote for a restaurant
 
 ## Authentication
@@ -110,7 +110,7 @@ npm run server
 - Restaurants include geometry column (`geom`) for location-based queries
 - Spatial indexing with GIST for efficient geographic searches
 - Seed data is loaded on first run
-- Aggregated stats (upvotes, downvotes, etc.) are updated hourly via CRON
+- Aggregated stats (upvotes) are updated hourly via CRON
 
 ## PostGIS Features
 

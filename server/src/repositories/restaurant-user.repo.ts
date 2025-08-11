@@ -23,13 +23,12 @@ export class RestaurantUserRepository {
     try {
       const newRelationship = this.create(createRestaurantUserDto);
       return await this.dbService.getConnection().query(
-        `INSERT INTO restaurant_user (user_id, restaurant_id, upvoted, downvoted, favorited, rating, comment, visited_at, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        `INSERT INTO restaurant_user (user_id, restaurant_id, upvoted, favorited, rating, comment, visited_at, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
         [
           newRelationship.user_id,
           newRelationship.restaurant_id,
           newRelationship.upvoted,
-          newRelationship.downvoted,
           newRelationship.favorited,
           newRelationship.rating,
           newRelationship.comment,
