@@ -26,9 +26,12 @@ export class RestaurantsRepository {
     };
 
     this.aggregateUserData();
+    this.aggregateComments();
+
     cron.schedule('0 * * * *', async () => {
       try {
         this.aggregateUserData();
+        this.aggregateComments();
       } catch (error) {
         logger.error('Error running CRON in restaurantRepo:', error);
       }
@@ -222,7 +225,7 @@ export class RestaurantsRepository {
     }
   }
 
-  async aggregateUserData(): Promise<void> {
+  private async aggregateUserData(): Promise<void> {
     try {
       await this.dbService.getConnection().none(`
         UPDATE ${TABLE_NAME} r
@@ -252,5 +255,35 @@ export class RestaurantsRepository {
       logger.error('Error aggregating Users data:', error);
       throw error;
     }
+  }
+
+  private async aggregateComments(): Promise<void> {
+    await this.dbService.getConnection().none(`
+     WITH restaurant_comments AS (
+      SELECT ru.restaurant_id, ru.updated_at, u.username, ru.comment
+      FROM restaurant_user ru
+      LEFT JOIN users u ON ru.user_id = u.id
+      WHERE ru.comment IS NOT NULL AND ru.comment <> ''
+    ),
+    aggregated_comments AS (
+      SELECT restaurant_id, 
+        jsonb_agg(jsonb_build_object('updatedAt', updated_at, 'username', username, 'comment', comment)
+          ORDER BY updated_at DESC
+        ) as comment_json
+      FROM restaurant_comments
+      GROUP BY restaurant_id
+    ),
+    updated_comments AS (
+      SELECT r.id, r.comments as old_comments, COALESCE(ac.comment_json, '[]'::jsonb) as new_comments
+      FROM restaurants r
+      LEFT JOIN aggregated_comments ac ON r.id = ac.restaurant_id
+    )
+
+    UPDATE restaurants
+    SET comments = uc.new_comments
+    FROM updated_comments uc
+    WHERE restaurants.id = uc.id
+    AND uc.old_comments IS DISTINCT FROM uc.new_comments;
+    `);
   }
 }
