@@ -1,1 +1,78 @@
 @import "tailwindcss";
+
+/* Additional styles for sidebar layout */
+.sidebar-layout {
+  transition: padding-left 0.3s ease;
+}
+
+.sidebar-active {
+  padding-left: 20rem; /* 320px (sidebar width) */
+}
+
+/* Mobile-first approach */
+@media (max-width: 768px) {
+  .sidebar-active {
+    padding-left: 0;
+  }
+}
+
+/* Custom animations */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Custom styling for buttons */
+.btn-primary {
+  background-color: #ef2a39;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #d91f2d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-outline {
+  border: 1px solid #ef2a39;
+  color: #ef2a39;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+  background-color: rgba(239, 42, 57, 0.05);
+}
+
+/* Improved scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ef2a39;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d91f2d;
+}

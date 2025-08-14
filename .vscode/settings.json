@@ -14,5 +14,6 @@
     "source.organizeImports": "explicit",
     "source.fixAll.eslint": "explicit"
   },
-  "typescript.updateImportsOnFileMove.enabled": "always"
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true
 }

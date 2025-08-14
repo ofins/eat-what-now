@@ -7,9 +7,9 @@ import Home from "./components/home/Home";
 import AuthLayout from "./layouts/AuthLayout";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Footer from "./components/Footer";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Search from "./components/Search";
+import Sidebar from "./components/Sidebar";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,7 +36,7 @@ function App() {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <main className="h-screen flex justify-center items-center overflow-hidden">
+        <main className="h-screen overflow-y-auto pb-16 md:pb-0">
           <Routes>
             <Route index element={<Home />} />
             <Route
@@ -69,7 +69,7 @@ function App() {
             </Route>
           </Routes>
         </main>
-        <Footer />
+        <Sidebar />
       </QueryClientProvider>
     </BrowserRouter>
   );

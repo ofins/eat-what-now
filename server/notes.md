@@ -1,3 +1,8 @@
+### 14th
+
+- add `comments` column in `restaurants` table and index table `users` id
+- fix correct total count when returning list of restaurants
+
 ### 11th
 
 - create `user_upvote`, `user_comment`, and `user_favorited` for client
