@@ -213,6 +213,13 @@ export class RestaurantsRepository {
     }
   }
 
+  async getTotalCount() {
+    const result = await this.dbService
+      .getConnection()
+      .one(`SELECT COUNT(*) FROM ${TABLE_NAME}`);
+    return result.count;
+  }
+
   async delete(id: string): Promise<boolean> {
     try {
       const result = await this.dbService

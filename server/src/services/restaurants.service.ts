@@ -17,16 +17,9 @@ export class RestaurantsService {
 
   async getRestaurantsByQuery(query: Request['query']) {
     const options = this.createOptionParams(query);
-
     const result =
       await this.restaurantsRepository.findRestaurantsByQuery(options);
-
-    return paginateResponse(
-      result,
-      result.length,
-      options.limit,
-      options.offset
-    );
+    return this.createPaginateResponse(result, options);
   }
 
   async getRestaurantsByQueryOptionalUserId(
@@ -41,12 +34,7 @@ export class RestaurantsService {
       userId,
       options
     );
-    return paginateResponse(
-      result,
-      result.length,
-      options.limit,
-      options.offset
-    );
+    return this.createPaginateResponse(result, options);
   }
 
   async createRestaurant(data: CreateRestaurantDto): Promise<IRestaurant> {
@@ -87,5 +75,19 @@ export class RestaurantsService {
       limit: parseFloat(limit as string),
       offset: parseFloat(offset as string),
     };
+  }
+
+  private async createPaginateResponse(
+    result: IRestaurant[],
+    options: RestaurantFilterOptions
+  ) {
+    const totalCount = await this.restaurantsRepository.getTotalCount();
+
+    return paginateResponse(
+      result,
+      Number(totalCount),
+      options.limit,
+      options.offset
+    );
   }
 }

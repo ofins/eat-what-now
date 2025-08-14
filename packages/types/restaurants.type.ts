@@ -1,5 +1,10 @@
 import type { PaginationTypes } from "./index";
 
+export interface Comment {
+  updatedAt: string;
+  username: string;
+  comment: string;
+}
 export interface IRestaurant {
   id: number;
   google_id: string;
@@ -19,7 +24,8 @@ export interface IRestaurant {
   contributor_username?: string; // Username of the contributor who added the restaurant
   user_upvoted: boolean;
   user_favorited: boolean;
-  user_comment: boolean | null;
+  user_comment: string;
+  comments: Comment[];
 }
 
 export interface RestaurantFilterOptions extends PaginationTypes {
