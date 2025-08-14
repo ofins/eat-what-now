@@ -22,6 +22,18 @@ type FeedResponse = {
   };
 };
 
+// Comment interface that matches the JSONB structure in the database
+interface CommentItem {
+  updatedAt: string;
+  username: string;
+  comment: string;
+}
+
+// Extended restaurant interface to include comments array
+interface RestaurantWithComments extends IRestaurant {
+  comments?: CommentItem[];
+}
+
 const PAGE_LIMIT = 10;
 
 interface Props {
@@ -197,7 +209,7 @@ const Feed = ({ isLoggedIn = false }: Props) => {
       </div>
     );
 
-  const currentRestaurant = restaurants[currentIndex];
+  const currentRestaurant = restaurants[currentIndex] as RestaurantWithComments;
   // const nextRestaurant = restaurants[currentIndex + 1];
   // const nextNextRestaurant = restaurants[currentIndex + 2];
 
@@ -648,7 +660,7 @@ const Feed = ({ isLoggedIn = false }: Props) => {
                       <div className="bg-gray-50 rounded-lg p-3 space-y-3 min-h-[150px]">
                         {/* Show the current user's comment if it exists */}
                         {currentRestaurant?.user_comment && (
-                          <div className="bg-white rounded-lg p-3 shadow-sm border-l-4 border-blue-500">
+                          <div className="bg-white rounded-lg p-3 shadow-sm border-l-4 border-blue-500 mb-4">
                             <div className="flex items-start gap-3">
                               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
                                 {userData?.data.username
@@ -690,16 +702,66 @@ const Feed = ({ isLoggedIn = false }: Props) => {
                           </div>
                         )}
 
-                        {/* Placeholder for other comments - In a real app, you would fetch and display actual comments */}
-                        {currentRestaurant?.total_comments > 0 ? (
-                          <div className="text-center text-gray-600 text-sm py-4">
-                            Other comments would be displayed here
+                        {/* Display all comments from the comments array */}
+                        {currentRestaurant?.comments &&
+                        Array.isArray(currentRestaurant.comments) &&
+                        currentRestaurant.comments.length > 0 ? (
+                          <div className="space-y-3">
+                            <h4 className="font-medium text-sm text-gray-700 mt-2 mb-3">
+                              All Comments ({currentRestaurant.comments.length})
+                            </h4>
+
+                            {currentRestaurant.comments.map(
+                              (commentItem: CommentItem, index: number) => {
+                                // Skip rendering if it's the current user's comment to avoid duplication
+                                if (
+                                  commentItem.username ===
+                                  userData?.data.username
+                                ) {
+                                  return null;
+                                }
+
+                                return (
+                                  <div
+                                    key={`comment-${index}`}
+                                    className="bg-white rounded-lg p-3 shadow-sm"
+                                  >
+                                    <div className="flex items-start gap-3">
+                                      <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                                        {commentItem.username
+                                          ?.charAt(0)
+                                          .toUpperCase() || "?"}
+                                      </div>
+                                      <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-1">
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-medium text-sm text-gray-800">
+                                              {commentItem.username}
+                                            </span>
+                                            {commentItem.updatedAt && (
+                                              <span className="text-xs text-gray-500">
+                                                {new Date(
+                                                  commentItem.updatedAt
+                                                ).toLocaleDateString()}
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+                                        <p className="text-sm text-gray-600">
+                                          {commentItem.comment}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                            )}
                           </div>
-                        ) : (
+                        ) : !currentRestaurant?.user_comment ? (
                           <div className="text-center text-gray-400 text-sm py-4">
                             No comments yet. Be the first to comment!
                           </div>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   </div>
