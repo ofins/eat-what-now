@@ -1,40 +1,9 @@
-import type { IRestaurant } from "@ewn/types/restaurants.type";
-import type { IUser } from "@ewn/types/users.type";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import DOMPurify from "dompurify";
-import { useEffect, useState, type FormEvent } from "react";
-import {
-  toggleFavorite,
-  toggleUpvote,
-  updateComment,
-} from "../../api/restaurants-user";
+import { useState } from "react";
+import { toggleFavorite, toggleUpvote } from "../../api/restaurants-user";
 import { useLocation } from "../../hooks/useLocation";
-import { calculateDistance } from "../../utils/common";
-
-type FeedResponse = {
-  data: IRestaurant[];
-  meta: {
-    total: number;
-    limit: number;
-    offset: number;
-    page: number;
-    totalPages: number;
-  };
-};
-
-// Comment interface that matches the JSONB structure in the database
-interface CommentItem {
-  updatedAt: string;
-  username: string;
-  comment: string;
-}
-
-// Extended restaurant interface to include comments array
-interface RestaurantWithComments extends IRestaurant {
-  comments?: CommentItem[];
-}
-
-const PAGE_LIMIT = 10;
+import RestaurantCard from "./components/RestaurantCard";
+import { useFeedData } from "./hooks/useFeedData";
+import { useRestaurantInteractions } from "./hooks/useRestaurantInteractions";
 
 interface Props {
   isLoggedIn?: boolean;
@@ -42,104 +11,48 @@ interface Props {
 
 const Feed = ({ isLoggedIn = false }: Props) => {
   const { location } = useLocation();
-
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [clickedStats, setClickedStats] = useState<{ [key: string]: boolean }>(
-    {}
-  );
   const [isExpanded, setIsExpanded] = useState(false);
-  const [newComment, setNewComment] = useState("");
-  const [isCommenting, setIsCommenting] = useState(false);
-  const [commentSubmitting, setCommentSubmitting] = useState(false);
 
-  // Efficient infinite data fetching
   const {
-    data,
+    restaurants,
     isLoading,
     error,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     refetch,
-  } = useInfiniteQuery<FeedResponse>({
-    queryKey: ["feed"],
-    queryFn: async ({ pageParam = 0 }) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/feed?offset=${pageParam}&limit=${PAGE_LIMIT}&longitude=${location?.longitude}&latitude=${location?.latitude}&radius=500`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+  } = useFeedData(
+    location?.latitude && location?.longitude
+      ? {
+          latitude: location.latitude,
+          longitude: location.longitude,
         }
-      );
-      if (!response.ok) throw new Error("Failed to fetch feed");
-      return response.json();
-    },
-    getNextPageParam: (lastPage, pages) => {
-      // Check if we've reached the last page based on API pagination info
-      if (lastPage.meta.page >= lastPage.meta.totalPages) {
-        return undefined;
-      }
-      // Return the next offset (current page * limit)
-      return pages.length * PAGE_LIMIT;
-    },
-    initialPageParam: 0,
-    enabled: !!location, // Only fetch if location is provided
-  });
+      : null
+  );
 
-  const { data: userData } = useQuery<{ data: IUser }>({
-    queryKey: ["users/profile"], // Path matches API endpoint
-    enabled: isLoggedIn, // Only fetch if user is logged in
-  });
+  const currentRestaurant = restaurants[currentIndex] || null;
 
-  const handleStatClick = async (
-    statType: string,
-    action: () => Promise<void>
-  ) => {
-    if (!isLoggedIn || !userData?.data.id) return;
-
-    // Show pulse animation
-    const key = `${currentRestaurant.id}-${statType}`;
-    setClickedStats((prev) => ({ ...prev, [key]: true }));
-
-    try {
-      // Execute the action and wait for it to complete
-      await action();
-
-      // Refetch feed data to update stats
-      await refetch();
-    } catch (error) {
-      console.error(`Error performing ${statType}:`, error);
-    }
-
-    // Remove animation after delay
-    setTimeout(() => {
-      setClickedStats((prev) => ({ ...prev, [key]: false }));
-    }, 300);
-  };
-
-  const restaurants = data?.pages.flatMap((page) => page.data) || [];
-
-  // Prefetch next page when user is near the end
-  useEffect(() => {
-    if (
-      currentIndex >= restaurants.length - 3 &&
-      hasNextPage &&
-      !isFetchingNextPage
-    ) {
-      fetchNextPage();
-    }
-  }, [
-    currentIndex,
-    restaurants.length,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-  ]);
+  const {
+    userData,
+    clickedStats,
+    newComment,
+    setNewComment,
+    isCommenting,
+    setIsCommenting,
+    commentSubmitting,
+    handleCommentSubmit,
+  } = useRestaurantInteractions(isLoggedIn, currentRestaurant, refetch);
 
   const handleNext = () => {
     // Reset expanded state when going to next restaurant
     setIsExpanded(false);
+    setIsCommenting(false);
+    setNewComment("");
+
+    console.log({ currentIndex });
+    console.log({ restaurants });
+    console.log({ hasNextPage });
 
     if (currentIndex < restaurants.length - 1) {
       setCurrentIndex((prev) => prev + 1);
@@ -154,64 +67,74 @@ const Feed = ({ isLoggedIn = false }: Props) => {
     }
   };
 
-  const handleExpand = () => {
-    setIsExpanded(true);
-  };
+  const handleExpand = () => setIsExpanded(true);
+  const handleCollapse = () => setIsExpanded(false);
 
-  const handleCollapse = () => {
-    setIsExpanded(false);
-  };
-
-  const handleCommentSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!isLoggedIn || !userData?.data.id || !newComment.trim()) return;
-
-    try {
-      setCommentSubmitting(true);
-      // Sanitize the comment to prevent XSS attacks
-      const sanitizedComment = DOMPurify.sanitize(newComment.trim());
-
-      await updateComment(
-        userData.data.id,
-        currentRestaurant.id,
-        sanitizedComment
-      );
-
-      // Clear the comment field and exit commenting mode
-      setNewComment("");
-      setIsCommenting(false);
-
-      // Refetch feed data to update comments
-      await refetch();
-    } catch (error) {
-      console.error("Error submitting comment:", error);
-    } finally {
-      setCommentSubmitting(false);
+  const handleCommentClick = () => {
+    if (isLoggedIn) {
+      setIsExpanded(true);
+      setTimeout(() => {
+        setIsCommenting(true);
+      }, 300);
     }
   };
 
+  const handleStatClick = async (
+    statType: string,
+    action: () => Promise<void>
+  ) => {
+    if (!isLoggedIn || !userData?.data.id) return;
+
+    // Show pulse animation
+    const key = `${currentRestaurant?.id}-${statType}`;
+    clickedStats[key] = true;
+
+    try {
+      // Execute the action and wait for it to complete
+      await action();
+
+      // Refetch feed data to update stats
+      await refetch();
+    } catch (error) {
+      console.error(`Error performing ${statType}:`, error);
+    }
+
+    // Remove animation after delay
+    setTimeout(() => {
+      clickedStats[key] = false;
+    }, 300);
+  };
+
+  // Prefetch next page when user is near the end
+  if (
+    currentIndex >= restaurants.length - 3 &&
+    hasNextPage &&
+    !isFetchingNextPage
+  ) {
+    fetchNextPage();
+  }
+
+  // Loading and error states
   if (isLoading)
     return (
       <div className="flex items-center justify-center h-screen">
         Loading...
       </div>
     );
+
   if (error)
     return (
       <div className="flex items-center justify-center h-screen text-red-500">
         Error: {error.message}
       </div>
     );
+
   if (restaurants.length === 0)
     return (
       <div className="flex items-center justify-center h-screen">
         No restaurants found
       </div>
     );
-
-  const currentRestaurant = restaurants[currentIndex] as RestaurantWithComments;
-  // const nextRestaurant = restaurants[currentIndex + 1];
-  // const nextNextRestaurant = restaurants[currentIndex + 2];
 
   return (
     <div
@@ -226,549 +149,52 @@ const Feed = ({ isLoggedIn = false }: Props) => {
             : "w-80 h-[70%] max-w-sm"
         }`}
       >
-        {/* Third card (background) */}
-        {/* {nextNextRestaurant && (
-          <div
-            className="absolute inset-0 bg-white rounded-2xl shadow-md"
-            style={{
-              transform: "translateY(8px) scale(0.92)",
-              zIndex: 1,
-            }}
-          >
-            <div className="w-full h-full p-6 rounded-2xl">
-              <h3 className="text-lg font-bold text-gray-400">
-                {nextNextRestaurant.name}
-              </h3>
-            </div>
-          </div>
-        )} */}
-
-        {/* Second card (middle) */}
-        {/* {nextRestaurant && (
-          <div
-            className="absolute inset-0 bg-white rounded-2xl shadow-lg border"
-            style={{
-              transform: "translateY(4px) scale(0.96)",
-              zIndex: 2,
-            }}
-          >
-            <div className="w-full h-full p-6 rounded-2xl">
-              <h3 className="text-xl font-bold text-gray-600">
-                {nextRestaurant.name}
-              </h3>
-            </div>
-          </div>
-        )} */}
-
-        {/* Current card (top) */}
-        <div
-          className="absolute inset-0"
-          style={{
-            zIndex: 3,
-          }}
-        >
-          <div className="w-full h-full bg-white rounded-2xl shadow-xl border-2 border-gray-100 overflow-hidden">
-            <div
-              className={`h-full flex flex-col ${isExpanded ? "overflow-y-auto" : ""}`}
-            >
-              {/* Header with back button (only shown when expanded) */}
-              {isExpanded && (
-                <div className="flex-shrink-0 p-4 border-b border-gray-100">
-                  <button
-                    onClick={handleCollapse}
-                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium transition-colors"
-                  >
-                    <span className="text-lg">←</span>
-                    <span>Back</span>
-                  </button>
-                </div>
-              )}
-
-              {/* Content Section - Scrollable if needed */}
-              <div
-                className={`flex-1 flex flex-col p-4 min-h-0 ${isExpanded ? "pb-6" : ""}`}
-              >
-                {/* Restaurant Name - Fixed height */}
-                <div className="flex-shrink-0 mb-3">
-                  <h2
-                    className={`font-bold text-gray-800 line-clamp-2 leading-tight ${
-                      isExpanded ? "text-2xl" : "text-lg"
-                    }`}
-                  >
-                    {currentRestaurant?.name}
-                  </h2>
-                </div>
-
-                {/* Address - Fixed height */}
-                <div className="flex-shrink-0 mb-3">
-                  <p
-                    className={`text-gray-600 line-clamp-2 leading-relaxed ${
-                      isExpanded ? "text-sm" : "text-xs"
-                    }`}
-                  >
-                    {currentRestaurant?.address}
-                  </p>
-                </div>
-
-                {/* Rating and Distance Row */}
-                <div className="flex-shrink-0 flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-1">
-                    <span
-                      className={`text-yellow-500 ${isExpanded ? "text-base" : "text-sm"}`}
-                    >
-                      {"★".repeat(Math.floor(currentRestaurant?.rating || 0))}
-                      {"☆".repeat(
-                        5 - Math.floor(currentRestaurant?.rating || 0)
-                      )}
-                    </span>
-                    <span
-                      className={`text-gray-500 font-medium ml-1 ${
-                        isExpanded ? "text-sm" : "text-xs"
-                      }`}
-                    >
-                      {Number(currentRestaurant?.rating).toFixed(1)}
-                    </span>
-                  </div>
-                  <div
-                    className={`text-gray-600 bg-gray-50 px-2 py-1 rounded-full ${
-                      isExpanded ? "text-sm" : "text-xs"
-                    }`}
-                  >
-                    {calculateDistance(
-                      currentRestaurant?.latitude || 0,
-                      currentRestaurant?.longitude || 0,
-                      location?.latitude || 0,
-                      location?.longitude || 0
-                    ).toFixed(1)}{" "}
-                    km
-                  </div>
-                </div>
-
-                {/* Price Range and Outbound Link */}
-                <div className="flex-shrink-0 mb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`text-gray-500 ${isExpanded ? "text-sm" : "text-xs"}`}
-                      >
-                        Price:
-                      </span>
-                      <span
-                        className={`text-green-600 font-medium ${
-                          isExpanded ? "text-base" : "text-sm"
-                        }`}
-                      >
-                        {"$".repeat(
-                          Math.floor(currentRestaurant?.price_range || 1)
-                        )}
-                      </span>
-                    </div>
-
-                    {/* Outbound Link Button */}
-                    {currentRestaurant?.outbound_link && (
-                      <a
-                        href={currentRestaurant.outbound_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm ${
-                          isExpanded
-                            ? "px-4 py-2 text-sm font-medium"
-                            : "px-3 py-1.5 text-xs font-medium"
-                        }`}
-                      >
-                        <span>Visit</span>
-                        <svg
-                          className={`${isExpanded ? "w-4 h-4" : "w-3 h-3"}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                          />
-                        </svg>
-                      </a>
-                    )}
-                  </div>
-                </div>
-
-                {/* Stats Grid - Repositioned */}
-                <div className="flex-shrink-0 mb-4 pt-3 border-t border-gray-100">
-                  <div
-                    className={`grid gap-3 ${isExpanded ? "grid-cols-4" : "grid-cols-2"}`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`transition-all duration-200 hover:scale-110 active:scale-95 ${
-                          clickedStats[`${currentRestaurant.id}-upvote`]
-                            ? "animate-pulse scale-125"
-                            : ""
-                        } ${isLoggedIn ? "cursor-pointer" : "cursor-default opacity-50"} ${
-                          isExpanded ? "text-base" : "text-sm"
-                        } ${
-                          currentRestaurant.user_upvoted
-                            ? "text-green-600"
-                            : "text-gray-500"
-                        }`}
-                        onClick={() =>
-                          handleStatClick("upvote", async () => {
-                            await toggleUpvote(
-                              userData?.data.id || "",
-                              currentRestaurant.id,
-                              !currentRestaurant.user_upvoted
-                            );
-                          })
-                        }
-                      >
-                        👍
-                      </span>
-                      <span
-                        className={`${isExpanded ? "text-sm" : "text-xs"} ${
-                          currentRestaurant.user_upvoted
-                            ? "text-green-600 font-medium"
-                            : "text-gray-600"
-                        }`}
-                      >
-                        {(currentRestaurant?.total_upvotes || 0) +
-                          (currentRestaurant?.user_upvoted ? 1 : 0)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`transition-all duration-200 hover:scale-110 active:scale-95 ${
-                          clickedStats[`${currentRestaurant.id}-favorite`]
-                            ? "animate-pulse scale-125"
-                            : ""
-                        } ${isLoggedIn ? "cursor-pointer" : "cursor-default opacity-50"} ${
-                          isExpanded ? "text-base" : "text-sm"
-                        } ${
-                          currentRestaurant.user_favorited
-                            ? "text-pink-600"
-                            : "text-gray-500"
-                        }`}
-                        onClick={() =>
-                          handleStatClick("favorite", async () => {
-                            await toggleFavorite(
-                              userData?.data.id || "",
-                              currentRestaurant.id,
-                              !currentRestaurant.user_favorited
-                            );
-                          })
-                        }
-                      >
-                        ❤️
-                      </span>
-                      <span
-                        className={`${isExpanded ? "text-sm" : "text-xs"} ${
-                          currentRestaurant.user_favorited
-                            ? "text-pink-600 font-medium"
-                            : "text-gray-600"
-                        }`}
-                      >
-                        {(currentRestaurant?.total_favorites || 0) +
-                          (currentRestaurant?.user_favorited ? 1 : 0)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`transition-all duration-200 hover:scale-110 ${
-                          isLoggedIn
-                            ? "cursor-pointer"
-                            : "cursor-default opacity-50"
-                        } ${isExpanded ? "text-base" : "text-sm"} ${
-                          currentRestaurant.user_comment
-                            ? "text-blue-600"
-                            : "text-gray-500"
-                        }`}
-                        onClick={() => {
-                          if (isLoggedIn) {
-                            setIsExpanded(true);
-                            setTimeout(() => {
-                              setIsCommenting(true);
-                            }, 300);
-                          }
-                        }}
-                      >
-                        💬
-                      </span>
-                      <span
-                        className={`${isExpanded ? "text-sm" : "text-xs"} ${
-                          currentRestaurant.user_comment
-                            ? "text-blue-600 font-medium"
-                            : "text-gray-600"
-                        }`}
-                      >
-                        {(currentRestaurant?.total_comments || 0) +
-                          (currentRestaurant?.user_comment ? 1 : 0)}
-                      </span>
-                    </div>
-                    {!isExpanded && (
-                      <div className="flex items-center justify-end">
-                        <button
-                          onClick={handleExpand}
-                          className="text-blue-600 hover:text-blue-800 text-xs font-medium transition-colors"
-                        >
-                          Details →
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Login prompt for non-authenticated users */}
-                  {!isLoggedIn && (
-                    <div
-                      className={`mt-2 text-gray-400 text-center ${
-                        isExpanded ? "text-sm" : "text-xs"
-                      }`}
-                    >
-                      Login to interact with restaurants
-                    </div>
-                  )}
-                </div>
-
-                {/* Contributed By Section */}
-                {currentRestaurant?.contributor_username && (
-                  <div className="flex-shrink-0 mb-4">
-                    <div
-                      className={`flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100 ${
-                        isExpanded ? "" : "mx-1"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 flex-1">
-                        <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">
-                            {currentRestaurant.contributor_username
-                              ?.charAt(0)
-                              .toUpperCase() || "U"}
-                          </span>
-                        </div>
-                        <div className="flex flex-col">
-                          <span
-                            className={`text-gray-600 ${isExpanded ? "text-xs" : "text-xs"}`}
-                          >
-                            Contributed by
-                          </span>
-                          <span
-                            className={`font-medium text-gray-800 ${isExpanded ? "text-sm" : "text-xs"}`}
-                          >
-                            @{currentRestaurant.contributor_username}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="text-purple-500">
-                        <svg
-                          className={`${isExpanded ? "w-5 h-5" : "w-4 h-4"}`}
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Comments Section - Only visible when expanded */}
-                {isExpanded && (
-                  <div className="flex-shrink-0">
-                    <div className="border-t border-gray-100 pt-4">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                        Comments & Reviews
-                      </h3>
-
-                      {/* Comment Form */}
-                      {isLoggedIn ? (
-                        isCommenting ? (
-                          <form
-                            onSubmit={handleCommentSubmit}
-                            className="bg-white rounded-lg p-3 shadow-sm mb-4"
-                          >
-                            <div className="mb-2">
-                              <textarea
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                rows={3}
-                                placeholder="Share your thoughts about this restaurant..."
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                disabled={commentSubmitting}
-                                maxLength={500}
-                              />
-                            </div>
-                            <div className="flex justify-end gap-2">
-                              <button
-                                type="button"
-                                className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm font-medium transition-colors"
-                                onClick={() => {
-                                  setIsCommenting(false);
-                                  setNewComment("");
-                                }}
-                                disabled={commentSubmitting}
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                type="submit"
-                                className="px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm font-medium transition-colors disabled:bg-blue-300"
-                                disabled={
-                                  !newComment.trim() || commentSubmitting
-                                }
-                              >
-                                {commentSubmitting
-                                  ? "Posting..."
-                                  : "Post Comment"}
-                              </button>
-                            </div>
-                          </form>
-                        ) : (
-                          <div className="bg-white rounded-lg p-3 shadow-sm mb-4">
-                            <button
-                              className="w-full px-3 py-2 text-left text-gray-500 border border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:text-blue-500 transition-colors"
-                              onClick={() => setIsCommenting(true)}
-                            >
-                              <span className="flex items-center gap-2">
-                                <svg
-                                  className="w-4 h-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 4v16m8-8H4"
-                                  />
-                                </svg>
-                                Add your comment
-                              </span>
-                            </button>
-                          </div>
-                        )
-                      ) : (
-                        <div className="bg-blue-50 text-blue-800 p-3 rounded-lg mb-4 text-sm">
-                          Please log in to add comments
-                        </div>
-                      )}
-
-                      <div className="bg-gray-50 rounded-lg p-3 space-y-3 min-h-[150px]">
-                        {/* Show the current user's comment if it exists */}
-                        {currentRestaurant?.user_comment && (
-                          <div className="bg-white rounded-lg p-3 shadow-sm border-l-4 border-blue-500 mb-4">
-                            <div className="flex items-start gap-3">
-                              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                                {userData?.data.username
-                                  ?.charAt(0)
-                                  .toUpperCase() || "Y"}
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between mb-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium text-sm text-gray-800">
-                                      {userData?.data.username || "You"}
-                                    </span>
-                                    <span className="text-xs text-gray-500">
-                                      (your comment)
-                                    </span>
-                                  </div>
-                                  <button
-                                    className="text-gray-400 hover:text-blue-500 text-xs"
-                                    onClick={() => {
-                                      if (
-                                        typeof currentRestaurant.user_comment ===
-                                        "string"
-                                      ) {
-                                        setNewComment(
-                                          currentRestaurant.user_comment
-                                        );
-                                      }
-                                      setIsCommenting(true);
-                                    }}
-                                  >
-                                    Edit
-                                  </button>
-                                </div>
-                                <p className="text-sm text-gray-600">
-                                  {currentRestaurant.user_comment}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Display all comments from the comments array */}
-                        {currentRestaurant?.comments &&
-                        Array.isArray(currentRestaurant.comments) &&
-                        currentRestaurant.comments.length > 0 ? (
-                          <div className="space-y-3">
-                            <h4 className="font-medium text-sm text-gray-700 mt-2 mb-3">
-                              All Comments ({currentRestaurant.comments.length})
-                            </h4>
-
-                            {currentRestaurant.comments.map(
-                              (commentItem: CommentItem, index: number) => {
-                                // Skip rendering if it's the current user's comment to avoid duplication
-                                if (
-                                  commentItem.username ===
-                                  userData?.data.username
-                                ) {
-                                  return null;
-                                }
-
-                                return (
-                                  <div
-                                    key={`comment-${index}`}
-                                    className="bg-white rounded-lg p-3 shadow-sm"
-                                  >
-                                    <div className="flex items-start gap-3">
-                                      <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                                        {commentItem.username
-                                          ?.charAt(0)
-                                          .toUpperCase() || "?"}
-                                      </div>
-                                      <div className="flex-1">
-                                        <div className="flex items-center justify-between mb-1">
-                                          <div className="flex items-center gap-2">
-                                            <span className="font-medium text-sm text-gray-800">
-                                              {commentItem.username}
-                                            </span>
-                                            {commentItem.updatedAt && (
-                                              <span className="text-xs text-gray-500">
-                                                {new Date(
-                                                  commentItem.updatedAt
-                                                ).toLocaleDateString()}
-                                              </span>
-                                            )}
-                                          </div>
-                                        </div>
-                                        <p className="text-sm text-gray-600">
-                                          {commentItem.comment}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                );
-                              }
-                            )}
-                          </div>
-                        ) : !currentRestaurant?.user_comment ? (
-                          <div className="text-center text-gray-400 text-sm py-4">
-                            No comments yet. Be the first to comment!
-                          </div>
-                        ) : null}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+        {/* Current card */}
+        <div className="absolute inset-0" style={{ zIndex: 3 }}>
+          {currentRestaurant && (
+            <RestaurantCard
+              restaurant={currentRestaurant}
+              isExpanded={isExpanded}
+              isLoggedIn={isLoggedIn}
+              onExpand={handleExpand}
+              onCollapse={handleCollapse}
+              userData={userData}
+              clickedStats={clickedStats}
+              onUpvote={() =>
+                handleStatClick("upvote", async () => {
+                  await toggleUpvote(
+                    userData?.data.id || "",
+                    currentRestaurant.id,
+                    !currentRestaurant.user_upvoted
+                  );
+                })
+              }
+              onFavorite={() =>
+                handleStatClick("favorite", async () => {
+                  await toggleFavorite(
+                    userData?.data.id || "",
+                    currentRestaurant.id,
+                    !currentRestaurant.user_favorited
+                  );
+                })
+              }
+              onComment={handleCommentClick}
+              isCommenting={isCommenting}
+              setIsCommenting={setIsCommenting}
+              commentSubmitting={commentSubmitting}
+              newComment={newComment}
+              setNewComment={setNewComment}
+              onCommentSubmit={handleCommentSubmit}
+              location={
+                location?.latitude && location?.longitude
+                  ? {
+                      latitude: location.latitude as number,
+                      longitude: location.longitude as number,
+                    }
+                  : null
+              }
+            />
+          )}
         </div>
       </div>
 
