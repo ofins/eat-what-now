@@ -11,14 +11,14 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
   return (
     <header
       className="fixed top-0 left-0 right-0 bg-white shadow-md z-40 
-                     border-b border-gray-200 h-14"
+                     border-b border-gray-200 h-10"
     >
       <div className="flex items-center justify-between px-4 h-full">
         {/* Left side - Toggle button and Logo */}
         <div className="flex items-center space-x-3">
           <button
             onClick={onToggleSidebar}
-            className="p-2 rounded-lg hover:bg-gray-100 
+            className="p-1 rounded-lg hover:bg-gray-100 
                      transition-colors duration-200 cursor-pointer"
             aria-label="Toggle menu"
           >

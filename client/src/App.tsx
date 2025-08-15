@@ -4,10 +4,11 @@ import About from "./components/About";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import Home from "./components/home/Home";
+import WelcomeModal from "./components/WelcomeModal";
 import AuthLayout from "./layouts/AuthLayout";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Header from "./components/Header";
 import Search from "./components/Search";
@@ -38,6 +39,25 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDesktopSidebarExpanded, setIsDesktopSidebarExpanded] =
     useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+
+  // Check if user has seen the welcome modal before
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem("hasSeenWelcomeModal");
+    const dontShowAgain = localStorage.getItem("dontShowWelcomeModal");
+    if (!hasSeenWelcome && !dontShowAgain) {
+      setShowWelcomeModal(true);
+    }
+  }, []);
+
+  const handleWelcomeModalClose = () => {
+    setShowWelcomeModal(false);
+    // Don't set hasSeenWelcomeModal here anymore, let the modal handle it
+  };
+
+  const handleShowWelcomeModal = () => {
+    setShowWelcomeModal(true);
+  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -67,6 +87,7 @@ function App() {
               isExpanded={isDesktopSidebarExpanded}
               onToggleExpanded={toggleDesktopSidebar}
               onCloseExpanded={closeDesktopSidebar}
+              onShowWelcomeModal={handleShowWelcomeModal}
             />
           </div>
 
@@ -76,7 +97,7 @@ function App() {
               <Header onToggleSidebar={toggleSidebar} />
             </div>
 
-            <main className="flex-1 pt-14 lg:pt-0 overflow-hidden">
+            <main className="flex-1 pt-8 lg:pt-0 overflow-hidden">
               <Routes>
                 <Route index element={<Home />} />
                 <Route
@@ -113,9 +134,19 @@ function App() {
 
           {/* Mobile sidebar - overlay on small screens */}
           <div className="lg:hidden">
-            <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+            <Sidebar
+              isOpen={isSidebarOpen}
+              onClose={closeSidebar}
+              onShowWelcomeModal={handleShowWelcomeModal}
+            />
           </div>
         </div>
+
+        {/* Welcome Modal - Shows on first visit */}
+        <WelcomeModal
+          isOpen={showWelcomeModal}
+          onClose={handleWelcomeModalClose}
+        />
       </QueryClientProvider>
     </BrowserRouter>
   );

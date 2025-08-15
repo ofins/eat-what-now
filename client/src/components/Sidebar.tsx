@@ -8,6 +8,7 @@ interface SidebarProps {
   isExpanded?: boolean;
   onToggleExpanded?: () => void;
   onCloseExpanded?: () => void;
+  onShowWelcomeModal?: () => void;
 }
 
 const Sidebar = ({
@@ -16,6 +17,7 @@ const Sidebar = ({
   isExpanded = false,
   onToggleExpanded,
   onCloseExpanded,
+  onShowWelcomeModal,
 }: SidebarProps) => {
   const { isLoggedIn } = useAuth();
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -83,6 +85,10 @@ const Sidebar = ({
                        ? "lg:fixed lg:w-80 lg:z-50 lg:translate-x-0"
                        : "w-full sm:w-20 lg:w-20 lg:-translate-x-0"
                    }`}
+        style={{
+          // Prevent content shifting by maintaining consistent internal layout
+          minWidth: isExpanded ? "320px" : undefined,
+        }}
       >
         {/* Logo area */}
         <div
@@ -91,22 +97,24 @@ const Sidebar = ({
           }`}
         >
           <div
-            className={`flex items-center ${
+            className={`flex items-center transition-all duration-300 ${
               isExpanded ? "" : "lg:flex-col lg:text-center"
             }`}
           >
             <img
               src="/pixel-burger.png"
               alt="Logo"
-              className={`w-10 h-10 ${
+              className={`w-10 h-10 transition-all duration-300 ${
                 isExpanded ? "mr-3" : "lg:w-8 lg:h-8 mr-3 lg:mr-0 lg:mb-2"
               }`}
             />
-            <div className={isExpanded ? "" : "lg:hidden"}>
-              <div className="text-xl font-bold text-[#EF2A39]">
+            <div
+              className={`transition-all duration-300 ${isExpanded ? "opacity-100 w-auto" : "lg:opacity-0 lg:w-0 lg:h-0 lg:overflow-hidden opacity-100"}`}
+            >
+              <div className="text-xl font-bold text-[#EF2A39] whitespace-nowrap">
                 Eat What Now
               </div>
-              <div className="text-xs text-gray-500 mt-0.5">
+              <div className="text-xs text-gray-500 mt-0.5 whitespace-nowrap">
                 Find your next meal
               </div>
             </div>
@@ -181,22 +189,26 @@ const Sidebar = ({
 
         {/* Navigation links */}
         <nav
-          className={`flex-grow py-6 overflow-y-auto ${
+          className={`flex-grow py-6 overflow-y-auto transition-all duration-300 ${
             isExpanded ? "px-4" : "px-4 lg:px-2"
           }`}
         >
           <div
-            className={`mb-4 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ${
-              isExpanded ? "" : "lg:hidden"
+            className={`mb-4 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider transition-all duration-300 ${
+              isExpanded
+                ? "opacity-100 h-auto"
+                : "lg:opacity-0 lg:h-0 lg:overflow-hidden opacity-100 h-auto"
             }`}
           >
             Menu
           </div>
-          <ul className={`space-y-1 ${isExpanded ? "" : "lg:space-y-3"}`}>
+          <ul
+            className={`space-y-1 transition-all duration-300 ${isExpanded ? "" : "lg:space-y-3"}`}
+          >
             <li>
               <Link
                 to="/"
-                className={`flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-colors ${
+                className={`flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-300 ${
                   isExpanded
                     ? "px-4 py-3"
                     : "px-4 lg:px-2 py-3 lg:py-2 lg:flex-col lg:text-center"
@@ -204,7 +216,7 @@ const Sidebar = ({
                 onClick={isExpanded ? onCloseExpanded : onClose}
               >
                 <div
-                  className={`bg-blue-100 rounded-lg flex items-center justify-center ${
+                  className={`bg-blue-100 rounded-lg flex items-center justify-center transition-all duration-300 ${
                     isExpanded
                       ? "w-8 h-8 mr-3"
                       : "w-8 h-8 lg:w-6 lg:h-6 mr-3 lg:mr-0 lg:mb-1"
@@ -213,7 +225,7 @@ const Sidebar = ({
                   <svg
                     width="16"
                     height="16"
-                    className={isExpanded ? "" : "lg:w-4 lg:h-4"}
+                    className={`transition-all duration-300 ${isExpanded ? "" : "lg:w-4 lg:h-4"}`}
                     viewBox="0 0 24 24"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -235,8 +247,10 @@ const Sidebar = ({
                   </svg>
                 </div>
                 <span
-                  className={`font-medium ${
-                    isExpanded ? "" : "lg:text-xs lg:font-normal"
+                  className={`font-medium transition-all duration-300 whitespace-nowrap ${
+                    isExpanded
+                      ? "opacity-100 w-auto"
+                      : "lg:text-xs lg:font-normal lg:opacity-100 opacity-100"
                   }`}
                 >
                   Home
@@ -249,7 +263,7 @@ const Sidebar = ({
                 <li>
                   <Link
                     to="/search"
-                    className={`flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-colors ${
+                    className={`flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-300 ${
                       isExpanded
                         ? "px-4 py-3"
                         : "px-4 lg:px-2 py-3 lg:py-2 lg:flex-col lg:text-center"
@@ -257,7 +271,7 @@ const Sidebar = ({
                     onClick={isExpanded ? onCloseExpanded : onClose}
                   >
                     <div
-                      className={`bg-green-100 rounded-lg flex items-center justify-center ${
+                      className={`bg-green-100 rounded-lg flex items-center justify-center transition-all duration-300 ${
                         isExpanded
                           ? "w-8 h-8 mr-3"
                           : "w-8 h-8 lg:w-6 lg:h-6 mr-3 lg:mr-0 lg:mb-1"
@@ -266,7 +280,7 @@ const Sidebar = ({
                       <svg
                         width="16"
                         height="16"
-                        className={isExpanded ? "" : "lg:w-4 lg:h-4"}
+                        className={`transition-all duration-300 ${isExpanded ? "" : "lg:w-4 lg:h-4"}`}
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -288,8 +302,10 @@ const Sidebar = ({
                       </svg>
                     </div>
                     <span
-                      className={`font-medium ${
-                        isExpanded ? "" : "lg:text-xs lg:font-normal"
+                      className={`font-medium transition-all duration-300 whitespace-nowrap ${
+                        isExpanded
+                          ? "opacity-100 w-auto"
+                          : "lg:text-xs lg:font-normal lg:opacity-100 opacity-100"
                       }`}
                     >
                       Search
@@ -299,7 +315,7 @@ const Sidebar = ({
                 <li>
                   <Link
                     to="/about"
-                    className={`flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-colors ${
+                    className={`flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-300 ${
                       isExpanded
                         ? "px-4 py-3"
                         : "px-4 lg:px-2 py-3 lg:py-2 lg:flex-col lg:text-center"
@@ -307,7 +323,7 @@ const Sidebar = ({
                     onClick={isExpanded ? onCloseExpanded : onClose}
                   >
                     <div
-                      className={`bg-purple-100 rounded-lg flex items-center justify-center ${
+                      className={`bg-purple-100 rounded-lg flex items-center justify-center transition-all duration-300 ${
                         isExpanded
                           ? "w-8 h-8 mr-3"
                           : "w-8 h-8 lg:w-6 lg:h-6 mr-3 lg:mr-0 lg:mb-1"
@@ -316,7 +332,7 @@ const Sidebar = ({
                       <svg
                         width="16"
                         height="16"
-                        className={isExpanded ? "" : "lg:w-4 lg:h-4"}
+                        className={`transition-all duration-300 ${isExpanded ? "" : "lg:w-4 lg:h-4"}`}
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -340,8 +356,10 @@ const Sidebar = ({
                       </svg>
                     </div>
                     <span
-                      className={`font-medium ${
-                        isExpanded ? "" : "lg:text-xs lg:font-normal"
+                      className={`font-medium transition-all duration-300 whitespace-nowrap ${
+                        isExpanded
+                          ? "opacity-100 w-auto"
+                          : "lg:text-xs lg:font-normal lg:opacity-100 opacity-100"
                       }`}
                     >
                       Profile
@@ -350,8 +368,10 @@ const Sidebar = ({
                 </li>
 
                 <div
-                  className={`my-4 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ${
-                    isExpanded ? "" : "lg:hidden"
+                  className={`my-4 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider transition-all duration-300 ${
+                    isExpanded
+                      ? "opacity-100 h-auto"
+                      : "lg:opacity-0 lg:h-0 lg:overflow-hidden opacity-100 h-auto"
                   }`}
                 >
                   Account
@@ -359,14 +379,14 @@ const Sidebar = ({
                 <li>
                   <button
                     onClick={handleLogout}
-                    className={`flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-colors w-full text-left ${
+                    className={`flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-300 w-full text-left ${
                       isExpanded
                         ? "px-4 py-3"
                         : "px-4 lg:px-2 py-3 lg:py-2 lg:flex-col lg:text-center"
                     }`}
                   >
                     <div
-                      className={`bg-red-100 rounded-lg flex items-center justify-center ${
+                      className={`bg-red-100 rounded-lg flex items-center justify-center transition-all duration-300 ${
                         isExpanded
                           ? "w-8 h-8 mr-3"
                           : "w-8 h-8 lg:w-6 lg:h-6 mr-3 lg:mr-0 lg:mb-1"
@@ -375,7 +395,7 @@ const Sidebar = ({
                       <svg
                         width="16"
                         height="16"
-                        className={isExpanded ? "" : "lg:w-4 lg:h-4"}
+                        className={`transition-all duration-300 ${isExpanded ? "" : "lg:w-4 lg:h-4"}`}
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -404,8 +424,10 @@ const Sidebar = ({
                       </svg>
                     </div>
                     <span
-                      className={`font-medium ${
-                        isExpanded ? "" : "lg:text-xs lg:font-normal"
+                      className={`font-medium transition-all duration-300 whitespace-nowrap ${
+                        isExpanded
+                          ? "opacity-100 w-auto"
+                          : "lg:text-xs lg:font-normal lg:opacity-100 opacity-100"
                       }`}
                     >
                       Logout
@@ -413,140 +435,7 @@ const Sidebar = ({
                   </button>
                 </li>
               </>
-            ) : (
-              <>
-                <div
-                  className={`my-4 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ${
-                    isExpanded ? "" : "lg:hidden"
-                  }`}
-                >
-                  Account
-                </div>
-                <li>
-                  <Link
-                    to="/login"
-                    onClick={isExpanded ? onCloseExpanded : onClose}
-                    className={`flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-colors ${
-                      isExpanded
-                        ? "px-4 py-3"
-                        : "px-4 lg:px-2 py-3 lg:py-2 lg:flex-col lg:text-center"
-                    }`}
-                  >
-                    <div
-                      className={`bg-blue-100 rounded-lg flex items-center justify-center ${
-                        isExpanded
-                          ? "w-8 h-8 mr-3"
-                          : "w-8 h-8 lg:w-6 lg:h-6 mr-3 lg:mr-0 lg:mb-1"
-                      }`}
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        className={isExpanded ? "" : "lg:w-4 lg:h-4"}
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M15 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H15"
-                          stroke="#3B82F6"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M10 17L15 12L10 7"
-                          stroke="#3B82F6"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M15 12H3"
-                          stroke="#3B82F6"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <span
-                      className={`font-medium ${
-                        isExpanded ? "" : "lg:text-xs lg:font-normal"
-                      }`}
-                    >
-                      Login
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/register"
-                    onClick={isExpanded ? onCloseExpanded : onClose}
-                    className={`flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-colors ${
-                      isExpanded
-                        ? "px-4 py-3"
-                        : "px-4 lg:px-2 py-3 lg:py-2 lg:flex-col lg:text-center"
-                    }`}
-                  >
-                    <div
-                      className={`bg-green-100 rounded-lg flex items-center justify-center ${
-                        isExpanded
-                          ? "w-8 h-8 mr-3"
-                          : "w-8 h-8 lg:w-6 lg:h-6 mr-3 lg:mr-0 lg:mb-1"
-                      }`}
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        className={isExpanded ? "" : "lg:w-4 lg:h-4"}
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M16 21V19C16 17.9391 15.5786 16.9217 14.8284 16.1716C14.0783 15.4214 13.0609 15 12 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21"
-                          stroke="#10B981"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <circle
-                          cx="8.5"
-                          cy="7"
-                          r="4"
-                          stroke="#10B981"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M20 8V14"
-                          stroke="#10B981"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M23 11H17"
-                          stroke="#10B981"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <span
-                      className={`font-medium ${
-                        isExpanded ? "" : "lg:text-xs lg:font-normal"
-                      }`}
-                    >
-                      Register
-                    </span>
-                  </Link>
-                </li>
-              </>
-            )}
+            ) : null}
           </ul>
         </nav>
 
@@ -576,20 +465,42 @@ const Sidebar = ({
             <div className="space-y-3">
               <Link
                 to="/login"
-                onClick={onClose}
+                onClick={isExpanded ? onCloseExpanded : onClose}
                 className="block w-full bg-[#EF2A39] text-white text-center py-3 rounded-lg hover:bg-red-600 transition-colors shadow-sm font-medium"
               >
                 Log In
               </Link>
               <Link
                 to="/register"
-                onClick={onClose}
+                onClick={isExpanded ? onCloseExpanded : onClose}
                 className="block w-full bg-white border border-[#EF2A39] text-[#EF2A39] text-center py-3 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium"
               >
                 Sign Up
               </Link>
             </div>
           )}
+
+          {/* About EWN Button */}
+          <div className="mt-4">
+            <button
+              onClick={() => {
+                if (onShowWelcomeModal) {
+                  onShowWelcomeModal();
+                }
+                if (isExpanded && onCloseExpanded) {
+                  onCloseExpanded();
+                } else {
+                  onClose();
+                }
+              }}
+              className="block w-full bg-gradient-to-r from-red-500 to-red-600 text-white text-center py-2.5 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-sm font-medium text-sm"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-xs">🍴</span>
+                <span>About EWN</span>
+              </div>
+            </button>
+          </div>
 
           <div className="mt-6 text-center text-xs text-gray-500">
             <p>© 2025 Eat What Now. All rights reserved.</p>

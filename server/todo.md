@@ -5,6 +5,9 @@
 - [ ] Chatting system
   - If user is within vicinity of a restaurant, he will have access to its chat room
   - Need to crete additional tables: `rooms`, `room-member`, `messages`
+- [ ] Add user contribution stats
+  - number of restaurants created
+  - levels based on added restaurants, interactions, comments, people who liked his/her restaurants
 
 ## Bug Issues
 
@@ -20,13 +23,13 @@
 - [ ] Reviews management endpoints CRUD
 - [ ] Implement load balancing
 - [ ] Cache mechanism (Redis)
-- [ ] Ability to write comments for restaurants
+- [x] Ability to write comments for restaurants
 - [ ] Implement transaction mechanism
 - [ ] Setup OAuth Login
 - [ ] Feeds should start with restaurants closest to user and expand outward with no limits
 - [ ] Combine server Zod schema with frontend
 - [ ] When inputting restaurant to DB, this should be logged so it can be used as analytics in the future
-- [ ] For like, favorite, comments to work, `feeds` need to be able to be tied to user so user know which restaurants he liked/disliked
+- [x] For like, favorite, comments to work, `feeds` need to be able to be tied to user so user know which restaurants he liked/disliked
 - [x] Setup API for adding restaurant through link
 - [x] Add `contributed_username` and `google_id` column for `restaurant` table
 - [x] Protect against common vulnerabilities (SQL Injections, XSS, CSRF)
@@ -58,14 +61,14 @@
 
 ## DevOps Tasks
 
-- [ ] Setup basic Nginx for distribution of loads
-- [ ] Host server on AWS
+- [x] Setup basic Nginx for distribution of loads
+- [x] Host server on AWS
 - [ ] Setup CDN for static assets
-- [ ] Test PROD env
-- [ ] Purchase domain
-- [ ] Setup CI/CD pipeline in Github Actions
+- [x] Test PROD env
+- [x] Purchase domain
+- [x] Setup CI/CD pipeline in Github Actions
 - [x] Setup Database via AWS RDS
-- [ ] Setup server via AWS EC2 with Docker
+- [x] Setup server via AWS EC2 with Docker
 
 ## Documentation
 

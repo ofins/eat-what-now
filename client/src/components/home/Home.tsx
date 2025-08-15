@@ -10,7 +10,7 @@ export interface ILocation {
 const Home = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   return (
     <div id="Home" className="h-full w-full flex flex-col overflow-hidden">
-      <div className="flex-1 px-4 py-4">
+      <div className="flex-1 px-2 py-2">
         <Feed isLoggedIn={isLoggedIn} />
       </div>
     </div>
