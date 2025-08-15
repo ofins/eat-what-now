@@ -47,18 +47,9 @@ const Search = () => {
 
   const mutation = useMutation({
     mutationFn: createRestaurant,
-    onSuccess: (data) => {
-      console.log("Restaurant added successfully:", data);
-      // Clear any previous errors
-      setError(null);
-    },
-    onError: (error) => {
-      console.error("Error adding restaurant:", error);
-      setError(
-        error instanceof Error
-          ? `Failed to add restaurant: ${error.message}`
-          : "An unexpected error occurred while adding the restaurant. Please try again."
-      );
+    onSuccess: (response: Response) => {
+      console.log("Restaurant added successfully:", response);
+      // The modal handles success display
     },
   });
 
@@ -114,51 +105,43 @@ const Search = () => {
   const handleAddToDatabase = async (place: RestaurantGoogleDetails) => {
     console.log("Adding restaurant to database:", place);
 
-    try {
-      // Clear any previous errors
-      setError(null);
+    // Clear any previous errors
+    setError(null);
 
-      if (!userData?.data.id) {
-        setError("You must be logged in to add restaurants.");
-        return;
-      }
-
-      await mutation.mutate({
-        google_id: place.id,
-        name: place.displayName.text,
-        address: place.formattedAddress,
-        price_range: googlePriceLevelToNum(place.priceLevel),
-        longitude: place.location.longitude,
-        latitude: place.location.latitude,
-        website: place.websiteUri,
-        outbound_link: place.googleMapsUri,
-        contributor_username: userData?.data.username,
-      });
-    } catch (error) {
-      console.error("Error adding restaurant:", error);
-      setError(
-        error instanceof Error
-          ? `Failed to add restaurant: ${error.message}`
-          : "An unexpected error occurred while adding the restaurant. Please try again."
-      );
+    if (!userData?.data.id) {
+      throw new Error("You must be logged in to add restaurants.");
     }
+
+    // Use mutateAsync to properly throw errors
+    await mutation.mutateAsync({
+      google_id: place.id,
+      name: place.displayName.text,
+      address: place.formattedAddress,
+      price_range: googlePriceLevelToNum(place.priceLevel),
+      longitude: place.location.longitude,
+      latitude: place.location.latitude,
+      website: place.websiteUri,
+      outbound_link: place.googleMapsUri,
+      contributor_username: userData?.data.username,
+    });
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with Search Box */}
+      {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-md mx-auto p-4">
-          <div className="mb-4">
-            <h1 className="text-xl font-bold text-gray-800 mb-3 text-center">
+        <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+          <div className="py-3 lg:py-6">
+            <h1 className="text-lg lg:text-2xl font-bold text-gray-800 mb-3 lg:mb-4 text-center">
               Restaurant Search
             </h1>
 
             {/* Search Input */}
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <div className="relative max-w-2xl mx-auto">
+              <div className="absolute inset-y-0 left-0 pl-3 lg:pl-4 flex items-center pointer-events-none">
                 <svg
-                  className="h-5 w-5 text-gray-400"
+                  className="h-4 w-4 lg:h-5 lg:w-5 text-gray-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -177,23 +160,23 @@ const Search = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Search restaurants, cuisine, location..."
-                className="block w-full pl-10 pr-20 py-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm placeholder-gray-500"
+                className="block w-full pl-10 lg:pl-12 pr-2 sm:pr-32 py-2.5 lg:py-4 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm lg:text-base placeholder-gray-500"
               />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-2">
+              <div className="absolute inset-y-0 right-0 flex items-center pr-2 lg:pr-3">
                 <button
                   onClick={handleSearch}
                   disabled={!searchQuery.trim() || isSearching}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+                  className="bg-blue-600 text-white px-2 sm:px-4 py-2 lg:py-2.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors flex items-center gap-1 lg:gap-2"
                 >
                   {isSearching ? (
                     <>
-                      <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-3 h-3 lg:w-4 lg:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       <span className="hidden sm:inline">Searching...</span>
                     </>
                   ) : (
                     <>
                       <svg
-                        className="w-4 h-4"
+                        className="w-3 h-3 sm:w-4 sm:h-4"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -211,12 +194,20 @@ const Search = () => {
                 </button>
               </div>
             </div>
-          </div>
 
-          {/* Quick Filters */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {["Pizza", "Sushi", "Italian", "Chinese", "Mexican", "Thai"].map(
-              (cuisine) => (
+            {/* Quick Filters */}
+            <div className="flex gap-2 lg:gap-3 overflow-x-auto pb-2 mt-3 lg:mt-4 max-w-4xl mx-auto">
+              {[
+                "Pizza",
+                "Sushi",
+                "Italian",
+                "Chinese",
+                "Mexican",
+                "Thai",
+                "Burgers",
+                "Coffee",
+                "Dessert",
+              ].map((cuisine) => (
                 <button
                   key={cuisine}
                   onClick={() => {
@@ -224,63 +215,63 @@ const Search = () => {
                     // Auto-search when filter is clicked
                     setTimeout(() => handleSearch(), 100);
                   }}
-                  className="flex-shrink-0 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                  className="flex-shrink-0 px-3 py-1.5 lg:px-4 lg:py-2 bg-gray-100 text-gray-700 rounded-full text-xs lg:text-sm font-medium hover:bg-blue-100 hover:text-blue-700 transition-colors whitespace-nowrap"
                 >
                   {cuisine}
                 </button>
-              )
-            )}
-          </div>
+              ))}
+            </div>
 
-          {/* Error Message Display */}
-          {error && (
-            <div className="mt-3 bg-red-50 border-l-4 border-red-500 p-3 rounded-md">
-              <div className="flex items-start">
-                <div className="flex-shrink-0 mt-0.5">
-                  <svg
-                    className="h-5 w-5 text-red-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-                <div className="ml-auto pl-3">
-                  <div className="-mx-1.5 -my-1.5">
-                    <button
-                      onClick={() => setError(null)}
-                      className="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none"
+            {/* Error Message Display */}
+            {error && (
+              <div className="mt-3 lg:mt-4 max-w-2xl mx-auto bg-red-50 border-l-4 border-red-500 p-3 lg:p-4 rounded-md">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 mt-0.5">
+                    <svg
+                      className="h-4 w-4 lg:h-5 lg:w-5 text-red-500"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
                     >
-                      <span className="sr-only">Dismiss</span>
-                      <svg
-                        className="h-4 w-4"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-2 lg:ml-3 flex-1">
+                    <p className="text-xs lg:text-sm text-red-700">{error}</p>
+                  </div>
+                  <div className="ml-auto pl-2 lg:pl-3">
+                    <div className="-mx-1.5 -my-1.5">
+                      <button
+                        onClick={() => setError(null)}
+                        className="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none"
                       >
-                        <path
-                          fillRule="evenodd"
-                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
+                        <span className="sr-only">Dismiss</span>
+                        <svg
+                          className="h-3 w-3 lg:h-4 lg:w-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
       {/* Search Results */}
-      <div className="max-w-md mx-auto p-4">
+      <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-3 lg:py-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <SearchResultList
             searchResults={data}

@@ -25,7 +25,9 @@ const RestaurantStats: React.FC<RestaurantStatsProps> = ({
   return (
     <div className="flex-shrink-0 mb-4 pt-3 border-t border-gray-100">
       <div
-        className={`grid gap-3 ${isExpanded ? "grid-cols-4" : "grid-cols-2"}`}
+        className={`grid gap-3 ${
+          isExpanded ? "grid-cols-4" : "grid-cols-2 lg:grid-cols-3"
+        }`}
       >
         <div className="flex items-center gap-2">
           <span
@@ -98,7 +100,7 @@ const RestaurantStats: React.FC<RestaurantStatsProps> = ({
           </span>
         </div>
         {!isExpanded && onExpand && (
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-end lg:hidden">
             <button
               onClick={onExpand}
               className="text-blue-600 hover:text-blue-800 text-xs font-medium transition-colors"

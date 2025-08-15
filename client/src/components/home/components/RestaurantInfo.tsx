@@ -19,7 +19,7 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
       <div className="flex-shrink-0 mb-3">
         <h2
           className={`font-bold text-gray-800 line-clamp-2 leading-tight ${
-            isExpanded ? "text-2xl" : "text-lg"
+            isExpanded ? "text-2xl" : "text-base lg:text-lg"
           }`}
         >
           {restaurant?.name}
@@ -30,7 +30,7 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
       <div className="flex-shrink-0 mb-3">
         <p
           className={`text-gray-600 line-clamp-2 leading-relaxed ${
-            isExpanded ? "text-sm" : "text-xs"
+            isExpanded ? "text-sm" : "text-xs lg:text-sm"
           }`}
         >
           {restaurant?.address}
@@ -41,14 +41,14 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
       <div className="flex-shrink-0 flex items-center justify-between mb-3">
         <div className="flex items-center gap-1">
           <span
-            className={`text-yellow-500 ${isExpanded ? "text-base" : "text-sm"}`}
+            className={`text-yellow-500 ${isExpanded ? "text-base" : "text-xs lg:text-sm"}`}
           >
             {"★".repeat(Math.floor(restaurant?.rating || 0))}
             {"☆".repeat(5 - Math.floor(restaurant?.rating || 0))}
           </span>
           <span
             className={`text-gray-500 font-medium ml-1 ${
-              isExpanded ? "text-sm" : "text-xs"
+              isExpanded ? "text-sm" : "text-xs lg:text-xs"
             }`}
           >
             {Number(restaurant?.rating).toFixed(1)}
@@ -56,7 +56,7 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
         </div>
         <div
           className={`text-gray-600 bg-gray-50 px-2 py-1 rounded-full ${
-            isExpanded ? "text-sm" : "text-xs"
+            isExpanded ? "text-sm" : "text-xs lg:text-xs"
           }`}
         >
           {calculateDistance(
@@ -74,7 +74,7 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span
-              className={`text-gray-500 ${isExpanded ? "text-sm" : "text-xs"}`}
+              className={`text-gray-500 ${isExpanded ? "text-sm" : "text-xs lg:text-xs"}`}
             >
               Price:
             </span>
@@ -118,9 +118,9 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
         </div>
       </div>
 
-      {/* Contributed By Section */}
+      {/* Contributed By Section - hidden on desktop in card layout */}
       {restaurant?.contributor_username && (
-        <div className="flex-shrink-0 mb-4">
+        <div className={`flex-shrink-0 mb-4 ${isExpanded ? "" : "lg:hidden"}`}>
           <div
             className={`flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100 ${
               isExpanded ? "" : "mx-1"

@@ -1,6 +1,7 @@
 html {
   width: 100%;
   height: 100%;
+  overflow: hidden; /* Prevent scrolling completely */
 }
 
 body {
@@ -10,7 +11,7 @@ body {
   padding: 0;
   font-family: "Inter", sans-serif;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  overflow-x: hidden;
+  overflow: hidden; /* Prevent body scrolling completely */
 }
 
 .root {
@@ -18,8 +19,7 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden; /* Prevent scrolling at root level */
 }
 
 /* Line clamp utilities for text truncation */

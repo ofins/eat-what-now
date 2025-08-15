@@ -17,6 +17,7 @@ const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const getPriceLevelDisplay = (priceLevel: string) => {
     switch (priceLevel) {
@@ -39,12 +40,17 @@ const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
     if (!place) return;
 
     setIsLoading(true);
+    setError(null); // Clear any previous errors
     try {
       await onConfirm(place);
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error adding restaurant:", error);
-      // Could add error toast here
+      setError(
+        error instanceof Error
+          ? `Failed to add restaurant: ${error.message}`
+          : "An unexpected error occurred while adding the restaurant. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +68,7 @@ const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
       <Modal
         isOpen={isOpen && !showSuccessModal}
         onClose={onClose}
-        title="Add Restaurant to Database"
+        title="Add Restaurant to List"
         maxWidth="md"
       >
         <div className="space-y-4">
@@ -107,7 +113,7 @@ const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
               </div>
               <div>
                 <p className="text-sm text-blue-800 font-medium">
-                  Add this restaurant to your database?
+                  Add this restaurant to your list?
                 </p>
                 <p className="text-xs text-blue-700 mt-1">
                   This will import the restaurant information and make it
@@ -117,6 +123,33 @@ const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <div className="text-red-500 mt-0.5">
+                  <svg
+                    className="w-4 h-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm text-red-800 font-medium">
+                    Error Adding Restaurant
+                  </p>
+                  <p className="text-xs text-red-700 mt-1">{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-2">
@@ -143,7 +176,7 @@ const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
                       clipRule="evenodd"
                     />
                   </svg>
-                  Add to Database
+                  Add to List
                 </>
               )}
             </button>

@@ -74,7 +74,10 @@ export class UsersRepository {
     try {
       return await this.dbService
         .getConnection()
-        .oneOrNone<IUser>(`SELECT * FROM ${TABLE_NAME} WHERE id = $1`, [id]);
+        .oneOrNone<IUser>(
+          `SELECT id, email, username, full_name, avatar_url, is_active, is_verified, created_at, updated_at FROM ${TABLE_NAME} WHERE id = $1`,
+          [id]
+        );
     } catch (error) {
       logger.error(`Error fetching user with id ${id}:`, error);
       return null;
