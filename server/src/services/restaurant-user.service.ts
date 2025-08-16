@@ -45,4 +45,14 @@ export class RestaurantUserService {
       comment,
     });
   }
+
+  async updateRating(
+    restaurantId: string,
+    userId: string,
+    rating: number
+  ): Promise<IRestaurantUser> {
+    return await this.restaurantUserRepository.upsert(restaurantId, userId, {
+      rating,
+    });
+  }
 }

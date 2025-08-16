@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { toggleFavorite, toggleUpvote } from "../../api/restaurants-user";
+import {
+  toggleFavorite,
+  toggleUpvote,
+  updateRating,
+} from "../../api/restaurants-user";
 import { useLocation } from "../../hooks/useLocation";
 import CommentsModal from "./components/CommentsModal";
 import RestaurantCard from "./components/RestaurantCard";
@@ -140,6 +144,19 @@ const Feed = ({ isLoggedIn = false }: Props) => {
     }, 300);
   };
 
+  const handleRating = async (rating: number) => {
+    if (!isLoggedIn || !userData?.data.id || !currentRestaurant) return;
+
+    try {
+      await updateRating(userData.data.id, currentRestaurant.id, rating);
+
+      // Refetch feed data to update rating
+      await refetch();
+    } catch (error) {
+      console.error("Error updating rating:", error);
+    }
+  };
+
   // Prefetch next page when user is near the end
   if (
     currentIndex >= restaurants.length - 3 &&
@@ -231,6 +248,7 @@ const Feed = ({ isLoggedIn = false }: Props) => {
                 })
               }
               onComment={handleCommentClick}
+              onRating={handleRating}
               isCommenting={isCommenting}
               setIsCommenting={setIsCommenting}
               commentSubmitting={commentSubmitting}

@@ -28,7 +28,7 @@ export class RestaurantsRepository {
     this.aggregateUserData();
     this.aggregateComments();
 
-    cron.schedule('0 * * * *', async () => {
+    cron.schedule('* * * * *', async () => {
       try {
         this.aggregateUserData();
         this.aggregateComments();

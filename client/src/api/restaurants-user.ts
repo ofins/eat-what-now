@@ -91,3 +91,22 @@ export const updateComment = async (
 
   return response;
 };
+
+export const updateRating = async (
+  user_id: string,
+  restaurant_id: number,
+  rating: number
+) => {
+  const response = await httpClient.post(
+    `${import.meta.env.VITE_API_BASE_URL}/restaurant-user/rating`,
+    {
+      userId: user_id,
+      restaurantId: restaurant_id,
+      rating,
+    }
+  );
+
+  if (!response) throw new Error("Failed to update rating");
+
+  return response;
+};

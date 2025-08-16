@@ -16,6 +16,7 @@ interface RestaurantCardProps {
   onUpvote: () => void;
   onFavorite: () => void;
   onComment: () => void;
+  onRating: (rating: number) => void;
   isCommenting: boolean;
   setIsCommenting: (value: boolean) => void;
   commentSubmitting: boolean;
@@ -28,12 +29,15 @@ interface RestaurantCardProps {
 const RestaurantCard: React.FC<RestaurantCardProps> = ({
   restaurant,
   isLoggedIn,
+  // isExpanded,
   onExpand,
+  // onCollapse,
   userData,
   clickedStats,
   onUpvote,
   onFavorite,
   onComment,
+  onRating,
   isCommenting,
   setIsCommenting,
   commentSubmitting,
@@ -58,6 +62,8 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({
             restaurant={restaurant}
             isExpanded={false}
             location={location}
+            isLoggedIn={isLoggedIn}
+            onRating={onRating}
           />
 
           {/* Stats Section */}

@@ -64,4 +64,19 @@ export class RestaurantUserController {
       this.logger.error(`Error commenting on restaurant: ${error}`);
     }
   }
+
+  async updateRating(req: Request, res: Response) {
+    try {
+      const { userId, restaurantId, rating } = req.body;
+      const result = await this.restaurantUserService.updateRating(
+        restaurantId,
+        userId,
+        rating
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to update restaurant rating' });
+      this.logger.error(`Error updating restaurant rating: ${error}`);
+    }
+  }
 }
