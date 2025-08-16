@@ -52,22 +52,16 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
               />
             </svg>
           </button>
-
-          <Link
-            to="/"
-            className="flex items-center space-x-2 hover:opacity-80 
-                     transition-opacity"
-          >
-            <img
-              src="/pixel-burger.png"
-              alt="Eat What Now"
-              className="w-8 h-8"
-            />
-            <span className="font-bold text-[#EF2A39] text-lg hidden sm:block">
-              Eat What Now
-            </span>
-          </Link>
         </div>
+        <Link
+          to="/"
+          className="flex items-center space-x-2 hover:opacity-80 
+                     transition-opacity"
+        >
+          <span className="font-bold text-[#EF2A39] text-lg sm:block">
+            Eat What Now
+          </span>
+        </Link>
 
         {/* Right side - Search link (only when logged in) */}
         {isLoggedIn && (

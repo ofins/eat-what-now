@@ -97,7 +97,7 @@ function App() {
               <Header onToggleSidebar={toggleSidebar} />
             </div>
 
-            <main className="flex-1 pt-8 lg:pt-0 overflow-hidden">
+            <main className="flex-1 pt-8 lg:pt-0 w-[100vw] lg:w-[100%]">
               <Routes>
                 <Route index element={<Home />} />
                 <Route

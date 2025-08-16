@@ -160,11 +160,11 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                   onClick={(e) => handleCardClick(place, e)}
                 >
                   {/* Mobile Compact Card */}
-                  <div className="py-3">
+                  <div className="py-1">
                     <div className="flex items-center gap-2 min-w-0">
                       {/* Restaurant Image */}
-                      <div className="w-10 h-10 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
-                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-lg">
+                      <div className="w-6 h-6 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
+                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
                           🍽️
                         </div>
                       </div>
@@ -173,7 +173,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                       <div className="flex-1 min-w-0 mr-2">
                         <div className="flex items-center justify-between min-w-0">
                           <div className="flex-1 min-w-0 mr-2">
-                            <h4 className="font-medium text-gray-800 text-sm truncate">
+                            <h4 className="font-small text-gray-800 text-sm truncate">
                               {place.displayName.text}
                             </h4>
                             <p className="text-xs text-gray-500 truncate">
@@ -182,7 +182,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                           </div>
 
                           {/* Price and Distance - Stack on very small screens */}
-                          <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-2 flex-shrink-0">
+                          <div className="flex sm:flex-row items-end sm:items-center gap-1 sm:gap-2 flex-shrink-0">
                             <span className="text-green-600 font-medium text-xs bg-green-50 px-2 py-1 rounded-full whitespace-nowrap">
                               {getPriceLevelDisplay(place.priceLevel)}
                             </span>
@@ -222,52 +222,108 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                   {isExpanded && (
                     <div className="border-t border-gray-100 pb-3 bg-gray-50">
                       <div className="pt-3 space-y-3">
-                        {/* Distance and Duration */}
-                        {routing && routing.legs && routing.legs.length > 0 && (
-                          <div className="flex items-center gap-2">
-                            <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded-full text-xs font-medium">
-                              {formatDistance(routing.legs[0].distanceMeters)}
-                            </span>
-                            <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
-                              {formatDuration(routing.legs[0].duration)}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Website Link */}
-                        {place.websiteUri && (
-                          <div>
-                            <a
-                              href={place.websiteUri}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 text-sm underline"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Visit Website
-                            </a>
-                          </div>
-                        )}
-
                         {/* Actions */}
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 overflow-x-auto">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               setModalPlace(place);
                               setIsModalOpen(true);
                             }}
-                            className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 active:scale-[0.98] transition-all duration-150"
+                            className="bg-blue-600 text-white py-1.5 px-3 rounded-md text-xs font-medium hover:bg-blue-700 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-1 whitespace-nowrap"
                           >
-                            Add to List
+                            <svg
+                              className="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 4v16m8-8H4"
+                              />
+                            </svg>
+                            Add
                           </button>
+
+                          {place.googleMapsUri && (
+                            <a
+                              href={place.googleMapsUri}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="bg-green-600 text-white py-1.5 px-3 rounded-md text-xs font-medium hover:bg-green-700 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-1 whitespace-nowrap"
+                            >
+                              <svg
+                                className="w-3 h-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                              </svg>
+                              Maps
+                            </a>
+                          )}
+
+                          {place.websiteUri && (
+                            <a
+                              href={place.websiteUri}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="bg-gray-600 text-white py-1.5 px-3 rounded-md text-xs font-medium hover:bg-gray-700 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-1 whitespace-nowrap"
+                            >
+                              <svg
+                                className="w-3 h-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                />
+                              </svg>
+                              Web
+                            </a>
+                          )}
+
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               onSelectPlace(place);
                             }}
-                            className="bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 active:scale-[0.98] transition-all duration-150"
+                            className="bg-purple-600 text-white py-1.5 px-3 rounded-md text-xs font-medium hover:bg-purple-700 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-1 whitespace-nowrap"
                           >
+                            <svg
+                              className="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
                             Select
                           </button>
                         </div>
@@ -281,8 +337,8 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
         </div>
 
         {/* Desktop Layout: Grid */}
-        <div className="hidden lg:block p-3">
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="hidden lg:block p-2">
+          <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2">
             {searchResults.places.map((place, index) => {
               const routing = searchResults.routingSummaries[index];
               const isExpanded = expandedItem === place.id;
@@ -290,16 +346,16 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
               return (
                 <div
                   key={place.id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-100 cursor-pointer transition-all duration-200 hover:shadow-md hover:border-blue-200 flex flex-col h-48"
+                  className="bg-white rounded-lg shadow-sm border border-gray-100 cursor-pointer transition-all duration-200 hover:shadow-md hover:border-blue-200 flex flex-col h-28"
                   onClick={(e) => handleCardClick(place, e)}
                 >
                   {!isExpanded ? (
                     /* Normal Card Content */
-                    <div className="p-4 flex flex-col h-full">
-                      <div className="flex gap-3 flex-1">
+                    <div className="p-2 flex flex-col h-full">
+                      <div className="flex gap-2 flex-1">
                         {/* Restaurant Image */}
-                        <div className="w-14 h-14 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
-                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xl">
+                        <div className="w-8 h-8 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
                             🍽️
                           </div>
                         </div>
@@ -307,65 +363,55 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                         {/* Restaurant Info */}
                         <div className="flex-1 min-w-0">
                           {/* Name and Price */}
-                          <div className="flex items-start justify-between mb-2">
-                            <h4 className="font-semibold text-gray-800 text-base leading-tight pr-2 break-words line-clamp-2">
+                          <div className="flex items-start justify-between mb-1">
+                            <h4 className="font-medium text-gray-800 text-xs leading-tight pr-1 line-clamp-2">
                               {place.displayName.text}
                             </h4>
-                            <span className="text-green-600 font-medium text-sm bg-green-50 px-2 py-1 rounded-full flex-shrink-0 ml-2">
-                              {getPriceLevelDisplay(place.priceLevel)}
-                            </span>
                           </div>
 
                           {/* Address */}
-                          <p className="text-sm text-gray-500 mb-2 break-words line-clamp-2">
+                          <p className="text-xs text-gray-500 mb-1 line-clamp-1">
                             {place.formattedAddress}
                           </p>
 
-                          {/* Distance and Duration */}
+                          {/* Price, Distance, and Duration */}
                           {routing &&
                             routing.legs &&
                             routing.legs.length > 0 && (
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded-full text-sm font-medium">
+                              <div className="flex items-center gap-1">
+                                <span className="text-green-600 font-medium text-xs bg-green-50 px-1 py-0.5 rounded-full flex-shrink-0 ml-1">
+                                  {getPriceLevelDisplay(place.priceLevel)}
+                                </span>
+                                <span className="bg-blue-50 text-blue-600 px-1 py-0.5 rounded-full text-xs font-medium">
                                   {formatDistance(
                                     routing.legs[0].distanceMeters
                                   )}
                                 </span>
-                                <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-sm">
+                                <span className="bg-gray-100 text-gray-600 px-1 py-0.5 rounded-full text-xs">
                                   {formatDuration(routing.legs[0].duration)}
                                 </span>
                               </div>
                             )}
                         </div>
                       </div>
-
-                      {/* Click to expand hint */}
-                      <div className="flex justify-center mt-auto pt-3 border-t border-gray-100">
-                        <span className="text-xs text-gray-400">
-                          Click for actions
-                        </span>
-                      </div>
                     </div>
                   ) : (
                     /* Expanded Actions Content */
-                    <div className="p-4 flex flex-col h-full justify-center items-center">
-                      <div className="text-center mb-4">
-                        <h4 className="font-semibold text-gray-800 text-base mb-1 line-clamp-1">
+                    <div className="p-2 flex flex-col h-full">
+                      <div className="text-center mb-2 flex">
+                        <h4 className="font-medium text-gray-800 text-xs mb-1 line-clamp-1">
                           {place.displayName.text}
                         </h4>
-                        <p className="text-xs text-gray-600">
-                          Choose an action:
-                        </p>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 w-full">
+                      <div className="grid grid-cols-2 gap-1 w-full">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setModalPlace(place);
                             setIsModalOpen(true);
                           }}
-                          className="bg-blue-600 text-white py-2 px-3 rounded-lg text-xs font-medium hover:bg-blue-700 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-1"
+                          className="bg-blue-600 text-white py-1.5 px-2 rounded-md text-xs font-medium hover:bg-blue-700 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-1"
                         >
                           <svg
                             className="w-3 h-3"
@@ -380,7 +426,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                               d="M12 4v16m8-8H4"
                             />
                           </svg>
-                          Add to List
+                          Add
                         </button>
 
                         {place.googleMapsUri && (
@@ -389,7 +435,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-green-600 text-white py-2 px-3 rounded-lg text-xs font-medium hover:bg-green-700 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-1"
+                            className="bg-green-600 text-white py-1.5 px-2 rounded-md text-xs font-medium hover:bg-green-700 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-1"
                           >
                             <svg
                               className="w-3 h-3"
@@ -410,7 +456,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                               />
                             </svg>
-                            View Maps
+                            Maps
                           </a>
                         )}
 
@@ -420,7 +466,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-gray-600 text-white py-2 px-3 rounded-lg text-xs font-medium hover:bg-gray-700 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-1"
+                            className="bg-gray-600 text-white py-1.5 px-2 rounded-md text-xs font-medium hover:bg-gray-700 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-1"
                           >
                             <svg
                               className="w-3 h-3"
@@ -435,7 +481,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                                 d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                               />
                             </svg>
-                            Website
+                            Web
                           </a>
                         )}
 
@@ -444,7 +490,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                             e.stopPropagation();
                             onSelectPlace(place);
                           }}
-                          className="bg-purple-600 text-white py-2 px-3 rounded-lg text-xs font-medium hover:bg-purple-700 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-1"
+                          className="bg-purple-600 text-white py-1.5 px-2 rounded-md text-xs font-medium hover:bg-purple-700 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-1"
                         >
                           <svg
                             className="w-3 h-3"
@@ -461,12 +507,6 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                           </svg>
                           Select
                         </button>
-                      </div>
-
-                      <div className="mt-auto pt-3 w-full text-center">
-                        <span className="text-xs text-gray-400">
-                          Click again to close
-                        </span>
                       </div>
                     </div>
                   )}

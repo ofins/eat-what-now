@@ -132,41 +132,26 @@ const Search = () => {
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
         <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-          <div className="py-3 lg:py-6">
-            <h1 className="text-lg lg:text-2xl font-bold text-gray-800 mb-3 lg:mb-4 text-center">
+          <div className="py-3 flex flex-col">
+            <h1 className="text-md lg:text-xl font-bold text-gray-800 mb-3 lg:mb-4 text-center">
               Restaurant Search
             </h1>
 
             {/* Search Input */}
-            <div className="relative max-w-2xl mx-auto">
-              <div className="absolute inset-y-0 left-0 pl-3 lg:pl-4 flex items-center pointer-events-none">
-                <svg
-                  className="h-4 w-4 lg:h-5 lg:w-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
+            <div className="relative mx-auto w-full">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Search restaurants, cuisine, location..."
-                className="block w-full pl-10 lg:pl-12 pr-2 sm:pr-32 py-2.5 lg:py-4 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm lg:text-base placeholder-gray-500"
+                className="block w-full pl-4 lg:pl-6 pr-2 sm:pr-32 py-2.5 lg:py-4 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm lg:text-base placeholder-gray-500 h-10"
               />
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 lg:pr-3">
                 <button
                   onClick={handleSearch}
                   disabled={!searchQuery.trim() || isSearching}
-                  className="bg-blue-600 text-white px-2 sm:px-4 py-2 lg:py-2.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors flex items-center gap-1 lg:gap-2"
+                  className="bg-blue-600 text-white px-2 sm:px-4 py-2 lg:py-2.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors flex items-center gap-1 lg:gap-2 h-8"
                 >
                   {isSearching ? (
                     <>
@@ -196,7 +181,7 @@ const Search = () => {
             </div>
 
             {/* Quick Filters */}
-            <div className="flex gap-2 lg:gap-3 overflow-x-auto pb-2 mt-3 lg:mt-4 max-w-4xl mx-auto">
+            <div className="flex gap-2 lg:gap-3 overflow-x-scroll mt-3 lg:mt-4 mx-auto w-full">
               {[
                 "Pizza",
                 "Sushi",
@@ -215,7 +200,7 @@ const Search = () => {
                     // Auto-search when filter is clicked
                     setTimeout(() => handleSearch(), 100);
                   }}
-                  className="flex-shrink-0 px-3 py-1.5 lg:px-4 lg:py-2 bg-gray-100 text-gray-700 rounded-full text-xs lg:text-sm font-medium hover:bg-blue-100 hover:text-blue-700 transition-colors whitespace-nowrap"
+                  className="flex-shrink-0 px-3 py-1.5 lg:px-4 lg:py-2 bg-gray-100 text-gray-700 rounded-full text-xs lg:text-xs font-medium hover:bg-blue-100 hover:text-blue-700 transition-colors whitespace-nowrap cursor-pointer"
                 >
                   {cuisine}
                 </button>

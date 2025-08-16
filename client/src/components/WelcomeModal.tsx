@@ -56,7 +56,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
       {/* Modal */}
       <div
         className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl transform transition-all duration-300 
-                   md:aspect-[16/9] max-md:min-h-[80vh] max-md:max-h-[90vh] max-md:overflow-y-auto md:overflow-hidden"
+                   md:aspect-[16/9] max-md:min-h-[80vh] max-md:max-h-[80vh] max-md:overflow-y-auto md:overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Scrollable content */}
@@ -77,10 +77,12 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
                   🚀 About This Project
                 </h2>
                 <p className="text-sm md:text-sm">
-                  This is an <strong>open-source project</strong> created by{" "}
-                  <span className="font-medium text-orange-600">ofins</span>.
-                  What started as a side project has evolved into a hobby that
-                  we're passionate about sharing with the community.
+                  This site helps you discover and share your favorite
+                  restaurants by leveraging the power of community
+                  contributions. EatWhatNow is an{" "}
+                  <strong>open-source project</strong> created by{" "}
+                  <span className="font-medium text-orange-600">ofins</span> and
+                  all restaurants are contributed by users like you.
                 </p>
               </div>
 
@@ -96,7 +98,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
                 </p>
               </div>
 
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 md:p-6 rounded-xl border border-green-100">
+              {/* <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 md:p-6 rounded-xl border border-green-100">
                 <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-3">
                   💚 Non-Profit Initiative
                 </h2>
@@ -105,7 +107,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
                   here to make money – we're here to help you discover amazing
                   food experiences and build a community of food lovers.
                 </p>
-              </div>
+              </div> */}
 
               <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-4 md:p-6 rounded-xl border border-purple-100">
                 <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-3">
@@ -118,16 +120,17 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
                 </p>
                 <ul className="list-disc list-inside space-y-1 md:space-y-2 ml-4 text-xs md:text-xs">
                   <li>
-                    <strong>User levels</strong> based on contributions
+                    ⭐ <strong>User levels</strong> based on contributions
                   </li>
                   <li>
-                    <strong>Achievement badges</strong> for different milestones
+                    🔰 <strong>Achievement badges</strong> for different
+                    milestones
                   </li>
                   <li>
-                    <strong>Community challenges</strong> and food quests
+                    🥠 <strong>Community challenges</strong> and food quests
                   </li>
                   <li>
-                    <strong>Leaderboards</strong> for top contributors
+                    🏆 <strong>Leaderboards</strong> for top contributors
                   </li>
                 </ul>
               </div>
@@ -137,10 +140,10 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
                   🌟 Get Started
                 </h2>
                 <p className="text-sm md:text-sm">
-                  Ready to explore? Start by browsing restaurants, adding your
-                  favorites, or contributing new discoveries to help fellow food
-                  enthusiasts. Every review, rating, and recommendation helps
-                  build our community!
+                  Ready to explore? Start by browsing restaurants! Sign-in to
+                  add your favorites, or contribute new discoveries to help
+                  fellow food enthusiasts. Every review, rating, and
+                  recommendation helps build our community!
                 </p>
               </div>
             </div>

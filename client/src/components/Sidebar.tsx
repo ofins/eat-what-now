@@ -379,7 +379,7 @@ const Sidebar = ({
                 <li>
                   <button
                     onClick={handleLogout}
-                    className={`flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-300 w-full text-left ${
+                    className={`flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-300 w-full text-left cursor-pointer ${
                       isExpanded
                         ? "px-4 py-3"
                         : "px-4 lg:px-2 py-3 lg:py-2 lg:flex-col lg:text-center"
@@ -495,7 +495,7 @@ const Sidebar = ({
               }}
               className="block w-full bg-gradient-to-r from-red-500 to-red-600 text-white text-center py-2.5 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-sm font-medium text-sm"
             >
-              <div className="flex items-center justify-center gap-2">
+              <div className="flex items-center justify-center gap-2 cursor-pointer">
                 <span className="text-xs">🍴</span>
                 <span>About EWN</span>
               </div>
