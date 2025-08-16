@@ -8,6 +8,9 @@
 - [ ] Add user contribution stats
   - number of restaurants created
   - levels based on added restaurants, interactions, comments, people who liked his/her restaurants
+- save avatar emoji to DB
+- allow more dynamic sorting of restaurants such as by: type, different locations, most rated, etc
+- allow users to interact with each other such as sending messages? spend community points.
 
 ## Bug Issues
 

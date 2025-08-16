@@ -1,3 +1,7 @@
+### 16th
+
+- fix `restaurant.repo` so that `findByUserId` will sort restaurants from closest to location to farthest
+
 ### 14th
 
 - add `comments` column in `restaurants` table and index table `users` id

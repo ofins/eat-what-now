@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { useAuth } from "../hooks/useAuth";
+import { useAvatar } from "../hooks/useAvatar";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ const Sidebar = ({
   onShowWelcomeModal,
 }: SidebarProps) => {
   const { isLoggedIn } = useAuth();
+  const { selectedAvatar } = useAvatar();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   // Close sidebar when clicking outside
@@ -447,11 +449,14 @@ const Sidebar = ({
         >
           {isLoggedIn ? (
             <div className="flex items-center bg-gray-50 rounded-lg p-4">
-              <img
+              {/* <img
                 src="/profile.svg"
                 alt="Profile"
                 className="w-10 h-10 bg-gray-200 p-2 rounded-full"
-              />
+              /> */}
+              <div className="w-10 h-10 bg-gray-200 p-2 rounded-full flex justify-center items-center">
+                {selectedAvatar}
+              </div>
               <div className="ml-3">
                 <div className="text-sm font-medium text-gray-900">
                   Logged in

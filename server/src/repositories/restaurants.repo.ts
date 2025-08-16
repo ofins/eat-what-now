@@ -111,23 +111,28 @@ export class RestaurantsRepository {
       r.*,
       ru.upvoted as user_upvoted,
       ru.favorited as user_favorited,
-      ru.comment as user_comment
+      ru.comment as user_comment`;
+
+    if (options?.longitude && options?.latitude) {
+      query += `,
+      ST_Distance(
+        ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography,
+        ST_SetSRID(ST_MakePoint($${2}, $${3}), 4326)::geography
+      ) / 1000.0 as distance_km`;
+    }
+
+    query += `
     FROM ${TABLE_NAME} r
     LEFT JOIN restaurant_user ru ON r.id = ru.restaurant_id AND ru.user_id = $1
     WHERE 1=1`;
+
     const params: unknown[] = [userId];
 
-    if (options) {
-      // Apply any filtering or pagination based on the options
-      if (options.radius && options.longitude && options.latitude) {
-        query += ` AND ST_DWithin(
-        ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography, 
-        ST_SetSRID(ST_MakePoint($${params.length + 1}, $${params.length + 2}), 4326)::geography, 
-        $${params.length + 3}
-      )`;
-        params.push(options.longitude, options.latitude, options.radius * 1000); // Convert km to meters
-      }
+    if (options?.longitude && options?.latitude) {
+      params.push(options.longitude, options.latitude);
+    }
 
+    if (options) {
       if (options.priceRange) {
         query += ` AND price_range = $${params.length + 1}`;
         params.push(options.priceRange);
@@ -137,7 +142,15 @@ export class RestaurantsRepository {
         query += ` AND rating >= $${params.length + 1}`;
         params.push(options.minRating);
       }
+    }
 
+    if (options?.longitude && options?.latitude) {
+      query += ` ORDER BY distance_km ASC`;
+    } else {
+      query += ` ORDER BY r.created_at DESC`;
+    }
+
+    if (options) {
       if (options.limit) {
         query += ` LIMIT $${params.length + 1}`;
         params.push(options.limit);
