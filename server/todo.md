@@ -11,6 +11,7 @@
 - save avatar emoji to DB
 - allow more dynamic sorting of restaurants such as by: type, different locations, most rated, etc
 - allow users to interact with each other such as sending messages? spend community points.
+- created restaurants frame looks different based on contributor lvl
 
 ## Bug Issues
 
@@ -32,6 +33,7 @@
 - [ ] Feeds should start with restaurants closest to user and expand outward with no limits
 - [ ] Combine server Zod schema with frontend
 - [ ] When inputting restaurant to DB, this should be logged so it can be used as analytics in the future
+- [ ] Setup SSO login with Google
 - [x] For like, favorite, comments to work, `feeds` need to be able to be tied to user so user know which restaurants he liked/disliked
 - [x] Setup API for adding restaurant through link
 - [x] Add `contributed_username` and `google_id` column for `restaurant` table
