@@ -1,28 +1,39 @@
+import { useLogin } from "@ofins/client";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
 import { Link } from "react-router";
 import { login as loginAsync } from "../../api/auth";
-import { useAuth } from "../../hooks/useAuth";
 import "./Auth.css";
 
 const Login = () => {
-  const { login } = useAuth(); // Assuming useAuth is defined in your hooks
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  // const navigate = useNavigate(); // Use useNavigate from react-router
-
   const mutation = useMutation({
     mutationFn: loginAsync,
-    onSuccess: (data) => {
-      login(data.token);
-      console.log("Login successful:", data);
-    },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    mutation.mutate({ email, password });
-  };
+  const {
+    credentials,
+    setEmail,
+    setPassword,
+    handleSubmit,
+    isLoading,
+    errors,
+    isValid,
+    isLoggedIn,
+  } = useLogin({
+    onLogin: async ({ email, password }) => {
+      const data = await mutation.mutateAsync({ email, password });
+      return data.token;
+    },
+    validate({ email, password }) {
+      const errors: Record<string, string> = {};
+      if (!email) {
+        errors.email = "Email is required";
+      }
+      if (!password) {
+        errors.password = "Password is required";
+      }
+      return Object.keys(errors).length ? errors : null;
+    },
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-2 flex items-center justify-center">
@@ -77,7 +88,7 @@ const Login = () => {
                       name="email"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter your email"
-                      value={email}
+                      value={credentials.email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
@@ -96,7 +107,7 @@ const Login = () => {
                       name="password"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter your password"
-                      value={password}
+                      value={credentials.password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
@@ -105,18 +116,18 @@ const Login = () => {
                   <button
                     type="submit"
                     className="w-full bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold py-2 px-4 rounded-md transition-colors duration-200"
-                    disabled={mutation.isPending}
+                    disabled={isLoading || !isValid}
                   >
-                    {mutation.isPending ? "Signing in..." : "Sign In"}
+                    {isLoading ? "Signing in..." : "Sign In"}
                   </button>
 
-                  {mutation.isError && (
+                  {errors && (
                     <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-md text-xs">
-                      {(mutation.error as Error).message}
+                      {errors.message}
                     </div>
                   )}
 
-                  {mutation.isSuccess && (
+                  {isLoggedIn && (
                     <div className="bg-green-50 border border-green-200 text-green-600 px-3 py-2 rounded-md text-xs">
                       Login successful! Redirecting...
                     </div>
@@ -186,7 +197,7 @@ const Login = () => {
                       name="email"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter your email"
-                      value={email}
+                      value={credentials.email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
@@ -205,7 +216,7 @@ const Login = () => {
                       name="password"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter your password"
-                      value={password}
+                      value={credentials.password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
@@ -214,18 +225,18 @@ const Login = () => {
                   <button
                     type="submit"
                     className="w-full bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold py-2.5 px-4 rounded-md transition-colors duration-200 mt-4"
-                    disabled={mutation.isPending}
+                    disabled={isLoading || !isValid}
                   >
-                    {mutation.isPending ? "Signing in..." : "Sign In"}
+                    {isLoading ? "Signing in..." : "Sign In"}
                   </button>
 
-                  {mutation.isError && (
+                  {errors.message && (
                     <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-md text-xs mt-2">
-                      {(mutation.error as Error).message}
+                      {errors.message}
                     </div>
                   )}
 
-                  {mutation.isSuccess && (
+                  {isLoggedIn && (
                     <div className="bg-green-50 border border-green-200 text-green-600 px-3 py-2 rounded-md text-xs mt-2">
                       Login successful! Redirecting...
                     </div>

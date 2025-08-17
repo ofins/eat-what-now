@@ -1,5 +1,5 @@
+import { useAuth } from "@ofins/client";
 import { Link } from "react-router";
-import { useAuth } from "../hooks/useAuth";
 
 interface HeaderProps {
   onToggleSidebar: () => void;

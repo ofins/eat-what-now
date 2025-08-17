@@ -1,6 +1,6 @@
+import { useAuth } from "@ofins/client";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router";
-import { useAuth } from "../hooks/useAuth";
 import { useAvatar } from "../hooks/useAvatar";
 
 interface SidebarProps {

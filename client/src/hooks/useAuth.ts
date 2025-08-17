@@ -1,41 +1,21 @@
+import { createAuth } from "@ofins/client";
 import { useEffect, useState } from "react";
 
 export const useAuth = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    return !!localStorage.getItem("token");
-  });
+  const auth = createAuth();
+  const [isLoggedIn, setIsLoggedIn] = useState(auth.getAuthState());
 
   useEffect(() => {
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === "token") {
-        setIsLoggedIn(!!event.newValue);
-      }
-    };
+    const unsubscribe = auth.subscribe((loggedIn) => {
+      setIsLoggedIn(loggedIn);
+    });
 
-    const handleAuthChange = () => {
-      setIsLoggedIn(!!localStorage.getItem("token"));
-    };
+    return () => unsubscribe(); // Cleanup on unmount
+  }, [auth]);
 
-    window.addEventListener("storage", handleStorageChange);
-    window.addEventListener("auth-change", handleAuthChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("auth-change", handleAuthChange);
-    };
-  });
-
-  const login = (token: string) => {
-    localStorage.setItem("token", token);
-    setIsLoggedIn(true);
-    window.dispatchEvent(new Event("auth-change"));
+  return {
+    isLoggedIn,
+    login: (token: string) => auth.login(token),
+    logout: () => auth.logout(),
   };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-    window.dispatchEvent(new Event("auth-change"));
-  };
-
-  return { isLoggedIn, logout, login };
 };
