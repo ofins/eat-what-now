@@ -35,6 +35,8 @@ const Login = () => {
     },
   });
 
+  console.log(errors.message);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-2 flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-md w-full max-w-4xl overflow-hidden">
@@ -121,7 +123,7 @@ const Login = () => {
                     {isLoading ? "Signing in..." : "Sign In"}
                   </button>
 
-                  {errors && (
+                  {errors.message && (
                     <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-md text-xs">
                       {errors.message}
                     </div>
