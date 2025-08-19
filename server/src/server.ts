@@ -31,7 +31,7 @@ export async function startServer() {
     ).default;
 
     const app = express();
-    const port = process.env.PORT || 3000;
+    const port = parseInt(process.env.PORT as string) || 3000;
 
     app.use('/docs', swaggerUiHandler, swaggerUiSetup);
     app.use(cors());
@@ -58,8 +58,8 @@ export async function startServer() {
       await serveMarkdownFile('src/todo.md', res);
     });
 
-    app.listen(port, () => {
-      logger.info(`App listening on port ${port}`);
+    app.listen(port, '127.0.0.1', () => {
+      logger.info(`App listening on http://localhost:${port}`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);
