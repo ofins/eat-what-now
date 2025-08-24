@@ -4,7 +4,7 @@ export interface IUser {
   id: string;
   email: string;
   username: string;
-  password_hash: string;
+  password_hash?: string;
   full_name?: string;
   avatar_url?: string;
   is_active: boolean;
@@ -28,7 +28,7 @@ export type CreateUser = Omit<IUser, "id">;
 export interface CreateUserDto {
   email: string;
   username: string;
-  password_hash: string;
+  password_hash?: string;
   full_name?: string;
 }
 

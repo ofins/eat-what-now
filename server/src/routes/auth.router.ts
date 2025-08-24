@@ -9,6 +9,7 @@ import {
 const router = express.Router();
 
 const usersController = container.resolve(InjectionTokens.usersController);
+const googleController = container.resolve(InjectionTokens.googleController);
 
 router.post(
   '/login',
@@ -21,6 +22,8 @@ router.post(
   validateCreateUser,
   usersController.registerUser.bind(usersController)
 );
+
+router.post('/auth/google', googleController.googleAuth.bind(googleController));
 
 export default router;
 

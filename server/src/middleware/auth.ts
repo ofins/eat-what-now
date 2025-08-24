@@ -85,6 +85,7 @@ export const checkOptionalToken = (
     next();
   }
 };
+
 export const signToken = (user: string | object): string => {
   const secret = process.env.JWT_SECRET;
   if (!secret)

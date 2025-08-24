@@ -9,6 +9,7 @@ import logger from 'src/log/logger';
 import { RestaurantUserRepository } from 'src/repositories/restaurant-user.repo';
 import { RestaurantsRepository } from 'src/repositories/restaurants.repo';
 import { UsersRepository } from 'src/repositories/users.repo';
+import { AuthService } from 'src/services/auth.service';
 import { RestaurantUserService } from 'src/services/restaurant-user.service';
 import { RestaurantsService } from 'src/services/restaurants.service';
 import { UsersService } from 'src/services/users.service';
@@ -51,6 +52,7 @@ export function initContainer() {
       .asClass(GoogleController)
       .singleton(),
     [InjectionTokens.usersService]: awilix.asClass(UsersService).singleton(),
+    [InjectionTokens.authService]: awilix.asClass(AuthService).singleton(),
 
     [InjectionTokens.logger]: awilix.asValue(logger),
   });

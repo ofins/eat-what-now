@@ -9,6 +9,7 @@ export enum InjectionTokens {
   usersRepository = 'usersRepository',
   usersService = 'usersService',
   usersController = 'usersController',
+  authService = 'authService',
   logger = 'logger',
   configService = 'configService',
   googleController = 'googleController',

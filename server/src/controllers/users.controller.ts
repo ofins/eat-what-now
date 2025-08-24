@@ -2,12 +2,13 @@ import { AuthRequest } from '@ewn/types/auth.type';
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { Logger } from 'src/log/logger';
-import { signToken } from 'src/middleware/auth';
+import { AuthService } from 'src/services/auth.service';
 import { UsersService } from '../services/users.service';
 
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
+    private readonly authService: AuthService,
     private readonly logger: Logger
   ) {
     this.getUsers = this.getUsers.bind(this);
@@ -63,7 +64,7 @@ export class UsersController {
     this.usersService
       .findUserByEmail(email)
       .then((user) => {
-        if (!user) {
+        if (!user || !user.password_hash) {
           res.status(401).json({ error: 'Invalid credentials' });
           return;
         }
@@ -73,7 +74,7 @@ export class UsersController {
             res.status(401).json({ error: 'Invalid credentials' });
             return;
           }
-          const token = signToken({ user_id: user.id });
+          const token = this.authService.signToken({ user_id: user.id });
           res.json({
             data: {
               id: user.id,

@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { OAuth2Client, TokenPayload } from 'google-auth-library';
 import logger from 'src/log/logger';
 
 dotenv.config();
@@ -69,4 +70,17 @@ export const searchGooglePlacesByText = async (
   );
   const data = await response.json();
   return data;
+};
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+export const verifyGoogleAuth = async (
+  token: string
+): Promise<TokenPayload | undefined> => {
+  const ticket = await googleClient.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  return ticket.getPayload();
 };
