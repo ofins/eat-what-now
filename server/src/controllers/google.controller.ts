@@ -30,15 +30,15 @@ export class GoogleController {
   }
 
   async googleAuth(req: Request, res: Response): Promise<void> {
-    const { token } = req.body;
+    const { credential } = req.body;
 
-    if (!token) {
+    if (!credential) {
       res.status(400).send({ error: 'Google token is required' });
       return;
     }
 
     try {
-      const userData = await verifyGoogleAuth(token);
+      const userData = await verifyGoogleAuth(credential);
 
       if (!userData || !userData.email) {
         res.status(401).send({ error: 'Invalid Google token' });
@@ -64,13 +64,15 @@ export class GoogleController {
         });
 
         // Generate JWT token
-        const jwtToken = this.authService.signToken({ user_id: newUser.id });
+        const token = this.authService.signToken({ user_id: newUser.id });
 
-        res.send({ data: newUser, token: jwtToken });
+        res.json({ data: newUser, token });
         return;
       }
 
-      res.send({ data: userData });
+      const token = this.authService.signToken({ user_id: user.id });
+
+      res.json({ data: userData, token });
     } catch (error) {
       this.logger.error(`Error verifying Google token: ${error}`);
       res.status(500).send({ error: 'Internal Server Error' });

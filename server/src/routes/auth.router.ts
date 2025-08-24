@@ -23,7 +23,7 @@ router.post(
   usersController.registerUser.bind(usersController)
 );
 
-router.post('/auth/google', googleController.googleAuth.bind(googleController));
+router.post('/google', googleController.googleAuth.bind(googleController));
 
 export default router;
 
@@ -111,6 +111,46 @@ export default router;
  *         description: Missing or invalid registration info
  *       409:
  *         description: Email already registered
+ *       500:
+ *         description: Internal server error
+ *
+ * /auth/google:
+ *   post:
+ *     summary: Google authentication
+ *     description: Authenticates a user with Google and returns a JWT token.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - id_token
+ *             properties:
+ *               id_token:
+ *                 type: string
+ *                 example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+ *     responses:
+ *       200:
+ *         description: Google authentication successful, returns user and JWT token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/UserLoginSchema'
+ *                     token:
+ *                       type: string
+ *       400:
+ *         description: Missing id_token
+ *       401:
+ *         description: Invalid id_token
  *       500:
  *         description: Internal server error
  */

@@ -20,7 +20,7 @@ const Sidebar = ({
   onCloseExpanded,
   onShowWelcomeModal,
 }: SidebarProps) => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, logout } = useAuth();
   const { selectedAvatar } = useAvatar();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -56,7 +56,7 @@ const Sidebar = ({
   }, [isOpen]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     window.location.href = "/login";
     onClose();
   };

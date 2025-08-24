@@ -1,4 +1,4 @@
-import { useLogin } from "@ofins/client";
+import { GoogleLogin, useLogin } from "@ofins/client";
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { login as loginAsync } from "../../api/auth";
@@ -145,6 +145,9 @@ const Login = () => {
                     </Link>
                   </p>
                 </div>
+                <GoogleLogin
+                  endpoint={`${import.meta.env.VITE_API_BASE_URL}/auth/google`}
+                />
               </div>
             </div>
           </div>
@@ -254,6 +257,9 @@ const Login = () => {
                     </Link>
                   </p>
                 </div>
+                <GoogleLogin
+                  endpoint={`${import.meta.env.VITE_API_BASE_URL}/auth/google`}
+                />
               </div>
             </div>
           </div>

@@ -27,8 +27,5 @@
     "client",
     "server",
     "packages/*"
-  ],
-  "dependencies": {
-    "@ofins/client": "^0.6.0"
-  }
+  ]
 }
