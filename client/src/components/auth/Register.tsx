@@ -1,21 +1,61 @@
+import { useRegister } from "@ofins/client";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
 import { Link } from "react-router";
 import { register } from "../../api/auth";
 import "./Auth.css";
 
+interface RegisterResponse {
+  token: string;
+  user?: unknown;
+}
+
 const Register = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullname, setFullname] = useState("");
+  const {
+    credentials,
+    setEmail,
+    setPassword,
+    setUsername,
+    setFirstName,
+    setLastName,
+    handleSubmit,
+    isLoading,
+    errors,
+  } = useRegister({
+    onRegister: async ({ email, password, firstName, username, lastName }) => {
+      if (!email || !password || !firstName || !username || !lastName) {
+        throw new Error("All fields are required");
+      }
+
+      const fullname = `${firstName} ${lastName}`;
+
+      try {
+        const response = await mutation.mutateAsync({
+          email,
+          password,
+          username,
+          fullname,
+        });
+
+        // The response is already parsed JSON from httpClient
+        return (response as unknown as RegisterResponse).token;
+      } catch (error) {
+        console.error("Registration error:", error);
+        throw error;
+      }
+    },
+    validate({ email, password }) {
+      const errors: Record<string, string> = {};
+      if (!email) {
+        errors.email = "Email is required";
+      }
+      if (!password) {
+        errors.password = "Password is required";
+      }
+      return Object.keys(errors).length ? errors : null;
+    },
+  });
 
   const mutation = useMutation({ mutationFn: register });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    mutation.mutate({ username, email, password, fullname });
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-2 flex items-center justify-center">
@@ -70,7 +110,7 @@ const Register = () => {
                       name="username"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="Choose a username"
-                      value={username}
+                      value={credentials.username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
                     />
@@ -89,7 +129,7 @@ const Register = () => {
                       name="email"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="Enter your email"
-                      value={email}
+                      value={credentials.email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
@@ -97,19 +137,37 @@ const Register = () => {
 
                   <div>
                     <label
-                      htmlFor="fullname"
+                      htmlFor="firstName"
                       className="block text-xs font-medium text-gray-700 mb-1"
                     >
-                      Full Name
+                      First Name
                     </label>
                     <input
                       type="text"
-                      id="fullname"
-                      name="fullname"
+                      id="firstName"
+                      name="firstName"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="Enter your first name"
+                      value={credentials.firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="lastName"
+                      className="block text-xs font-medium text-gray-700 mb-1"
+                    >
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      id="lastName"
+                      name="lastName"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="Enter your full name"
-                      value={fullname}
-                      onChange={(e) => setFullname(e.target.value)}
+                      value={credentials.lastName}
+                      onChange={(e) => setLastName(e.target.value)}
                       required
                     />
                   </div>
@@ -127,7 +185,7 @@ const Register = () => {
                       name="password"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="Create a strong password"
-                      value={password}
+                      value={credentials.password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
@@ -136,16 +194,14 @@ const Register = () => {
                   <button
                     type="submit"
                     className="w-full bg-green-500 hover:bg-green-600 text-white text-xs font-semibold py-2 px-4 rounded-md transition-colors duration-200 mt-4"
-                    disabled={mutation.isPending}
+                    disabled={isLoading}
                   >
-                    {mutation.isPending
-                      ? "Creating Account..."
-                      : "Create Account"}
+                    {isLoading ? "Creating Account..." : "Create Account"}
                   </button>
 
-                  {mutation.isError && (
+                  {errors.message && (
                     <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-md text-xs">
-                      {(mutation.error as Error).message}
+                      {errors.message}
                     </div>
                   )}
 
@@ -174,7 +230,7 @@ const Register = () => {
 
         {/* Mobile Layout - Same theme as desktop */}
         <div className="block lg:hidden">
-          <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 flex items-start justify-center">
+          <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 flex items-start` justify-center">
             <div className="bg-white rounded-lg shadow-md w-full max-w-sm overflow-hidden">
               {/* Header Section with green gradient */}
               <div className="bg-gradient-to-r from-green-500 to-green-600 p-4 text-center">
@@ -205,7 +261,13 @@ const Register = () => {
                   Create Account
                 </h3>
 
-                <form onSubmit={handleSubmit} className="space-y-3">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmit();
+                  }}
+                  className="space-y-3"
+                >
                   <div>
                     <label
                       htmlFor="username-mobile"
@@ -219,7 +281,7 @@ const Register = () => {
                       name="username"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="Choose a username"
-                      value={username}
+                      value={credentials.username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
                     />
@@ -238,7 +300,7 @@ const Register = () => {
                       name="email"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="Enter your email"
-                      value={email}
+                      value={credentials.email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
@@ -246,19 +308,37 @@ const Register = () => {
 
                   <div>
                     <label
-                      htmlFor="fullname-mobile"
+                      htmlFor="firstName-mobile"
                       className="block text-xs font-medium text-gray-700 mb-1"
                     >
-                      Full Name
+                      First Name
                     </label>
                     <input
                       type="text"
-                      id="fullname-mobile"
-                      name="fullname"
+                      id="firstName-mobile"
+                      name="firstName"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      placeholder="Enter your full name"
-                      value={fullname}
-                      onChange={(e) => setFullname(e.target.value)}
+                      placeholder="Enter your first name"
+                      value={credentials.firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="lastName-mobile"
+                      className="block text-xs font-medium text-gray-700 mb-1"
+                    >
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      id="lastName-mobile"
+                      name="lastName"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="Enter your last name"
+                      value={credentials.lastName}
+                      onChange={(e) => setLastName(e.target.value)}
                       required
                     />
                   </div>
@@ -276,7 +356,7 @@ const Register = () => {
                       name="password"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="Create a strong password"
-                      value={password}
+                      value={credentials.password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
@@ -285,16 +365,14 @@ const Register = () => {
                   <button
                     type="submit"
                     className="w-full bg-green-500 hover:bg-green-600 text-white text-xs font-semibold py-2.5 px-4 rounded-md transition-colors duration-200 mt-4"
-                    disabled={mutation.isPending}
+                    disabled={isLoading}
                   >
-                    {mutation.isPending
-                      ? "Creating Account..."
-                      : "Create Account"}
+                    {isLoading ? "Creating Account..." : "Create Account"}
                   </button>
 
-                  {mutation.isError && (
+                  {errors.message && (
                     <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-md text-xs mt-2">
-                      {(mutation.error as Error).message}
+                      {errors.message}
                     </div>
                   )}
 

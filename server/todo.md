@@ -19,6 +19,7 @@
 - [ ] Application shuts down if errors are thrown in creating DB (5.30.2025)
   - `try/catch` blocks are used and issue still occurs
 - [x] Docker compose up throwing error (5.17.2025)
+- [ ] Limit how many restaurants each user can add per month
 
 ## Backend Development
 
@@ -33,6 +34,7 @@
 - [ ] Feeds should start with restaurants closest to user and expand outward with no limits
 - [ ] Combine server Zod schema with frontend
 - [ ] When inputting restaurant to DB, this should be logged so it can be used as analytics in the future
+- [ ] Encrypt payload
 - [ ] Setup SSO login with Google
 - [x] For like, favorite, comments to work, `feeds` need to be able to be tied to user so user know which restaurants he liked/disliked
 - [x] Setup API for adding restaurant through link
