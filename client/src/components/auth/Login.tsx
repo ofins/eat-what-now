@@ -145,9 +145,11 @@ const Login = () => {
                     </Link>
                   </p>
                 </div>
-                <GoogleLogin
-                  endpoint={`${import.meta.env.VITE_API_BASE_URL}/auth/google`}
-                />
+                <div className="flex w-full justify-center mt-5">
+                  <GoogleLogin
+                    endpoint={`${import.meta.env.VITE_API_BASE_URL}/auth/google`}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -257,9 +259,11 @@ const Login = () => {
                     </Link>
                   </p>
                 </div>
-                <GoogleLogin
-                  endpoint={`${import.meta.env.VITE_API_BASE_URL}/auth/google`}
-                />
+                <div className="flex justify-center mt-3">
+                  <GoogleLogin
+                    endpoint={`${import.meta.env.VITE_API_BASE_URL}/auth/google`}
+                  />
+                </div>
               </div>
             </div>
           </div>
