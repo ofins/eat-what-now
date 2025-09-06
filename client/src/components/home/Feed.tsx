@@ -6,7 +6,9 @@ import {
 } from "../../api/restaurants-user";
 import { useLocation } from "../../hooks/useLocation";
 import CommentsModal from "./components/CommentsModal";
+import ErrorSVG from "./components/ErrorSVG";
 import RestaurantCard from "./components/RestaurantCard";
+import SpinnerSVG from "./components/SpinnerSVG";
 import { useFeedData } from "./hooks/useFeedData";
 import { useRestaurantInteractions } from "./hooks/useRestaurantInteractions";
 
@@ -15,11 +17,17 @@ interface Props {
 }
 
 const Feed = ({ isLoggedIn = false }: Props) => {
-  const { location } = useLocation();
+  const {
+    location,
+    loading: locationLoading,
+    error: locationError,
+    refreshLocation,
+  } = useLocation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isNextButtonPressed, setIsNextButtonPressed] = useState(false);
   const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
 
+  console.log({ location, locationLoading, locationError });
   const {
     restaurants,
     isLoading,
@@ -164,6 +172,41 @@ const Feed = ({ isLoggedIn = false }: Props) => {
     !isFetchingNextPage
   ) {
     fetchNextPage();
+  }
+
+  // Location loading and error states
+  if (locationLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen text-xs">
+        <div className="mb-4">
+          <SpinnerSVG />
+        </div>
+        <p>Getting your location...</p>
+        <p className="text-gray-500 mt-2">
+          This helps us show restaurants near you
+        </p>
+      </div>
+    );
+  }
+
+  if (locationError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen text-xs">
+        <div className="mb-4 text-red-500">
+          <ErrorSVG />
+        </div>
+        <p className="text-red-500 mb-2">{locationError}</p>
+        <button
+          onClick={refreshLocation}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          Try Again
+        </button>
+        <p className="text-gray-500 mt-2 text-center">
+          You can also manually enable location access in your browser settings
+        </p>
+      </div>
+    );
   }
 
   // Loading and error states
