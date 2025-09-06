@@ -1,10 +1,10 @@
+import { useLocation } from "@ofins/client/react";
 import { useCallback, useEffect, useState } from "react";
 import {
   toggleFavorite,
   toggleUpvote,
   updateRating,
 } from "../../api/restaurants-user";
-import { useLocation } from "../../hooks/useLocation";
 import CommentsModal from "./components/CommentsModal";
 import ErrorSVG from "./components/ErrorSVG";
 import RestaurantCard from "./components/RestaurantCard";
@@ -21,13 +21,14 @@ const Feed = ({ isLoggedIn = false }: Props) => {
     location,
     loading: locationLoading,
     error: locationError,
-    refreshLocation,
-  } = useLocation();
+    refresh,
+  } = useLocation({
+    autoFetch: true,
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isNextButtonPressed, setIsNextButtonPressed] = useState(false);
   const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
 
-  console.log({ location, locationLoading, locationError });
   const {
     restaurants,
     isLoading,
@@ -195,9 +196,13 @@ const Feed = ({ isLoggedIn = false }: Props) => {
         <div className="mb-4 text-red-500">
           <ErrorSVG />
         </div>
-        <p className="text-red-500 mb-2">{locationError}</p>
+        <p className="text-red-500 mb-2">
+          {locationError instanceof Error
+            ? locationError.message
+            : String(locationError)}
+        </p>
         <button
-          onClick={refreshLocation}
+          onClick={refresh}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
         >
           Try Again

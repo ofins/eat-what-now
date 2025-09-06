@@ -1,9 +1,9 @@
 import type { RestaurantGoogleDetails } from "@ewn/types/restaurants.type";
 import type { IUser } from "@ewn/types/users.type";
+import { useLocation } from "@ofins/client/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { createRestaurant, searchRestaurantsByText } from "../api/restaurants";
-import { useLocation } from "../hooks/useLocation";
 import SearchResultList, { type SearchResult } from "./google/SearchResultList";
 
 const googlePriceLevelToNum = (priceLevel: string | undefined): number => {

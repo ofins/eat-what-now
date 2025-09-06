@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect } from "react";
 import Feed from "./Feed";
 
 export interface ILocation {
@@ -20,13 +19,6 @@ const Home = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 const withAuth = (WrappedComponent: React.ComponentType<any>) => {
   return (props: any) => {
     const isLoggedIn = localStorage.getItem("token") !== null;
-
-    useEffect(() => {
-      if (isLoggedIn) {
-        console.log("User is logged in");
-      }
-    }, [isLoggedIn]);
-
     return <WrappedComponent {...props} isLoggedIn={isLoggedIn} />;
   };
 };
