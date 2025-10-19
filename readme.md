@@ -2,7 +2,17 @@
 
 This repository contains both the **backend server** and **frontend client** projects for the Eat What Now application.
 
+## Overview
+
 ## Project Structure
+
+### Demo Video
+
+[![Watch the demo video](https://img.youtube.com/vi/fVNt2ssuDY8/maxresdefault.jpg)](https://www.youtube.com/watch?v=fVNt2ssuDY8)
+
+_Click the image above to watch the demo video on YouTube_
+
+![Image](./media/image.png)
 
 - **/server**: Node.js/TypeScript backend API
 
