@@ -20,7 +20,7 @@ const Sidebar = ({
   onCloseExpanded,
   onShowWelcomeModal,
 }: SidebarProps) => {
-  const { isLoggedIn, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const { selectedAvatar } = useAvatar();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -260,7 +260,7 @@ const Sidebar = ({
               </Link>
             </li>
 
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <>
                 <li>
                   <Link
@@ -447,7 +447,7 @@ const Sidebar = ({
             isExpanded ? "" : "lg:hidden"
           }`}
         >
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <div className="flex items-center bg-gray-50 rounded-lg p-4">
               {/* <img
                 src="/profile.svg"

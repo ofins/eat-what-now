@@ -17,11 +17,14 @@ const Login = () => {
     isLoading,
     errors,
     isValid,
-    isLoggedIn,
+    isAuthenticated,
   } = useLogin({
     onLogin: async ({ email, password }) => {
       const data = await mutation.mutateAsync({ email, password });
-      return data.token;
+      return { token: data.token, user: data.data };
+    },
+    onSuccess: () => {
+      window.location.href = "/";
     },
     validate({ email, password }) {
       const errors: Record<string, string> = {};
@@ -90,6 +93,7 @@ const Login = () => {
                       placeholder="Enter your email"
                       value={credentials.email}
                       onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="email"
                       required
                     />
                   </div>
@@ -105,6 +109,7 @@ const Login = () => {
                       type="password"
                       id="password"
                       name="password"
+                      autoComplete="password"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter your password"
                       value={credentials.password}
@@ -127,7 +132,7 @@ const Login = () => {
                     </div>
                   )}
 
-                  {isLoggedIn && (
+                  {isAuthenticated && (
                     <div className="bg-green-50 border border-green-200 text-green-600 px-3 py-2 rounded-md text-xs">
                       Login successful! Redirecting...
                     </div>
@@ -219,6 +224,7 @@ const Login = () => {
                       type="password"
                       id="password-mobile"
                       name="password"
+                      autoComplete="password"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter your password"
                       value={credentials.password}
@@ -241,7 +247,7 @@ const Login = () => {
                     </div>
                   )}
 
-                  {isLoggedIn && (
+                  {isAuthenticated && (
                     <div className="bg-green-50 border border-green-200 text-green-600 px-3 py-2 rounded-md text-xs mt-2">
                       Login successful! Redirecting...
                     </div>

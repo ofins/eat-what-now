@@ -18,7 +18,7 @@ const Home = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 
 const withAuth = (WrappedComponent: React.ComponentType<any>) => {
   return (props: any) => {
-    const isLoggedIn = localStorage.getItem("token") !== null;
+    const isLoggedIn = localStorage.getItem("auth_access_token") !== null;
     return <WrappedComponent {...props} isLoggedIn={isLoggedIn} />;
   };
 };

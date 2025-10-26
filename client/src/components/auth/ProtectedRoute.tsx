@@ -13,13 +13,13 @@ const ProtectedRoute = ({
   redirectTo = "/",
   requireAuth = true,
 }: ProtectedRouteProps) => {
-  const { isLoggedIn } = useAuth(); // Assuming useAuth is a custom hook that provides authentication status
+  const { isAuthenticated } = useAuth(); // Assuming useAuth is a custom hook that provides authentication status
 
-  if (requireAuth && !isLoggedIn) {
+  if (requireAuth && !isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!requireAuth && isLoggedIn) {
+  if (!requireAuth && isAuthenticated) {
     return <Navigate to={redirectTo} replace />;
   }
 
