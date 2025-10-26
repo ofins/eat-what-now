@@ -1,3 +1,3 @@
 - [x] Setup CI/CD
 - [x] Implement absolute path for `types` for server and client
-- [ ] Integrate OAuth login
+- [x] Integrate OAuth login

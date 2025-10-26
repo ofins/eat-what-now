@@ -30,12 +30,12 @@
 - [ ] Cache mechanism (Redis)
 - [x] Ability to write comments for restaurants
 - [ ] Implement transaction mechanism
-- [ ] Setup OAuth Login
+- [x] Setup OAuth Login
 - [ ] Feeds should start with restaurants closest to user and expand outward with no limits
 - [ ] Combine server Zod schema with frontend
 - [ ] When inputting restaurant to DB, this should be logged so it can be used as analytics in the future
 - [ ] Encrypt payload
-- [ ] Limit google search quota per user, save in DB
+- [x] Limit google search quota per user, save in DB
 - [x] Setup SSO login with Google
 - [x] For like, favorite, comments to work, `feeds` need to be able to be tied to user so user know which restaurants he liked/disliked
 - [x] Setup API for adding restaurant through link
