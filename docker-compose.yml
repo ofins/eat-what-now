@@ -9,6 +9,6 @@ services:
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: my_database
     ports:
-      - "7001:5432"
+      - "7188:5432"
     volumes:
       - ./.docker/db/data:/var/lib/postgresql/data
