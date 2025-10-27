@@ -6,7 +6,7 @@ interface HeaderProps {
 }
 
 const Header = ({ onToggleSidebar }: HeaderProps) => {
-  const { isLoggedIn } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <header
@@ -64,7 +64,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
         </Link>
 
         {/* Right side - Search link (only when logged in) */}
-        {isLoggedIn && (
+        {isAuthenticated && (
           <div className="flex items-center">
             <Link
               to="/search"
